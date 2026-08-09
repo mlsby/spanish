@@ -32,16 +32,20 @@ export class PassView {
   private chip: HTMLElement;
 
   constructor(
-    el: HTMLElement,
+    private el: HTMLElement,
     private store: Store,
     private onDone: () => void,
-    private onStartRequest: (includeNew: boolean) => void
+    private onStartRequest: (includeNew: boolean) => void,
+    private loggedIn: () => boolean = () => true
   ) {
     el.innerHTML = `
       <div class="pass">
         <div>
           <div class="pbar"><i id="passBar"></i></div>
           <div class="pmeta">
+            <button type="button" class="passexit" id="passExit" hidden aria-label="Avsluta passet">
+              <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Avsluta
+            </button>
             <span class="pcount" id="passCount"></span>
             <span class="dirchip" id="dirChip"></span>
           </div>
@@ -62,6 +66,7 @@ export class PassView {
     this.bar = el.querySelector("#passBar")!;
     this.count = el.querySelector("#passCount")!;
     this.chip = el.querySelector("#dirChip")!;
+    el.querySelector<HTMLButtonElement>("#passExit")!.addEventListener("click", () => this.onDone());
 
     this.form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -91,6 +96,11 @@ export class PassView {
 
   get active(): boolean {
     return this.session !== null && !this.session.finished;
+  }
+
+  /** Rita om vilo-/klart-skärmen (färska siffror & inloggningsläge) — rör aldrig ett pågående pass. */
+  refreshIdle(): void {
+    if (this.state === "idle" || this.state === "done") this.render();
   }
 
   focusInput(): void {
@@ -125,6 +135,10 @@ export class PassView {
   }
 
   private onAction(act: string): void {
+    // start-/navigeringsknappar funkar utan aktiv session (vilo- och klart-lägena)
+    if (act === "startFull" || act === "gologin") { this.onStartRequest(true); return; }
+    if (act === "startRep") { this.onStartRequest(false); return; }
+    if (act === "restart") { this.onDone(); return; }
     const s = this.session;
     if (!s) return;
     if (act === "next") { this.saveMnemIfAny(); this.advance(); }
@@ -139,12 +153,6 @@ export class PassView {
       this.state = "override";
       this.render();
       this.startAuto(AUTO_MS.override);
-    } else if (act === "restart") {
-      this.onDone();
-    } else if (act === "startFull") {
-      this.onStartRequest(true);
-    } else if (act === "startRep") {
-      this.onStartRequest(false);
     }
   }
 
@@ -216,11 +224,18 @@ export class PassView {
     return `<div class="mnembox"><span class="mlabel">Din minnesregel</span><p class="mtext">${esc(m)}</p></div>`;
   }
   private alsoLine(p: Pending): string {
-    if (p.card.dir !== "es2sv") return "";
-    const uw = this.store.userWord(p.word.id);
-    const syns = [...p.word.syn, ...uw.syn];
-    if (!syns.length) return "";
-    return `<p class="also">även: <b>${syns.slice(0, 6).map(esc).join("</b> · <b>")}</b></p>`;
+    if (p.card.dir === "es2sv") {
+      const uw = this.store.userWord(p.word.id);
+      const syns = [...p.word.syn, ...uw.syn];
+      if (!syns.length) return "";
+      return `<p class="also">även: <b>${syns.slice(0, 6).map(esc).join("</b> · <b>")}</b></p>`;
+    }
+    const alts = p.word.alt ?? [];
+    if (!alts.length) return "";
+    return `<p class="also">även rätt: <b>${alts.map(esc).join("</b> · <b>")}</b></p>`;
+  }
+  private hintLine(w: { hint?: string }): string {
+    return w.hint ? `<p class="hintled">(${esc(w.hint)})</p>` : "";
   }
   private mnemForm(p: Pending, required: boolean): string {
     const pre = esc(this.store.userWord(p.word.id).mnem);
@@ -237,6 +252,14 @@ export class PassView {
   private template(): string {
     const s = this.session;
     if (this.state === "idle" || !s) {
+      if (!this.loggedIn()) {
+        return `<div class="tomt">
+          <div class="stor">Logga in först</div>
+          <p>Så att ingenting du övar går förlorat — allt sparas i molnet.</p>
+          <div class="btnrow" style="max-width:230px">
+            <button class="btn" data-act="gologin">Till inloggningen</button>
+          </div></div>`;
+      }
       const st = this.store.stats();
       const total = st.due + st.newAvailable;
       return `<div class="tomt">
@@ -261,7 +284,9 @@ export class PassView {
       const card = s.current!;
       const w = s.word(card);
       const prompt = card.dir === "es2sv" ? (w.art ? `${w.art} ${w.es}` : w.es) : w.sv;
-      return `<p class="pos">${esc(POS_LABEL[w.pos] ?? w.pos)}</p><h2 class="head">${esc(prompt)}</h2>`;
+      // ledtråden särskiljer svenska dubbletter — visas bara åt sv→es-hållet
+      const hint = card.dir === "sv2es" ? this.hintLine(w) : "";
+      return `<p class="pos">${esc(POS_LABEL[w.pos] ?? w.pos)}</p><h2 class="head">${esc(prompt)}</h2>${hint}`;
     }
     if (!p) return "";
     switch (this.state) {
@@ -269,12 +294,13 @@ export class PassView {
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--good)"></i></div>
           <p class="verdict v-good">${IC_OK}Rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.alsoLine(p)}${this.mnemBox(p.word.id)}
+          ${this.hintLine(p.word)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
           <p class="tapnote" id="tapnote">tryck för paus · Enter för nästa</p>`;
       case "hard":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
+          ${this.hintLine(p.word)}
           <div class="cmp"><span class="cl">du skrev</span><code>${esc(p.raw)}</code>
           <span class="cl">rättstavat</span><code>${esc(p.matched ?? "")}</code></div>
           ${this.mnemBox(p.word.id)}
@@ -290,7 +316,7 @@ export class PassView {
         return `<p class="verdict v-bad">${IC_X}Fel</p>
           <div class="cmp"><span class="cl">du skrev</span><code class="wrote">${esc(p.raw)}</code>
           <span class="cl">rätt svar</span><code>${esc(this.facit(p))}</code></div>
-          ${this.alsoLine(p)}
+          ${this.hintLine(p.word)}${this.alsoLine(p)}
           ${this.mnemForm(p, false)}
           <button type="button" class="linkbtn" data-act="override">Jag hade rätt — spara mitt svar som synonym</button>`;
       case "forced":
@@ -304,10 +330,17 @@ export class PassView {
     return "";
   }
 
+  /** Pågår ett pass just nu? Styr avsluta-knappen och att flikraden göms. */
+  private get live(): boolean {
+    return this.session !== null && this.state !== "idle" && this.state !== "done";
+  }
+
   render(): void {
     const s = this.session;
     this.card.className = `card st-${this.state}`;
     this.card.innerHTML = this.template();
+    this.el.querySelector<HTMLButtonElement>("#passExit")!.hidden = !this.live;
+    document.getElementById("app")?.classList.toggle("pass-live", this.live);
     if (s && this.state !== "idle") {
       const pr = s.progress();
       this.bar.style.width = pr.total ? `${(pr.done / pr.total) * 100}%` : "100%";

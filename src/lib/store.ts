@@ -85,8 +85,9 @@ export class Store {
   targets(word: Word, dir: Dir): string[] {
     const uw = this.userWord(word.id);
     if (dir === "es2sv") return [word.sv, ...word.syn, ...uw.syn];
-    // sv→es: rätt svar är det spanska ordet (med eller utan artikel — normaliseringen sköter det)
-    return [word.es, ...uw.syn];
+    // sv→es: det spanska ordet + äkta synonymer (empezar/comenzar) + egna tillägg;
+    // artiklar och accenter sköts av normaliseringen
+    return [word.es, ...(word.alt ?? []), ...uw.syn];
   }
 
   card(wordId: string, dir: Dir): CardRec | undefined {

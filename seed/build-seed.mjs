@@ -250,6 +250,20 @@ const gender = loadGender(new Set(accepted.filter((w) => w.pos === "n").map((w) 
 console.log(`  genus för ${gender.size} substantiv`);
 
 const overrides = overridesEarly;
+const disambigPath = join(ROOT, "seed", "disambig.json");
+const disambig = existsSync(disambigPath) ? JSON.parse(readFileSync(disambigPath, "utf-8")) : {};
+
+function applyOv(w, ov) {
+  if (!ov) return;
+  if (ov.sv) w.sv = ov.sv;
+  if (ov.syn) w.syn = ov.syn;
+  else if (ov.addSyn) w.syn = [...new Set([...w.syn, ...ov.addSyn])];
+  if (ov.art !== undefined) { if (ov.art) w.art = ov.art; else delete w.art; }
+  if (ov.pos) w.pos = ov.pos; // endast visning — id:t behåller ursprunglig pos
+  if (ov.hint) w.hint = ov.hint;
+  if (ov.alt) w.alt = ov.alt;
+  w.src = "manuell";
+}
 
 const words = [];
 let rank = published.size;
@@ -264,15 +278,8 @@ for (const row of accepted) {
     if (g === "f") w.art = "la";
     else if (g && /^m/.test(g)) w.art = "el";
   }
-  const ov = overrides[row.id];
-  if (ov) {
-    if (ov.sv) w.sv = ov.sv;
-    if (ov.syn) w.syn = ov.syn;
-    else if (ov.addSyn) w.syn = [...new Set([...w.syn, ...ov.addSyn])];
-    if (ov.art !== undefined) { if (ov.art) w.art = ov.art; else delete w.art; }
-    if (ov.pos) w.pos = ov.pos; // endast visning — id:t behåller ursprunglig pos
-    w.src = "manuell";
-  }
+  applyOv(w, overrides[row.id]);
+  applyOv(w, disambig[row.id]); // särskiljningar vinner över allmänna korrigeringar
   words.push(w);
 }
 

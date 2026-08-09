@@ -12,7 +12,7 @@ class MemAdapter implements StorageAdapter {
 }
 
 const WORDS: Word[] = [
-  { id: "empezar|v", rank: 1, es: "empezar", pos: "v", sv: "börja", syn: ["starta"] },
+  { id: "empezar|v", rank: 1, es: "empezar", pos: "v", sv: "börja", syn: ["starta"], alt: ["comenzar"] },
   { id: "ciudad|n", rank: 2, es: "ciudad", pos: "n", sv: "stad", syn: [], art: "la" },
   { id: "feliz|adj", rank: 3, es: "feliz", pos: "adj", sv: "lycklig", syn: [] },
 ];
@@ -74,6 +74,13 @@ describe("session: betygsmappning och tvåfelsregeln", () => {
     expect(s.answer("ciudad").grade).toBe("good");
     const s2 = new Session(store, [newCardRec("ciudad|n", "sv2es", new Date())]);
     expect(s2.answer("la ciudad").grade).toBe("good");
+  });
+
+  it("sv→es: alternativa spanska svar (alt) godkänns som synonym", () => {
+    const s = new Session(store, [newCardRec("empezar|v", "sv2es", new Date())]);
+    expect(s.answer("comenzar")).toMatchObject({ grade: "good", step: "syn" });
+    const s2 = new Session(store, [newCardRec("empezar|v", "sv2es", new Date())]);
+    expect(s2.answer("empezar").grade).toBe("good");
   });
 
   it("första felet: frivillig regel; andra felet: obligatorisk", () => {

@@ -39,11 +39,11 @@
 | 28 | si | conj | om | ifall, såvida |
 | 29 | querer | v | vilja | älska, önska |
 | 30 | sí | pron | ja ✎ | jo, sig själv |
-| 31 | como | conj | som | när, eftersom, liksom |
+| 31 | como | conj | som ✎ | när, eftersom, liksom |
 | 32 | ése | pron | den där ✎ | den |
 | 33 | bien | adv | bra | väl |
 | 34 | más | adv | mer ✎ | mest, mera, plus, till |
-| 35 | ver | v | se | skönja |
+| 35 | ver | v | se ✎ | skönja |
 | 36 | tuyo | determiner | din ✎ | ditt, dina |
 | 37 | saber | v | veta | kunna, smaka |
 | 38 | ese | determiner | den där ✎ | den, det där |
@@ -57,46 +57,46 @@
 | 46 | deber | v | måste ✎ | böra, ska, vara skyldig |
 | 47 | mucho | adv | mycket | långt, åtskilligt |
 | 48 | otro | determiner | annan | övrig |
-| 49 | así | adv | så | sådär, härmed, därigenom, sålunda |
+| 49 | así | adv | så ✎ | sådär, härmed, därigenom, sålunda |
 | 50 | ahora | adv | nu |  |
-| 51 | la vez | n | gång |  |
-| 52 | cuando | conj | när | då |
+| 51 | la vez | n | gång ✎ |  |
+| 52 | cuando | conj | när ✎ | då |
 | 53 | algo | pron | någonting |  |
-| 54 | dejar | v | lämna | låta, överge, avsätta, efterlämna |
+| 54 | dejar | v | lämna ✎ | låta, överge, avsätta, efterlämna |
 | 55 | hablar | v | prata | tala, snacka, orda |
 | 56 | bueno | interj | nåväl ✎ | tja, okej, nåja, gott |
 | 57 | pasar | v | hända ✎ | passera, tillbringa, gå förbi, räcka, gå över |
 | 58 | nada | pron | ingenting | intet |
 | 59 | cómo | adv | hur |  |
 | 60 | solo | adv | bara ✎ | endast, enbart, ensam |
-| 61 | sentir | v | känna | uppleva |
+| 61 | sentir | v | känna ✎ | uppleva |
 | 62 | pensar | v | tänka | fundera |
 | 63 | porque | conj | därför att ✎ | eftersom, för att |
 | 64 | esperar | v | vänta | hoppas, förvänta, avvakta, dröja, invänta |
-| 65 | usted | pron | ni |  |
+| 65 | usted | pron | ni ✎ |  |
 | 66 | el día | n | dag | dygn, dagtid |
 | 67 | el año | n | år | klass, årgång, årskurs, årtal |
 | 68 | el padre | n | far |  |
-| 69 | venir | v | komma |  |
+| 69 | venir | v | komma ✎ |  |
 | 70 | nuestro | determiner | vår | våran |
 | 71 | la gracias | n | tack ✎ |  |
-| 72 | la cosa | n | sak | grej, ting, föremål, objekt, pryl |
+| 72 | la cosa | n | sak ✎ | grej, ting, föremål, objekt, pryl |
 | 73 | dos | num | två | tu, tvenne |
-| 74 | sin | prep | utan |  |
+| 74 | sin | prep | utan ✎ |  |
 | 75 | sobre | prep | över | ovanför, rörande, ovanpå, ovan |
 | 76 | alguno | determiner | någon ✎ | nån, något, viss |
-| 77 | el señor | n | herr | herre, patron, husbonde |
-| 78 | mirar | v | se | titta, kolla, skåda, blicka, beskåda |
-| 79 | el hombre | n | man | människa, karl |
+| 77 | el señor | n | herr ✎ | herre, patron, husbonde |
+| 78 | mirar | v | titta ✎ | titta på, kolla, se, skåda |
+| 79 | el hombre | n | man ✎ | människa, karl |
 | 80 | el tiempo | n | tid | väder, halvlek, tempus, väderlek |
 | 81 | también | adv | också ✎ | även, med, likaså |
 | 82 | mismo | adj | själv |  |
 | 83 | necesitar | v | behöva ✎ | kräva |
 | 84 | la casa | n | hus ✎ | hem, ställe |
 | 85 | llevar | v | ta med ✎ | bära, föra, ha på sig, ta med sig |
-| 86 | tan | adv | så |  |
-| 87 | entonces | adv | då | sedan, dess |
-| 88 | encontrar | v | hitta | spåra, finna, tänka ut, återfinna, påträffa |
+| 86 | tan | adv | så ✎ |  |
+| 87 | entonces | adv | då ✎ | sedan, dess |
+| 88 | encontrar | v | hitta ✎ | spåra, finna, tänka ut, återfinna, påträffa |
 | 89 | volver | v | vända | återvända, återgå, återkomma |
 | 90 | llamar | v | kalla | ropa, anropa, tillkalla, uppkalla |
 | 91 | parecer | v | verka ✎ | tyckas, se ut, framstå |
@@ -107,11 +107,11 @@
 | 96 | hasta | prep | till | tills |
 | 97 | quién | pron | vem | vilken |
 | 98 | la vida | n | liv | livstid, levnad |
-| 99 | nunca | adv | aldrig |  |
-| 100 | tomar | v | ta | hålla, äta, plocka, inta, vidta |
+| 99 | nunca | adv | aldrig ✎ |  |
+| 100 | tomar | v | ta ✎ | hålla, äta, plocka, inta, vidta |
 | 101 | quedar | v | bli kvar ✎ | stanna, återstå, finnas kvar |
 | 102 | grande | adj | stor | hög, rejäl, rymlig, maffig |
-| 103 | llegar | v | komma | anlända, ankomma |
+| 103 | llegar | v | anlända ✎ | komma fram, ankomma, komma |
 | 104 | hola | interj | hej | hejsan, mors, tjänare |
 | 105 | el chico | n | kille | pojke, unge, grabb, gosse, prick |
 | 106 | poner | v | sätta | lägga, ställa, placera, försätta, värpa |
@@ -119,21 +119,21 @@
 | 108 | la noche | n | kväll | natt, afton |
 | 109 | mí | pron | mig ✎ |  |
 | 110 | el hijo | n | son ✎ | barn |
-| 111 | dónde | adv | var |  |
+| 111 | dónde | adv | var? ✎ | var |
 | 112 | ni | conj | varken |  |
 | 113 | salir | v | gå ut ✎ | lämna, åka iväg, komma ut, stiga ut |
-| 114 | el favor | n | tjänst | nåd, gunst, favör, ynnest |
+| 114 | el favor | n | tjänst ✎ | nåd, gunst, favör, ynnest |
 | 115 | gustar | v | gilla | tilltala, läppja |
-| 116 | seguir | v | följa | fortsätta, vidta, iaktta, gå på, fortgå |
+| 116 | seguir | v | följa ✎ | fortsätta, vidta, iaktta, gå på, fortgå |
 | 117 | el amigo | n | vän | polare, kamrat |
 | 118 | oh | interj | oj | å |
 | 119 | siempre | adv | alltid | jämt, städse |
 | 120 | el papá | n | pappa | farsa |
 | 121 | antes | adv | innan | förut, förr, snarare |
 | 122 | desde | prep | från | ur, sedan, alltsedan, alltifrån |
-| 123 | conocer | v | känna |  |
+| 123 | conocer | v | känna ✎ |  |
 | 124 | poco | adv | lite | föga |
-| 125 | ahí | adv | där | dit, däri |
+| 125 | ahí | adv | där ✎ | dit, däri |
 | 126 | alguien | pron | någon ✎ | nån |
 | 127 | el trabajo | n | jobb | arbete, syssla, möda, vedermöda |
 | 128 | la mujer | n | kvinna | fruntimmer, fruga |
@@ -145,78 +145,78 @@
 | 134 | escuchar | v | lyssna ✎ | höra, lyssna på |
 | 135 | el momento | n | ögonblick ✎ | stund, tag, tillfälle |
 | 136 | matar | v | döda | slakta, avliva, dräpa |
-| 137 | donde | pron | var | där |
+| 137 | donde | pron | där ✎ | var, dit |
 | 138 | seguro | adj | säker | viss, trygg, osviklig |
 | 139 | el mundo | n | värld | yttervärld |
-| 140 | la gente | n | folk |  |
+| 140 | la gente | n | folk ✎ |  |
 | 141 | el niño | n | barn ✎ | pojke, unge, grabb |
 | 142 | la hora | n | timme ✎ | tid, klockslag, dags |
 | 143 | buscar | v | leta | söka, uppsöka, slå upp, efterlysa |
 | 144 | el problema | n | problem | mankemang |
 | 145 | el lugar | n | plats ✎ | ställe, ort, håll |
 | 146 | nadie | pron | ingen ✎ | inte någon |
-| 147 | tal | pron | så | sån, sådan, dylik |
+| 147 | tal | pron | sådan ✎ | sån, dylik, så |
 | 148 | ayudar | v | hjälpa | bistå, hjälpa till, understödja, biträda |
 | 149 | perder | v | förlora | mista, läcka, sumpa, bli av med, förlägga |
-| 150 | ustedes | pron | ni |  |
+| 150 | ustedes | pron | ni ✎ |  |
 | 151 | la persona | n | person ✎ | människa |
 | 152 | el tipo | n | typ | stil, snubbe, mönster, prick, knutte |
-| 153 | claro | adj | klar | ljus, tydlig, redig, avgjord, överskådlig |
+| 153 | claro | adj | klar ✎ | ljus, tydlig, redig, avgjord, överskådlig |
 | 154 | entender | v | förstå | fatta, uppfatta, hänga med, utläsa |
 | 155 | menos | adv | mindre | minus |
 | 156 | fuera | adv | ute ✎ | utanför, ut, borta |
-| 157 | acabar | v | sluta | hamna |
+| 157 | acabar | v | sluta ✎ | hamna |
 | 158 | tratar | v | försöka ✎ | behandla, handla om, umgås med |
 | 159 | tres | num | tre |  |
 | 160 | último | adj | sista | definitiv, slutlig |
 | 161 | trabajar | v | jobba | arbeta, verka |
 | 162 | morir | v | dö | förgås, omkomma |
-| 163 | cada | determiner | var | varje |
+| 163 | cada | determiner | varje ✎ | var, varenda |
 | 164 | el dinero | n | pengar | penning |
 | 165 | la mañana | n | morgon | förmiddag, morgondag |
 | 166 | el hermano | n | bror | brorsa |
-| 167 | quien | pron | som |  |
+| 167 | quien | pron | som ✎ |  |
 | 168 | vivir | v | leva | bo, uppleva, uppehålla sig |
 | 169 | valer | v | vara värd ✎ | gälla, kosta, duga |
-| 170 | allí | adv | där | dit, därborta, däri |
+| 170 | allí | adv | där ✎ | dit, därborta, däri |
 | 171 | hoy | adv | i dag |  |
 | 172 | luego | adv | sedan | därefter |
 | 173 | la mano | n | hand | handtag |
-| 174 | tanto | adv | så | desto |
+| 174 | tanto | adv | så mycket ✎ | så, desto |
 | 175 | quizá | adv | kanske | möjligen, måhända, kanhända |
 | 176 | el caso | n | fall ✎ | sak, rättsfall |
 | 177 | el nombre | n | namn | förnamn |
 | 178 | entrar | v | gå in ✎ | komma in, stiga in, träda in |
-| 179 | la forma | n | sätt | form, vis, gestalt, fason |
-| 180 | empezar | v | börja | starta, ge sig till |
+| 179 | la forma | n | sätt ✎ | form, vis, gestalt, fason |
+| 180 | empezar | v | börja ✎ | starta, ge sig till |
 | 181 | conseguir | v | lyckas ✎ | skaffa, uppnå, få tag i, fixa |
 | 182 | pedir | v | be | vädja, uppmana, rekvirera, plädera, fordra |
-| 183 | intentar | v | försöka | åsyfta |
-| 184 | ninguno | determiner | ingen |  |
+| 183 | intentar | v | försöka ✎ | åsyfta |
+| 184 | ninguno | determiner | ingen ✎ |  |
 | 185 | traer | v | ta med ✎ | hämta, bära, ha med sig |
 | 186 | pequeño | adj | liten | ringa, smärre |
 | 187 | importar | v | spela roll ✎ | betyda, bry sig om, importera |
 | 188 | aún | adv | fortfarande ✎ | ännu, än |
 | 189 | la cuenta | n | konto | räkning, nota, faktura |
-| 190 | la razón | n | grund | skäl, orsak, motiv, förnuft, förstånd |
-| 191 | preguntar | v | fråga | höra efter |
-| 192 | terminar | v | sluta | hamna, slutföra, fullborda, avlöpa |
+| 190 | la razón | n | skäl ✎ | anledning, orsak, förnuft, grund |
+| 191 | preguntar | v | fråga ✎ | höra efter |
+| 192 | terminar | v | sluta ✎ | avsluta, fullborda, hamna |
 | 193 | la idea | n | idé | föreställning, åskådning |
 | 194 | único | adj | enda | unik, oefterhärmlig |
 | 195 | mal | adv | illa | dåligt |
-| 196 | suponer | v | anta | förmoda, förutsätta |
+| 196 | suponer | v | anta ✎ | förmoda, förutsätta |
 | 197 | muerto | adj | död |  |
 | 198 | durante | prep | under ✎ | i, under loppet av |
 | 199 | el pasado | n | det förflutna ✎ | förflutet, dåtid |
 | 200 | recordar | v | minnas | påminna, komma på, erinra, erinra sig |
 | 201 | la semana | n | vecka |  |
 | 202 | cierto | adj | viss | bergsäker |
-| 203 | contra | prep | mot |  |
+| 203 | contra | prep | mot ✎ |  |
 | 204 | tarde | adv | sent ✎ | för sent |
 | 205 | segundo | adj | andra | sekund, näst, tvåa |
 | 206 | cambiar | v | ändra | byta, förändra, växla, lägga om, klä om |
 | 207 | la familia | n | familj | släkt, släkte, ätt, storfamilj |
-| 208 | usar | v | använda | mäta, nyttja, begagna |
+| 208 | usar | v | använda ✎ | mäta, nyttja, begagna |
 | 209 | la policía | n | polis | konstapel |
 | 210 | comer | v | äta ✎ | spisa, käka |
 | 211 | conmigo | adv | med mig ✎ |  |
@@ -224,8 +224,8 @@
 | 213 | mientras | conj | medan |  |
 | 214 | mantener | v | försörja | upprätthålla, hävda, uppehålla, underhålla, förvara |
 | 215 | realmente | adv | verkligen | riktigt, faktiskt, verkligt |
-| 216 | serio | adj | allvarlig | nykter, seriös, solid |
-| 217 | el país | n | land | rike |
+| 216 | serio | adj | allvarlig ✎ | nykter, seriös, solid |
+| 217 | el país | n | land ✎ | rike |
 | 218 | contar | v | berätta | räkna, omtala |
 | 219 | el minuto | n | minut |  |
 | 220 | la mierda | n | skit ✎ | bajs, dynga |
@@ -257,33 +257,33 @@
 | 246 | la palabra | n | ord | glosa |
 | 247 | el ojo | n | öga |  |
 | 248 | el agua | n | vatten ✎ | läcka |
-| 249 | el medio | n | mitt | medel |
+| 249 | el medio | n | mitt ✎ | medel |
 | 250 | dentro | adv | inne | inomhus, innanför |
 | 251 | abrir | v | öppna | spränga, bana, spärra, slå upp, spreta |
-| 252 | jugar | v | spela | leka, lira |
+| 252 | jugar | v | spela ✎ | leka, lira |
 | 253 | llamado | adj | kallad ✎ | så kallad, vid namn |
 | 254 | el loco | n | galning | vettvilling, blådåre |
-| 255 | ocurrir | v | hända | ske, råka, inträffa, förekomma, bli av |
+| 255 | ocurrir | v | hända ✎ | ske, inträffa, förekomma |
 | 256 | alto | adj | hög | reslig |
 | 257 | aquel | determiner | den där ✎ | den där borta, den |
-| 258 | el fin | n | slut | ände, ändamål |
+| 258 | el fin | n | slut ✎ | ände, ändamål |
 | 259 | pagar | v | betala | återgälda, lägga ut, återbetala, likvidera, erlägga |
 | 260 | el camino | n | väg ✎ | stig, färdväg |
-| 261 | el esposo | n | man | make |
-| 262 | permitir | v | låta | tillåta, medge, unna |
-| 263 | recibir | v | få | ta upp, ta emot, motta, erhålla |
-| 264 | la pregunta | n | fråga |  |
+| 261 | el esposo | n | make ✎ | man, äkta man |
+| 262 | permitir | v | låta ✎ | tillåta, medge, unna |
+| 263 | recibir | v | få ✎ | ta emot, motta, erhålla |
+| 264 | la pregunta | n | fråga ✎ |  |
 | 265 | leer | v | läsa | avläsa |
 | 266 | significar | v | betyda | mena, innebära, tyda på, beteckna |
-| 267 | suceder | v | hända | inträffa, avlösa, efterträda, inträda, försiggå |
+| 267 | suceder | v | hända ✎ | inträffa, ske, efterträda |
 | 268 | la muerte | n | död | kål |
 | 269 | el millón | n | miljon |  |
-| 270 | general | adj | allmän | övergripande, generell, gemen |
+| 270 | general | adj | allmän ✎ | övergripande, generell, gemen |
 | 271 | dormir | v | sova | söva, sussa |
 | 272 | la realidad | n | verklighet | realitet |
 | 273 | caer | v | falla | ramla, trilla |
 | 274 | rápido | adj | snabb ✎ | kvick, rask, fort |
-| 275 | enviar | v | skicka | sända, lägga in |
+| 275 | enviar | v | skicka ✎ | sända, lägga in |
 | 276 | acercar | v | närma sig ✎ | föra närmare, flytta närmare |
 | 277 | el equipo | n | lag ✎ | team, utrustning |
 | 278 | cuál | pron | vilken |  |
@@ -294,13 +294,13 @@
 | 283 | mover | v | flytta | röra, övertala, maka, vifta, rubba |
 | 284 | comprar | v | köpa | handla |
 | 285 | el supuesto | n | antagande ✎ | förutsättning |
-| 286 | bajo | prep | under | nedanför |
+| 286 | bajo | prep | under ✎ | nedanför |
 | 287 | el gobierno | n | regering | stat, regim |
-| 288 | comenzar | v | börja | påbörja, inleda |
+| 288 | comenzar | v | börja ✎ | påbörja, inleda |
 | 289 | buenas | interj | hejsan ✎ | goddag, hej |
 | 290 | joven | adj | ung |  |
 | 291 | el viejo | n | gubbe |  |
-| 292 | la tierra | n | land | mark, jord |
+| 292 | la tierra | n | jord ✎ | mark, land, mylla |
 | 293 | el número | n | nummer | tal, punkt, antal, siffra |
 | 294 | cuatro | num | fyra |  |
 | 295 | feliz | adj | lycklig | lyckad, salig, säll |
@@ -313,23 +313,23 @@
 | 302 | posible | adj | möjlig | eventuell |
 | 303 | echar | v | kasta ✎ | slänga, hälla, köra ut, sparka ut |
 | 304 | la clase | n | klass ✎ | sort, slag, lektion, klassrum |
-| 305 | cual | pron | som |  |
+| 305 | cual | pron | som ✎ |  |
 | 306 | el arma | n | vapen ✎ | tillhygge |
 | 307 | cinco | num | fem |  |
 | 308 | pronto | adv | snart |  |
 | 309 | convertir | v | omvandla |  |
-| 310 | difícil | adj | svår | knepig, knivig, prövande, kämpig, hårdsmält |
+| 310 | difícil | adj | svår ✎ | knepig, knivig, prövande, kämpig, hårdsmält |
 | 311 | la cara | n | ansikte ✎ | min, uppsyn, sida |
-| 312 | sino | conj | utan |  |
+| 312 | sino | conj | utan ✎ |  |
 | 313 | genial | adj | genial |  |
 | 314 | tocar | v | röra ✎ | röra vid, spela, knacka, ta på |
 | 315 | largo | adj | lång | långvarig, långdragen, hellång |
 | 316 | el juego | n | spel | match, lek, parti, omgång, game |
 | 317 | escribir | v | skriva | stava, författa |
-| 318 | meter | v | stoppa | lägga, sticka |
+| 318 | meter | v | stoppa in ✎ | lägga, sticka, stoppa |
 | 319 | igual | adj | likadan ✎ | lika, samma, jämlik |
 | 320 | incluso | adv | till och med ✎ | även, rentav |
-| 321 | el doctor | n | läkare | doktor |
+| 321 | el doctor | n | läkare ✎ | doktor |
 | 322 | el corazón | n | hjärta | skrott |
 | 323 | detener | v | stoppa ✎ | gripa, hejda, anhålla |
 | 324 | el adiós | n | adjö | farväl |
@@ -347,15 +347,15 @@
 | 336 | justo | adj | rättvis ✎ | rätt, precis, just |
 | 337 | el miedo | n | rädsla | fruktan, ängslan |
 | 338 | el modo | n | form | vis, maner |
-| 339 | la relación | n | förhållande | relation, koppling, samband, förbindelse, referat |
+| 339 | la relación | n | förhållande ✎ | relation, koppling, samband, förbindelse, referat |
 | 340 | el cambio | n | förändring | byte, växel, ändring, omslag, ombyte |
-| 341 | público | adj | allmän | offentlig, social, samhällelig |
-| 342 | el derecho | n | rätt | juridik, rättighet, rättsvetenskap, fordring |
+| 341 | público | adj | offentlig ✎ | allmän, publik |
+| 342 | el derecho | n | rättighet ✎ | rätt, juridik |
 | 343 | presentar | v | presentera ✎ | föreställa, introducera, visa upp |
 | 344 | cerca | adv | nära ✎ | i närheten, intill |
 | 345 | suficiente | adj | tillräcklig | uttömmande |
-| 346 | la prueba | n | försök | bevis, prov, smakprov, belägg, korrektur |
-| 347 | próximo | adj | nästa | snar, annalkande |
+| 346 | la prueba | n | prov ✎ | bevis, test, försök, belägg |
+| 347 | próximo | adj | nästa ✎ | snar, annalkande |
 | 348 | fuerte | adj | stark | frisk, kraftig, grov, stöddig, strong |
 | 349 | existir | v | existera | förekomma |
 | 350 | el sentido | n | mening ✎ | sinne, betydelse, riktning, håll |
@@ -363,8 +363,8 @@
 | 352 | el perro | n | hund |  |
 | 353 | humano | adj | mänsklig | human, medmänsklig |
 | 354 | la vuelta | n | runda ✎ | vända, varv, återkomst, växel |
-| 355 | listo | adj | redo | klar, smart, färdig, skärpt, klipsk |
-| 356 | mostrar | v | visa | påvisa, belysa, uppvisa |
+| 355 | listo | adj | redo ✎ | klar, smart, färdig, skärpt, klipsk |
+| 356 | mostrar | v | visa ✎ | påvisa, belysa, uppvisa |
 | 357 | subir | v | gå upp ✎ | stiga, höja, klättra, åka upp |
 | 358 | el coche | n | bil ✎ | vagn |
 | 359 | servir | v | servera ✎ | tjäna, duga, vara till nytta |
@@ -373,7 +373,7 @@
 | 362 | blanco | adj | vit |  |
 | 363 | la fuerza | n | kraft | styrka, effekt |
 | 364 | el sistema | n | system ✎ | metod |
-| 365 | explicar | v | förklara |  |
+| 365 | explicar | v | förklara ✎ |  |
 | 366 | bastante | adv | ganska ✎ | tillräckligt, rätt, nog |
 | 367 | levantar | v | lyfta ✎ | resa, höja, resa sig |
 | 368 | adelante | adv | framåt | framlänges |
@@ -383,18 +383,18 @@
 | 372 | asegurar | v | säkra | försäkra, trygga, säkerställa, assurera |
 | 373 | aceptar | v | acceptera | godta, gå med, finna sig, förlika sig |
 | 374 | quitar | v | ta bort ✎ | ta av, avlägsna, ta ifrån |
-| 375 | el plan | n | plan | uppslag |
+| 375 | el plan | n | plan ✎ | uppslag |
 | 376 | la calle | n | gata ✎ | väg |
-| 377 | el pueblo | n | folk | by, samhälle |
+| 377 | el pueblo | n | by ✎ | folk, folket, samhälle, småstad |
 | 378 | el cuidado | n | försiktighet ✎ | omsorg, vård, akta dig |
 | 379 | negro | adj | svart |  |
-| 380 | allá | adv | där | över, dit, därborta |
+| 380 | allá | adv | där ✎ | dit, därborta |
 | 381 | el partido | n | match | parti |
-| 382 | diferente | adj | annorlunda | skild, olik, skiljaktig |
+| 382 | diferente | adj | annorlunda ✎ | skild, olik, skiljaktig |
 | 383 | ante | prep | inför ✎ | framför, gentemot |
 | 384 | la fiesta | n | fest | party, skiva, kalas, högtid, partaj |
-| 385 | amar | v | älska | hålla av |
-| 386 | coger | v | ta | hålla, hämta, plocka, åka på, snappa |
+| 385 | amar | v | älska ✎ | hålla av |
+| 386 | coger | v | ta ✎ | hålla, hämta, plocka, åka på, snappa |
 | 387 | disparar | v | skjuta | avfyra, lossa, utlösa, avlossa, beskjuta |
 | 388 | disculpar | v | ursäkta ✎ | förlåta, be om ursäkt |
 | 389 | el pie | n | fot | stativ |
@@ -402,12 +402,12 @@
 | 391 | la frente | n | panna | front, tät, framsida, förgrund |
 | 392 | la escuela | n | skola | strömning |
 | 393 | la sangre | n | blod |  |
-| 394 | la oportunidad | n | chans | tillfälle |
+| 394 | la oportunidad | n | chans ✎ | tillfälle |
 | 395 | el muchacho | n | pojke ✎ | kille, grabb, yngling |
 | 396 | real | adj | riktig | verklig, kunglig, faktisk, reell, formlig |
-| 397 | la situación | n | förhållande | situation, läge, belägenhet |
+| 397 | la situación | n | situation ✎ | läge, förhållande, belägenhet |
 | 398 | la política | n | politik | policy |
-| 399 | la ley | n | lag |  |
+| 399 | la ley | n | lag ✎ |  |
 | 400 | vender | v | sälja | kränga, saluföra |
 | 401 | el teléfono | n | telefon |  |
 | 402 | el malo | n | skurk ✎ | bov, den onde |
@@ -415,48 +415,48 @@
 | 404 | perdonar | v | förlåta |  |
 | 405 | arriba | adv | uppe | ovan |
 | 406 | aparecer | v | dyka upp ✎ | synas, framträda, uppträda |
-| 407 | el servicio | n | tjänst | service, tjänstgöring, ämbete, serve, servis |
+| 407 | el servicio | n | tjänst ✎ | service, tjänstgöring, ämbete, serve, servis |
 | 408 | el novio | n | pojkvän | fästman, brudgum |
 | 409 | tampoco | adv | inte heller ✎ |  |
 | 410 | especial | adj | speciell | särskild |
 | 411 | casar | v | gifta sig ✎ | viga, gifta bort |
-| 412 | el puesto | n | plats | post, stånd |
+| 412 | el puesto | n | post ✎ | plats, stånd, befattning |
 | 413 | el dólar | n | dollar |  |
-| 414 | cuándo | adv | när |  |
+| 414 | cuándo | adv | när? ✎ | när |
 | 415 | duro | adj | hård | jobbig, seg, hårdhänt, styv, hårdkokt |
 | 416 | nacional | adj | nationell | inhemsk |
-| 417 | el recuerdo | n | minne | hågkomst, souvenir, suvenir |
-| 418 | lograr | v | lyckas | åstadkomma, driva igenom, genomdriva |
+| 417 | el recuerdo | n | minne ✎ | hågkomst, souvenir, suvenir |
+| 418 | lograr | v | lyckas ✎ | åstadkomma, driva igenom, genomdriva |
 | 419 | robar | v | sno | plundra, röva, snatta, snuva, palla |
 | 420 | la seguridad | n | säkerhet | trygghet |
 | 421 | prometer | v | lova | försäkra, utlova |
 | 422 | enseñar | v | lära ut ✎ | visa, undervisa, lära |
 | 423 | la obra | n | verk | skapelse, skrift, bygge |
 | 424 | descubrir | v | upptäcka | förråda, yppa, luska ut, uppdaga |
-| 425 | andar | v | gå | stiga, vandra, träda, knalla |
+| 425 | andar | v | gå ✎ | gå omkring, vandra, funka |
 | 426 | fácil | adj | lätt | lättvindig |
 | 427 | la película | n | film | hinna |
 | 428 | cuanto | adv | så mycket som ✎ | allt vad |
 | 429 | la lista | n | lista | register, längd, förteckning |
-| 430 | tras | prep | bakom |  |
+| 430 | tras | prep | bakom ✎ |  |
 | 431 | ambos | pron | båda | bägge, bådadera |
 | 432 | español | adj | spansk |  |
-| 433 | sonar | v | låta | ringa, klinga, pingla, ljuda, ticka |
+| 433 | sonar | v | låta ✎ | ringa, klinga, pingla, ljuda, ticka |
 | 434 | referir | v | hänvisa ✎ | syfta på, referera, berätta |
 | 435 | el vino | n | vin |  |
-| 436 | el centro | n | mitt | centrum, center, medelpunkt, härd |
-| 437 | el asunto | n | sak | fråga, affär, ting, ämne, ärende |
+| 436 | el centro | n | centrum ✎ | mitt, center, medelpunkt |
+| 437 | el asunto | n | ärende ✎ | sak, fråga, angelägenhet |
 | 438 | encantar | v | älska ✎ | förtjusa, tjusa, hänföra |
 | 439 | el embargo | n | embargo |  |
 | 440 | imaginar | v | föreställa sig ✎ | inbilla sig, tänka sig, ana |
 | 441 | la información | n | information | uppgift, upplysning, underrättelse |
-| 442 | la habitación | n | rum | kvart |
+| 442 | la habitación | n | rum ✎ | kvart |
 | 443 | aprender | v | lära sig ✎ | plugga in |
 | 444 | la falta | n | brist ✎ | fel, frånvaro, förseelse |
 | 445 | el cielo | n | himmel | sky |
 | 446 | seis | num | sex |  |
 | 447 | realizar | v | förverkliga ✎ | genomföra, utföra, realisera |
-| 448 | el negocio | n | affär | business, geschäft |
+| 448 | el negocio | n | affär ✎ | business, geschäft |
 | 449 | el sueño | n | dröm | sömn, önskedröm |
 | 450 | atrás | adv | tillbaka | tillbaks, back |
 | 451 | social | adj | social | samhällelig |
@@ -467,7 +467,7 @@
 | 456 | la voz | n | röst | stämma, läte, uppslagsord |
 | 457 | la foto | n | foto ✎ | bild, kort, fotografi |
 | 458 | abajo | adv | nere | ned, utför, nedåt, nedan, underst |
-| 459 | el par | n | par | like |
+| 459 | el par | n | par ✎ | like |
 | 460 | la paz | n | fred | frid |
 | 461 | confiar | v | anförtro | förlita sig på |
 | 462 | la culpa | n | skuld ✎ | fel |
@@ -480,15 +480,15 @@
 | 469 | la música | n | musik |  |
 | 470 | el diablo | n | djävul |  |
 | 471 | el resto | n | rest | återstod |
-| 472 | siguiente | adj | nästa | följande, efterföljande |
+| 472 | siguiente | adj | nästa ✎ | följande, efterföljande |
 | 473 | cuidar | v | ta hand om ✎ | sköta, vårda, passa, akta |
-| 474 | el médico | n | läkare | medicinare |
+| 474 | el médico | n | läkare ✎ | medicinare |
 | 475 | la carta | n | brev | meny, matsedel |
 | 476 | preparar | v | förbereda ✎ | laga, göra i ordning, tillaga |
 | 477 | el don | n | herr ✎ | gåva, talang |
 | 478 | correcto | adj | rätt | riktig, korrekt, vårdad |
 | 479 | el programa | n | program | schema, policy |
-| 480 | el sitio | n | plats | plätt |
+| 480 | el sitio | n | plats ✎ | ställe, plätt |
 | 481 | el campo | n | fält ✎ | land, landsbygd, plan, åker |
 | 482 | elegir | v | välja | kora |
 | 483 | exactamente | adv | precis | just, exakt, blankt |
@@ -500,19 +500,19 @@
 | 489 | invitar | v | bjuda | uppmana, inbjuda |
 | 490 | bonito | adj | fin | söt, grann, nätt, näpen |
 | 491 | peor | adj | värre |  |
-| 492 | obtener | v | få | skaffa, lösa, inhämta, utverka |
+| 492 | obtener | v | erhålla ✎ | få, skaffa, utverka |
 | 493 | molestar | v | störa ✎ | besvära, irritera, reta |
 | 494 | lejos | adv | långt | fjärran |
 | 495 | necesario | adj | nödvändig | nödig, erforderlig |
 | 496 | la cama | n | säng | bädd |
-| 497 | utilizar | v | använda | utnyttja, nyttja |
+| 497 | utilizar | v | använda ✎ | utnyttja, nyttja |
 | 498 | varios | determiner | flera |  |
 | 499 | el abuelo | n | farfar | morfar |
-| 500 | parar | v | sluta | stanna, hålla, stoppa, bli av, lägga ner |
+| 500 | parar | v | stanna ✎ | stoppa, sluta, hålla |
 | 501 | el viaje | n | resa ✎ | färd, tripp |
 | 502 | el demonio | n | demon |  |
 | 503 | perfecto | adj | perfekt | fulländad, fullkomlig |
-| 504 | raro | adj | konstig | rar, märklig, udda, sällsynt, ovanlig |
+| 504 | raro | adj | konstig ✎ | rar, märklig, udda, sällsynt, ovanlig |
 | 505 | tirar | v | kasta ✎ | slänga, dra, skjuta |
 | 506 | despertar | v | vakna | väcka |
 | 507 | resultar | v | visa sig ✎ | resultera, bli, utfalla |
@@ -521,7 +521,7 @@
 | 510 | la oficina | n | kontor | byrå, expedition |
 | 511 | continuar | v | fortsätta | kvarstå |
 | 512 | responder | v | svara ✎ | besvara, ansvara, reagera |
-| 513 | la acción | n | handling | gärning, action, inverkan, aktion, ingripande |
+| 513 | la acción | n | handling ✎ | gärning, action, inverkan, aktion, ingripande |
 | 514 | la línea | n | linje ✎ | rad, lina |
 | 515 | el agente | n | agent | mäklare |
 | 516 | personal | adj | personlig |  |
@@ -535,21 +535,21 @@
 | 524 | diez | num | tio |  |
 | 525 | el director | n | direktör ✎ | regissör, rektor, dirigent, chef |
 | 526 | el través | n | genom ✎ | tvärs, via |
-| 527 | producir | v | skapa | producera, framkalla, framställa, frambringa |
+| 527 | producir | v | producera ✎ | framställa, skapa, framkalla |
 | 528 | el ejemplo | n | exempel | mönster, belägg, föredöme, rättesnöre |
-| 529 | el amo | n | herre | husse |
+| 529 | el amo | n | herre ✎ | husse |
 | 530 | el rey | n | kung | konung |
 | 531 | el cuarto | n | rum ✎ | kvart, fjärdedel |
-| 532 | idiota | adj | idiotisk |  |
+| 532 | idiota | adj | idiotisk ✎ |  |
 | 533 | verdadero | adj | sann | verklig, sanningsenlig, veritabel, reell, sannskyldig |
 | 534 | pesar | v | väga |  |
-| 535 | probar | v | bevisa | prova, testa, smaka, chansa, läppja |
+| 535 | probar | v | bevisa ✎ | prova, testa, smaka |
 | 536 | bastar | v | räcka | förslå |
 | 537 | la decisión | n | avgörande | utslag |
 | 538 | demás | pron | övrig |  |
 | 539 | el control | n | kontroll | koll, styr, herravälde, reglage |
 | 540 | el hospital | n | sjukhus | lasarett |
-| 541 | el marido | n | man | make |
+| 541 | el marido | n | make ✎ | man, äkta man |
 | 542 | el fuego | n | eld | fyr, brasa |
 | 543 | el tema | n | ämne ✎ | tema, fråga, motiv |
 | 544 | la respuesta | n | svar | besked, respons, gensvar |
@@ -561,11 +561,11 @@
 | 550 | el resultado | n | resultat | prestation, konsekvens, utfall |
 | 551 | el error | n | fel ✎ | misstag, miss, blunder |
 | 552 | el futuro | n | framtid | futurum |
-| 553 | lleno | adj | full | fylld, mätt |
+| 553 | lleno | adj | full ✎ | fylld, mätt |
 | 554 | maldito | adj | förbannad | sabla |
 | 555 | el compañero | n | kamrat ✎ | kollega, partner, följeslagare |
 | 556 | soler | v | bruka |  |
-| 557 | reconocer | v | erkänna | medge, känna igen, tillstå, skönja, tillerkänna |
+| 557 | reconocer | v | erkänna ✎ | medge, känna igen, tillstå, skönja, tillerkänna |
 | 558 | pobre | adj | stackars | arm, fattig, klen, torftig, påver |
 | 559 | la atención | n | uppmärksamhet | akt, lystring, hänsyn, omsorg, omvårdnad |
 | 560 | la zona | n | område | zon |
@@ -580,13 +580,13 @@
 | 569 | partir | v | dela ✎ | skära, knäcka, utgå, bryta upp, klyva, åka iväg, ge sig av |
 | 570 | temer | v | frukta | fasa, gruva sig, skygga, befara |
 | 571 | alegrar | v | glädja ✎ | muntra upp, pigga upp |
-| 572 | estúpido | adj | idiotisk | klantig, stupid |
+| 572 | estúpido | adj | idiotisk ✎ | dum, korkad, stupid |
 | 573 | el fondo | n | botten | bakgrund, fond |
 | 574 | llorar | v | gråta | skrika, lipa |
 | 575 | el señorito | n | ung herre ✎ | snobb, överklasspojke |
 | 576 | lindo | adj | gullig | näpen |
-| 577 | la compañía | n | sällskap | bolag, kompani, följeslagare, följe, ensemble |
-| 578 | actuar | v | spela | handla, agera, uppträda, medverka, framträda |
+| 577 | la compañía | n | sällskap ✎ | bolag, kompani, följeslagare, följe, ensemble |
+| 578 | actuar | v | agera ✎ | spela teater, handla, uppträda, spela |
 | 579 | el proceso | n | process ✎ | rättegång, förlopp, mål |
 | 580 | la investigación | n | utredning | forskning, efterforskning |
 | 581 | tonto | adj | dum ✎ | fånig, korkad, tokig |
@@ -597,8 +597,8 @@
 | 586 | el estado | n | tillstånd ✎ | stat, skick, läge, delstat |
 | 587 | la ropa | n | kläder | beklädnad |
 | 588 | el valor | n | mod | värde, kurage, valör |
-| 589 | el profesor | n | lärare | professor, magister |
-| 590 | la reunión | n | möte | samling, församling, tillställning, sammankomst, sammanträde |
+| 589 | el profesor | n | lärare ✎ | professor, magister |
+| 590 | la reunión | n | möte ✎ | samling, församling, tillställning, sammankomst, sammanträde |
 | 591 | la boca | n | mun | öppning, gap, mynning |
 | 592 | la cámara | n | kamera |  |
 | 593 | conocido | adj | känd | bekant, välkänd, välbekant, omvittnad |
@@ -606,37 +606,37 @@
 | 595 | encima | adv | ovanpå ✎ | över, dessutom, ovan |
 | 596 | la imagen | n | bild | image, avbild |
 | 597 | abierto | adj | öppen | rättfram, käck |
-| 598 | el cargo | n | tjänst | post, befattning |
-| 599 | el caballero | n | herre | riddare, gentleman |
+| 598 | el cargo | n | befattning ✎ | post, tjänst, ansvar, åtal |
+| 599 | el caballero | n | herre ✎ | riddare, gentleman |
 | 600 | cantar | v | sjunga ✎ | gala, besjunga |
-| 601 | la posibilidad | n | chans | möjlighet |
-| 602 | detrás | adv | bakom | bak |
-| 603 | proteger | v | skydda | beskydda, värna, gardera, omhulda, fridlysa |
+| 601 | la posibilidad | n | möjlighet ✎ | chans |
+| 602 | detrás | adv | bakom ✎ | bak |
+| 603 | proteger | v | skydda ✎ | beskydda, värna, gardera, omhulda, fridlysa |
 | 604 | la universidad | n | universitet ✎ | högskola |
 | 605 | sufrir | v | lida ✎ | genomgå, utstå, tåla |
 | 606 | golpear | v | slå ✎ | slå till, banka, stöta |
-| 607 | abandonar | v | lämna | överge, negligera, skrinlägga |
+| 607 | abandonar | v | överge ✎ | lämna, svika |
 | 608 | el consejo | n | råd |  |
 | 609 | el asesino | n | mördare | baneman |
 | 610 | cuyo | determiner | vars |  |
 | 611 | vuestro | determiner | er |  |
-| 612 | caminar | v | gå | stiga, träda, knalla, spankulera |
+| 612 | caminar | v | promenera ✎ | gå, gå till fots, vandra |
 | 613 | el daño | n | skada |  |
-| 614 | la sociedad | n | sällskap | samhälle |
-| 615 | la base | n | grund | bas, stötta, underlag, basis, grundval |
-| 616 | el proyecto | n | plan | projekt |
+| 614 | la sociedad | n | samhälle ✎ | sällskap, förening, bolag |
+| 615 | la base | n | grund ✎ | bas, stötta, underlag, basis, grundval |
+| 616 | el proyecto | n | projekt ✎ | plan, utkast |
 | 617 | anoche | adv | i går kväll ✎ | i natt, igår kväll |
 | 618 | la mesa | n | bord |  |
 | 619 | el paciente | n | patient |  |
 | 620 | tercero | adj | tredje | tredje man |
-| 621 | crear | v | skapa | ställa till, nydana |
+| 621 | crear | v | skapa ✎ | ställa till, nydana |
 | 622 | dirigir | v | leda | rikta, regissera, dirigera, anföra, orientera |
 | 623 | capaz | adj | kapabel |  |
 | 624 | el movimiento | n | rörelse |  |
 | 625 | increíble | adj | otrolig | oerhörd |
-| 626 | divertido | adj | rolig | skoj, underhållande, skojig |
+| 626 | divertido | adj | rolig ✎ | skoj, underhållande, skojig |
 | 627 | principal | adj | huvudsaklig ✎ | främst, viktigast, huvud- |
-| 628 | el maestro | n | lärare | mästare, magister |
+| 628 | el maestro | n | lärare ✎ | mästare, magister |
 | 629 | recoger | v | hämta ✎ | plocka upp, samla in, ta upp, städa |
 | 630 | la carrera | n | karriär ✎ | lopp, kapplöpning, bana, studier |
 | 631 | el caballo | n | häst |  |
@@ -650,7 +650,7 @@
 | 639 | político | adj | politisk |  |
 | 640 | la mayoría | n | majoritet ✎ | flertal, merpart |
 | 641 | el miembro | n | medlem | lem, ledamot |
-| 642 | la condición | n | tillstånd | lag, förhållande, villkor, status, stånd |
+| 642 | la condición | n | villkor ✎ | tillstånd, skick, status |
 | 643 | el efecto | n | effekt | verkan, inverkan, verkställighet, verkning |
 | 644 | económico | adj | ekonomisk | sparsam |
 | 645 | volar | v | flyga | spränga |
@@ -667,7 +667,7 @@
 | 656 | el animal | n | djur | kreatur |
 | 657 | destruir | v | förstöra ✎ | förinta, rasera, sabba, krossa |
 | 658 | el sol | n | sol ✎ | sol |
-| 659 | entregar | v | lämna | överlämna, leverera, lägga in |
+| 659 | entregar | v | överlämna ✎ | lämna, lämna in, leverera |
 | 660 | el color | n | färg |  |
 | 661 | la caja | n | låda | paket, kista, back, lår, kassa |
 | 662 | el cliente | n | klient | kund, huvudman |
@@ -676,12 +676,12 @@
 | 665 | el deseo | n | önskan | önskemål, åtrå |
 | 666 | el arte | n | konst |  |
 | 667 | rojo | adj | röd |  |
-| 668 | acompañar | v | följa | foga, ledsaga, ackompanjera, åtfölja, beledsaga |
+| 668 | acompañar | v | följa med ✎ | göra sällskap, ledsaga, följa |
 | 669 | la causa | n | orsak ✎ | sak, mål, skäl, anledning |
 | 670 | la cita | n | träff ✎ | möte, citat, tid |
-| 671 | el trato | n | kontakt | umgänge, samröre, ackord, samvaro, tilltal |
+| 671 | el trato | n | umgänge ✎ | kontakt, avtal, behandling |
 | 672 | demostrar | v | bevisa ✎ | visa, demonstrera, påvisa |
-| 673 | jamás | adv | aldrig |  |
+| 673 | jamás | adv | aldrig ✎ |  |
 | 674 | recuperar | v | återfå ✎ | återhämta sig, återvinna, repa sig |
 | 675 | merecer | v | förtjäna ✎ | vara värd |
 | 676 | el hotel | n | hotell |  |
@@ -692,7 +692,7 @@
 | 681 | incluir | v | inkludera | räkna in, innefatta, inbegripa |
 | 682 | el dolor | n | smärta | sorg, lidande, värk |
 | 683 | la mitad | n | hälft |  |
-| 684 | el gusto | n | nöje | lust, smak, tycke, välbehag, förtjusning |
+| 684 | el gusto | n | nöje ✎ | lust, smak, tycke, välbehag, förtjusning |
 | 685 | la canción | n | låt | visa, sång, trall |
 | 686 | alrededor | adv | runt ✎ | omkring, runtom |
 | 687 | militar | adj | militär |  |
@@ -709,19 +709,19 @@
 | 698 | cortar | v | skära ✎ | klippa, kapa, hugga, skära av |
 | 699 | la posición | n | position | läge, ställning, hållning, placering |
 | 700 | la medida | n | mått | mån, åtgärd, utsträckning |
-| 701 | la especie | n | slag | art, sort, släkte |
+| 701 | la especie | n | art ✎ | sort, slag, släkte |
 | 702 | siete | num | sju |  |
 | 703 | la diferencia | n | skillnad | åtskillnad, olikhet, differens, mellanhavande, mellanskillnad |
 | 704 | formar | v | bilda ✎ | forma, utbilda, skapa |
 | 705 | el precio | n | pris |  |
 | 706 | maravilloso | adj | underbar | härlig, häpnadsväckande, ljuvlig |
 | 707 | el pelo | n | hår | ragg |
-| 708 | luchar | v | slåss | kämpa, brottas |
-| 709 | la opinión | n | mening | åsikt, omdöme, uppfattning, tycke, opinion |
+| 708 | luchar | v | slåss ✎ | kämpa, brottas |
+| 709 | la opinión | n | åsikt ✎ | mening, uppfattning, omdöme |
 | 710 | estudiar | v | studera ✎ | läsa, plugga |
 | 711 | resolver | v | lösa | avgöra, besluta |
 | 712 | el mercado | n | marknad | torg, avsättning |
-| 713 | la elección | n | val |  |
+| 713 | la elección | n | val ✎ |  |
 | 714 | el interior | n | inre | interiör, inner, innandöme, inland |
 | 715 | el silencio | n | tystnad |  |
 | 716 | la necesidad | n | behov | nöd |
@@ -737,7 +737,7 @@
 | 726 | el mar | n | hav | sjö |
 | 727 | el ataque | n | anfall | attack, angrepp, överfall, utfall |
 | 728 | imposible | adj | omöjlig |  |
-| 729 | el contacto | n | kontakt | beröring, samröre, kontaktperson |
+| 729 | el contacto | n | kontakt ✎ | beröring, samröre, kontaktperson |
 | 730 | privado | adj | privat | sluten, enskild |
 | 731 | el alma | n | själ ✎ | eldsjäl, kynne |
 | 732 | común | adj | vanlig | gemensam, ordinär, inbördes, gängse, gemen |
@@ -748,16 +748,16 @@
 | 737 | observar | v | observera ✎ | iaktta, betrakta, märka, följa |
 | 738 | el juez | n | domare | lagman |
 | 739 | atacar | v | attackera | anfalla, angripa, slå till, överfalla, ge sig på |
-| 740 | preparado | adj | klar |  |
+| 740 | preparado | adj | redo ✎ | förberedd, klar, beredd |
 | 741 | el río | n | flod | älv |
-| 742 | la tienda | n | affär | butik, handel |
+| 742 | la tienda | n | butik ✎ | affär, handel |
 | 743 | señalar | v | peka på ✎ | påpeka, markera, signalera, nämna |
 | 744 | negar | v | förneka | neka, vägra, bestrida, förvägra |
 | 745 | el avión | n | flygplan ✎ | plan |
 | 746 | el dulce | n | godis ✎ | sötsak, godsak |
-| 747 | marchar | v | gå | marschera, tåga, ge sig av |
+| 747 | marchar | v | marschera ✎ | tåga, ge sig av, gå |
 | 748 | la operación | n | operation | skötsel |
-| 749 | el encuentro | n | möte | sammanträffande, sammankomst |
+| 749 | el encuentro | n | möte ✎ | sammanträffande, sammankomst |
 | 750 | la fuente | n | källa | ursprung, brunn, fontän, sagesman, springbrunn |
 | 751 | el informe | n | rapport | redogörelse, redovisning, referat, betänkande |
 | 752 | la izquierda | n | vänster ✎ | vänstersida |
@@ -771,13 +771,13 @@
 | 760 | la señal | n | tecken | signal, märke, vink, handpenning, indikation |
 | 761 | anterior | adj | förra | främre, föregående, förutvarande |
 | 762 | costar | v | kosta | gå på, rendera, betinga |
-| 763 | la muestra | n | prov | preparat, betygelse |
+| 763 | la muestra | n | prov ✎ | preparat, betygelse |
 | 764 | la nota | n | anteckning ✎ | not, betyg, ton, nota |
 | 765 | la derecha | n | höger |  |
 | 766 | la escena | n | scen | uppträde |
 | 767 | soltar | v | släppa | lossa, utlösa |
 | 768 | interesante | adj | intressant |  |
-| 769 | vosotros | pron | ni |  |
+| 769 | vosotros | pron | ni ✎ |  |
 | 770 | menor | adj | minderårig | smärre |
 | 771 | el metro | n | meter | tunnelbana |
 | 772 | la entrada | n | ingång ✎ | entré, biljett, inträde, hall |
@@ -786,8 +786,8 @@
 | 775 | la enfermedad | n | sjukdom ✎ | sjuka, åkomma |
 | 776 | el traje | n | kostym |  |
 | 777 | gritar | v | skrika | ropa, gapa, hojta, tjuta, utropa |
-| 778 | totalmente | adv | helt | fullständigt |
-| 779 | contestar | v | svara | besvara |
+| 778 | totalmente | adv | helt ✎ | fullständigt |
+| 779 | contestar | v | svara ✎ | besvara |
 | 780 | peligroso | adj | farlig | allmänfarlig, vådlig |
 | 781 | salvo | adj | utom ✎ | förutom, med undantag av, oskadd |
 | 782 | jurar | v | svära ✎ | lova, gå ed |
@@ -808,10 +808,10 @@
 | 797 | presente | adj | närvarande | innevarande |
 | 798 | odiar | v | hata |  |
 | 799 | la cuestión | n | fråga ✎ | sak, spörsmål, ärende |
-| 800 | pelear | v | slåss | kämpa, bråka, gräla, tampas, fajtas |
+| 800 | pelear | v | slåss ✎ | kämpa, bråka, gräla |
 | 801 | acordar | v | komma överens om ✎ | besluta, göra upp, komma ihåg |
 | 802 | el dato | n | uppgift ✎ | data, fakta, upplysning |
-| 803 | el motivo | n | grund | anledning, skäl, motiv, bevekelsegrund |
+| 803 | el motivo | n | motiv ✎ | anledning, skäl, grund |
 | 804 | enfrentar | v | möta ✎ | konfrontera, ställas inför, tackla |
 | 805 | el crimen | n | brott | dåd, förbrytelse, missgärning |
 | 806 | la flor | n | blomma | blom, blomster, fägring |
@@ -820,17 +820,17 @@
 | 809 | la unidad | n | enhet | förband, sammanhållning, aggregat |
 | 810 | el montón | n | hög | stack, driva, bunt, skock, drös |
 | 811 | el éxito | n | framgång ✎ | succé, hit |
-| 812 | el peligro | n | fara | våda |
-| 813 | el golpe | n | slag | smäll, stöt |
+| 812 | el peligro | n | fara ✎ | våda |
+| 813 | el golpe | n | slag ✎ | smäll, stöt |
 | 814 | corto | adj | kort | snål |
 | 815 | construir | v | bygga | uppföra, anlägga |
 | 816 | mencionar | v | nämna | framhålla, omnämna |
-| 817 | revisar | v | kontrollera | granska, gå igenom, ompröva, redigera, revidera |
+| 817 | revisar | v | granska ✎ | gå igenom, kontrollera, se över |
 | 818 | atrapar | v | fånga ✎ | gripa, haffa, snärja |
 | 819 | el producto | n | produkt | skapelse, alster, fabrikat, behållning |
 | 820 | manejar | v | hantera | handskas med, handha |
 | 821 | la carne | n | kött | hull |
-| 822 | el placer | n | nöje | lust, glädje, njutning, behag, välbehag |
+| 822 | el placer | n | nöje ✎ | njutning, behag, glädje |
 | 823 | la ventana | n | fönster |  |
 | 824 | interesar | v | intressera | engagera |
 | 825 | despedir | v | avskeda | peta, säga upp, friställa, avspisa, permittera |
@@ -838,12 +838,12 @@
 | 827 | natural | adj | naturlig | bördig, naturell, självskriven, okonstlad, otvungen |
 | 828 | el oro | n | guld |  |
 | 829 | cometer | v | begå | föröva |
-| 830 | huir | v | fly | smita |
+| 830 | huir | v | fly ✎ | smita |
 | 831 | el lamento | n | klagan ✎ | jämmer, veklagan |
 | 832 | informar | v | rapportera | informera, underrätta, upplysa |
 | 833 | el acto | n | handling ✎ | akt, gärning |
 | 834 | la cárcel | n | fängelse |  |
-| 835 | hallar | v | hitta | spåra, finna |
+| 835 | hallar | v | hitta ✎ | spåra, finna |
 | 836 | el radio | n | radio | radie, radium, eker, ljudradio |
 | 837 | el enemigo | n | fiende | ovän |
 | 838 | profesional | adj | professionell | proffsig |
@@ -854,8 +854,8 @@
 | 843 | finalmente | adv | slutligen |  |
 | 844 | la espalda | n | rygg | ryggtavla |
 | 845 | el vestido | n | klänning | dräkt, klädsel, dress |
-| 846 | completamente | adv | helt | rent, hållet, fullständigt |
-| 847 | terrible | adj | hemsk | fruktansvärd, förfärlig, gräslig, ryslig, faslig |
+| 846 | completamente | adv | helt ✎ | rent, hållet, fullständigt |
+| 847 | terrible | adj | hemsk ✎ | fruktansvärd, förfärlig, gräslig, ryslig, faslig |
 | 848 | el norte | n | norr | nord, nordan |
 | 849 | cerrado | adj | stängd ✎ | sluten, instängd |
 | 850 | el aspecto | n | utseende ✎ | aspekt, sida, synvinkel |
@@ -872,17 +872,17 @@
 | 861 | depender | v | bero |  |
 | 862 | la regla | n | regel | linjal, föreskrift |
 | 863 | la comunidad | n | gemenskap ✎ | samhälle, samfund |
-| 864 | el intento | n | försök | satsning |
+| 864 | el intento | n | försök ✎ | satsning |
 | 865 | la cantidad | n | mängd | summa, storhet, belopp, bredd, kvantitet |
-| 866 | compartir | v | dela |  |
+| 866 | compartir | v | dela ✎ | dela med sig, ha gemensamt |
 | 867 | entendido | adj | kunnig ✎ | uppfattat, förstått |
 | 868 | besar | v | kyssa | pussa |
 | 869 | pertenecer | v | tillhöra |  |
 | 870 | repetir | v | upprepa | repetera, dubblera |
 | 871 | engañar | v | lura | skoja, bedra, bluffa, snuva, missleda |
 | 872 | la nave | n | skepp | farkost |
-| 873 | el riesgo | n | fara | risk |
-| 874 | la justicia | n | rätt | rättvisa, rimlighet |
+| 873 | el riesgo | n | risk ✎ | fara |
+| 874 | la justicia | n | rättvisa ✎ | rätt, rimlighet |
 | 875 | central | adj | central | mellersta |
 | 876 | cubrir | v | täcka | tillsätta, skyla, lacka, betäcka, belägga |
 | 877 | la salida | n | utväg | utgång, avfärd, avgång, utlopp, avfart |
@@ -892,40 +892,40 @@
 | 881 | el sector | n | sektor |  |
 | 882 | permanecer | v | förbli ✎ | stanna kvar, uppehålla sig |
 | 883 | viajar | v | åka ✎ | resa, färdas |
-| 884 | apartar | v | avlägsna | tränga, undanröja |
+| 884 | apartar | v | avlägsna ✎ | tränga, undanröja |
 | 885 | preocupado | adj | orolig | bekymrad |
 | 886 | asustar | v | skrämma |  |
 | 887 | desarrollar | v | utveckla |  |
 | 888 | el uso | n | användning | bruk, sed, praxis, sedvänja, hävd |
 | 889 | calmar | v | lugna | stilla, lindra, blidka |
 | 890 | el cabo | n | ända | korpral, stump, snibb |
-| 891 | horrible | adj | hemsk | skrämmande, fruktansvärd, läskig, otäck, förskräcklig |
+| 891 | horrible | adj | hemsk ✎ | fruktansvärd, förskräcklig, otäck |
 | 892 | el corte | n | snitt ✎ | klipp, hugg, domstol |
 | 893 | prestar | v | låna ✎ | avge, låna ut |
 | 894 | el dedo | n | finger ✎ | tå |
 | 895 | discutir | v | diskutera | behandla, överlägga, tvista |
 | 896 | la esperanza | n | hopp | förtröstan, förhoppning |
 | 897 | el peso | n | vikt | våg |
-| 898 | la opción | n | val | option, tillval |
+| 898 | la opción | n | alternativ ✎ | val, option, tillval |
 | 899 | la época | n | epok ✎ | tid, era, tidsålder |
 | 900 | delante | adv | framför ✎ | framme, före |
 | 901 | alemán | adj | tysk |  |
 | 902 | el rato | n | stund |  |
 | 903 | el frío | n | kyla | köld |
 | 904 | el testigo | n | vittne |  |
-| 905 | pegar | v | slå | göra sig, slå till, limma, klistra |
-| 906 | admitir | v | anta | medge, bekänna, ta in |
-| 907 | la ocasión | n | chans | tillfälle |
+| 905 | pegar | v | slå ✎ | slå till, klistra, limma |
+| 906 | admitir | v | erkänna ✎ | medge, anta, släppa in |
+| 907 | la ocasión | n | tillfälle ✎ | chans, gång |
 | 908 | el área | n | yta ✎ | gren, area |
 | 909 | el detective | n | detektiv | deckare |
 | 910 | triste | adj | ledsen | nere, sorglig, sorgsen, smärtsam, ledsam |
 | 911 | el matrimonio | n | äktenskap ✎ | gifte, giftermål |
-| 912 | superior | adj | bättre | övre, överlägsen, överordnad, förmer, övermäktig |
+| 912 | superior | adj | överlägsen ✎ | övre, bättre, överordnad |
 | 913 | el árbol | n | träd |  |
 | 914 | el destino | n | öde | destination, skickelse |
-| 915 | el objeto | n | sak | ting, föremål, pjäs, objekt, ändamål |
+| 915 | el objeto | n | föremål ✎ | objekt, sak, ting |
 | 916 | sentado | adj | sittande ✎ |  |
-| 917 | defender | v | skydda | försvara, hävda, värna, plädera, tillvarata |
+| 917 | defender | v | försvara ✎ | skydda, hävda, värna |
 | 918 | el sur | n | söder | syd |
 | 919 | cansado | adj | trött | led, tröttsam |
 | 920 | azul | adj | blå |  |
@@ -938,18 +938,18 @@
 | 927 | gracioso | adj | rolig ✎ | lustig, skojig, komisk |
 | 928 | bromear | v | skämta | skoja, raljera |
 | 929 | limpiar | v | städa ✎ | rengöra, tvätta, putsa |
-| 930 | la marcha | n | gång | marsch |
+| 930 | la marcha | n | marsch ✎ | gång, avfärd, växel |
 | 931 | la misión | n | mission | kallelse, mandat, åliggande |
 | 932 | la cocina | n | kök | matlagning, spis |
 | 933 | la isla | n | ö |  |
 | 934 | el enfermo | n | sjukling |  |
 | 935 | encargar | v | beställa ✎ | uppdra, ta hand om, ansvara för |
 | 936 | responsable | adj | skyldig | ansvarig |
-| 937 | declarar | v | förklara | deklarera |
+| 937 | declarar | v | tillkännage ✎ | förklara, deklarera, vittna |
 | 938 | el sentimiento | n | känsla |  |
 | 939 | colocar | v | lägga | ställa, placera, ställa om, förlägga, anbringa |
 | 940 | visitar | v | besöka | uppvakta, gästa |
-| 941 | indicar | v | visa | tala, märka, ange, påpeka, uppge |
+| 941 | indicar | v | ange ✎ | peka på, visa, påpeka, uppge |
 | 942 | físico | adj | fysisk | kroppslig, fysikalisk |
 | 943 | la prensa | n | press |  |
 | 944 | el actor | n | skådespelare | skådis, aktör |
@@ -958,7 +958,7 @@
 | 947 | francés | adj | fransk |  |
 | 948 | la organización | n | organisation | organ, arrangemang, uppbyggnad |
 | 949 | causar | v | orsaka ✎ | vålla, förorsaka, framkalla |
-| 950 | afirmar | v | förklara | påstå, hävda, konsolidera |
+| 950 | afirmar | v | hävda ✎ | påstå, förklara, bekräfta |
 | 951 | celebrar | v | fira ✎ | hålla, hylla |
 | 952 | la televisión | n | television |  |
 | 953 | la prisa | n | brådska | hast |
@@ -966,12 +966,12 @@
 | 955 | nervioso | adj | nervös | skärrad, skakis |
 | 956 | caliente | adj | varm | het, kåt |
 | 957 | la lucha | n | kamp | brottning, dust, bekämpning |
-| 958 | entero | adj | full | hel, oavkortad |
+| 958 | entero | adj | hel ✎ | full, oavkortad |
 | 959 | el culo | n | röv | arsle |
 | 960 | el modelo | n | modell | mönster, förebild, föredöme, mall, mannekäng |
 | 961 | la mentira | n | lögn | osanning |
 | 962 | divertir | v | roa | underhålla, förströra |
-| 963 | comprobar | v | kontrollera ✎ | bekräfta, konstatera, verifiera |
+| 963 | comprobar | v | bekräfta ✎ | kontrollera, konstatera, verifiera |
 | 964 | cenar | v | äta middag ✎ | äta kvällsmat, supera |
 | 965 | la bolsa | n | påse | pung, börs, bag, kasse |
 | 966 | el honor | n | ära | heder |
@@ -987,19 +987,19 @@
 | 976 | la pared | n | vägg |  |
 | 977 | el carajo | n | fan ✎ | tusan, jäklar |
 | 978 | europeo | adj | europeisk |  |
-| 979 | iniciar | v | börja | inviga, initiera |
+| 979 | iniciar | v | börja ✎ | inleda, inviga, initiera |
 | 980 | el diario | n | dagbok | journal, dagstidning, diarium |
 | 981 | inteligente | adj | intelligent | skärpt, klipsk, klyftig |
 | 982 | la pista | n | spår | ledtråd, tips, bana, pist |
 | 983 | descansar | v | vila | slappa, koppla av |
-| 984 | grave | adj | svår | allvarlig, grav, djup, grov, graverande |
+| 984 | grave | adj | allvarlig ✎ | svår, grav, djup |
 | 985 | retirar | v | dra tillbaka ✎ | ta bort, dra in, ta ut |
 | 986 | arruinar | v | ruinera |  |
 | 987 | la banda | n | band | liga, klunga |
 | 988 | el héroe | n | hjälte |  |
 | 989 | la reina | n | drottning |  |
 | 990 | el bar | n | pub |  |
-| 991 | la memoria | n | minne | avhandling, hågkomst, inlaga |
+| 991 | la memoria | n | minne ✎ | avhandling, hågkomst, inlaga |
 | 992 | el artículo | n | artikel | uppsats, paragraf, uppslagsord |
 | 993 | acá | adv | hit ✎ | här |
 | 994 | enorme | adj | enorm | väldig, ohygglig, ofantlig |
@@ -1008,4 +1008,4 @@
 | 997 | pretender | v | försöka ✎ | ha för avsikt, göra anspråk på, ämna |
 | 998 | la máquina | n | maskin |  |
 | 999 | agarrar | v | gripa | greppa, haffa |
-| 1000 | el permiso | n | tillstånd | lov, tillåtelse, permission, medgivande |
+| 1000 | el permiso | n | lov ✎ | tillstånd, tillåtelse, permission |

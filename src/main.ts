@@ -90,6 +90,7 @@ async function boot(): Promise<void> {
 
   function showTab(id: TabId): void {
     currentTab = id;
+    root.classList.toggle("tab-pass", id === "pass");
     (Object.keys(screens) as TabId[]).forEach((k) => (screens[k].hidden = k !== id));
     tabButtons.forEach((b) => {
       const on = b.dataset.tab === id;
@@ -99,10 +100,23 @@ async function boot(): Promise<void> {
     });
     if (id === "idag") renderIdagTab();
     if (id === "ordlista") renderOrdlista(screens.ordlista, store);
-    if (id === "pass") pass.focusInput();
+    if (id === "pass") { pass.refreshIdle(); pass.focusInput(); }
+  }
+
+  function flashKonto(): void {
+    const p = document.getElementById("kontoPanel");
+    p?.scrollIntoView({ behavior: "smooth", block: "center" });
+    p?.classList.add("pulse");
+    window.setTimeout(() => p?.classList.remove("pulse"), 1500);
   }
 
   function startPass(includeNew: boolean): void {
+    // inlogg krävs för att öva — annars riskerar ett helt pass att aldrig sparas i molnet
+    if (!sync.session) {
+      showTab("idag");
+      flashKonto();
+      return;
+    }
     if (includeNew) store.introduceToday();
     const cards = store.dueCards();
     pass.start(cards);
@@ -113,7 +127,8 @@ async function boot(): Promise<void> {
     screens.pass,
     store,
     () => showTab("idag"),
-    (includeNew) => startPass(includeNew)
+    (includeNew) => startPass(includeNew),
+    () => sync.session !== null
   );
   pass.render();
 
@@ -138,10 +153,14 @@ async function boot(): Promise<void> {
       sync.signedOut();
     }
     if (currentTab === "idag") renderIdagTab();
+    pass.refreshIdle();
   });
 
   tabButtons.forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab as TabId)));
   showTab("idag");
+
+  // debug-handtag för felsökning i konsolen (och smoke-tester)
+  (window as unknown as Record<string, unknown>).__glosa = { store, sync };
 
   // uppdatera Idag-statistiken när appen får fokus igen (t.ex. ny dag),
   // och skicka upp osynkade ändringar när den läggs i bakgrunden

@@ -57,7 +57,9 @@ export function renderOrdlista(el: HTMLElement, store: Store): void {
           </span>
         </button>
         <div class="rowx">
-          <div><div class="xl">${esc(POS_LABEL[word.pos] ?? word.pos)} · rank ${word.rank}</div></div>
+          <div><div class="xl">${esc(POS_LABEL[word.pos] ?? word.pos)} · rank ${word.rank}</div>
+            ${word.hint ? `<p class="omtext" style="margin:4px 0 0">Ledtråd: <i>(${esc(word.hint)})</i></p>` : ""}
+            ${word.alt?.length ? `<p class="omtext" style="margin:4px 0 0">Accepteras även: ${word.alt.map(esc).join(", ")}</p>` : ""}</div>
           <div><div class="xl">Synonymer</div>
             <div class="syns">${baseSyns}${ownSyns}
               <input type="text" data-addsyn placeholder="+ lägg till" aria-label="Lägg till synonym"></div></div>

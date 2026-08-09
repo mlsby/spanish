@@ -138,9 +138,16 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
       <div class="hero">
         <div class="big">${totalToday}</div>
         <div class="cap"><b>${s.due}</b> repetitioner · <b>${s.newAvailable}</b> nya ord</div>
-        <button class="btn" id="startFull" ${totalToday === 0 ? "disabled" : ""}>Starta dagens pass</button>
-        <button class="btn ghost" id="startRep" ${s.due === 0 ? "disabled" : ""}>Bara repetitioner (${s.due})</button>
+        <button class="btn" id="startFull" ${totalToday === 0 && cloud.email ? "disabled" : ""}>
+          ${cloud.email ? "Starta dagens pass" : "Logga in för att öva"}</button>
+        <button class="btn ghost" id="startRep" ${s.due === 0 || !cloud.email ? "disabled" : ""}>Bara repetitioner (${s.due})</button>
+        ${cloud.email ? "" : `<p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>`}
       </div>
+
+      ${cloud.email ? "" : `<div class="panel" id="kontoPanel">
+        <p class="plabel">Konto &amp; molnsynk</p>
+        ${kontoHtml(cloud)}
+      </div>`}
 
       <div class="statrow">
         <div class="stat"><div class="n">${s.ny}</div><div class="l"><span class="dot ny"></span>Nya</div></div>
@@ -173,10 +180,10 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
         </span>
       </div>
 
-      <div class="panel" id="kontoPanel">
+      ${cloud.email ? `<div class="panel" id="kontoPanel">
         <p class="plabel">Konto &amp; molnsynk</p>
         ${kontoHtml(cloud)}
-      </div>
+      </div>` : ""}
 
       <div class="mer">
         <button class="btn ghost" id="exportBtn">Exportera backup</button>

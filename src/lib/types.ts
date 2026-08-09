@@ -11,6 +11,10 @@ export interface Word {
   syn: string[];
   art?: string;
   src?: string;
+  /** parentes-ledtråd som särskiljer svenska dubbletter ("vara (egenskap)") */
+  hint?: string;
+  /** alternativa spanska svar som också godkänns (äkta synonymer: empezar/comenzar) */
+  alt?: string[];
 }
 
 export interface UserWord {
