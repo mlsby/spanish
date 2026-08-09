@@ -1,0 +1,14 @@
+{
+  "name": "Glosa — spanska glosor",
+  "short_name": "Glosa",
+  "description": "Lär dig de vanligaste spanska orden med skrivträning, FSRS och egna minnesregler.",
+  "start_url": "/spanish/",
+  "scope": "/spanish/",
+  "display": "standalone",
+  "background_color": "#F7F9FC",
+  "theme_color": "#2A4FD0",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
