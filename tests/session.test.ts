@@ -37,6 +37,20 @@ describe("introduktion av nya ord", () => {
     ]);
     expect(store.introduceToday()).toHaveLength(0); // samma dag → inget mer
   });
+
+  it("dagsbudgeten delas mellan enheter — härleds ur korten, inte en lokal räknare", () => {
+    const store = makeStore();
+    store.data.settings.newPerDay = 2;
+    // simulera moln-pull: två ord introducerades idag på en annan enhet
+    const now = new Date();
+    for (const id of ["empezar|v", "ciudad|n"]) {
+      store.data.cards[`${id}:es2sv`] = newCardRec(id, "es2sv", now);
+      store.data.cards[`${id}:sv2es`] = newCardRec(id, "sv2es", now);
+    }
+    expect(store.introducedToday()).toBe(2);
+    expect(store.introduceToday()).toHaveLength(0); // budgeten redan full idag
+    expect(store.stats().newAvailable).toBe(0);
+  });
 });
 
 describe("session: betygsmappning och tvåfelsregeln", () => {

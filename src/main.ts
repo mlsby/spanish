@@ -130,6 +130,8 @@ async function boot(): Promise<void> {
       flashKonto();
       return;
     }
+    // vänta in första synken — annars kan en andra enhet dubbla dagens nya ord
+    if (sync.status === "syncing") return;
     if (includeNew) store.introduceToday();
     const cards = store.dueCards();
     pass.start(cards);
@@ -141,7 +143,8 @@ async function boot(): Promise<void> {
     store,
     () => showTab("idag"),
     (includeNew) => startPass(includeNew),
-    () => sync.session !== null
+    () => sync.session !== null,
+    () => sync.status === "syncing"
   );
   pass.render();
 
@@ -151,6 +154,7 @@ async function boot(): Promise<void> {
 
   sync.onStatus = () => {
     if (currentTab === "idag") renderIdagTab();
+    pass.refreshIdle();
   };
 
   let syncedUser = "";

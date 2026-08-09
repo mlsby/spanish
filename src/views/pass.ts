@@ -36,7 +36,8 @@ export class PassView {
     private store: Store,
     private onDone: () => void,
     private onStartRequest: (includeNew: boolean) => void,
-    private loggedIn: () => boolean = () => true
+    private loggedIn: () => boolean = () => true,
+    private syncBusy: () => boolean = () => false
   ) {
     el.innerHTML = `
       <div class="pass">
@@ -72,6 +73,12 @@ export class PassView {
       e.preventDefault();
       this.onSubmit();
     });
+    // knappar får aldrig sno fokus från textfältet — annars fälls mobiltangentbordet ihop
+    const keepFocus = (e: Event) => {
+      if ((e.target as HTMLElement).closest("button")) e.preventDefault();
+    };
+    this.form.addEventListener("pointerdown", keepFocus);
+    this.card.addEventListener("pointerdown", keepFocus);
     this.card.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       const act = target.closest<HTMLElement>("[data-act]")?.dataset.act;
@@ -262,12 +269,13 @@ export class PassView {
       }
       const st = this.store.stats();
       const total = st.due + st.newAvailable;
+      const busy = this.syncBusy();
       return `<div class="tomt">
         <div class="stor">Inget pass igång</div>
         <p>${st.due} repetitioner och ${st.newAvailable} nya ord väntar.</p>
         <div class="btnrow" style="max-width:280px">
-          <button class="btn" data-act="startFull" ${total === 0 ? "disabled" : ""}>Starta pass</button>
-          <button class="btn ghost" data-act="startRep" ${st.due === 0 ? "disabled" : ""}>Bara rep.</button>
+          <button class="btn" data-act="startFull" ${total === 0 || busy ? "disabled" : ""}>${busy ? "Synkar …" : "Starta pass"}</button>
+          <button class="btn ghost" data-act="startRep" ${st.due === 0 || busy ? "disabled" : ""}>Bara rep.</button>
         </div></div>`;
     }
     if (this.state === "done") {

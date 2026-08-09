@@ -108,10 +108,24 @@ export class Store {
       .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime());
   }
 
+  /**
+   * Antal ord introducerade under dagens lokala kalenderdag — härlett ur korten
+   * (introducedAt), inte ur en lokal räknare, så att flera enheter delar samma
+   * dagsbudget efter synk.
+   */
+  introducedToday(now: Date = new Date()): number {
+    const day = dayKey(now);
+    let n = 0;
+    for (const key in this.data.cards) {
+      const c = this.data.cards[key];
+      if (c.dir === "es2sv" && dayKey(new Date(c.introducedAt)) === day) n++;
+    }
+    return n;
+  }
+
   /** Introducerar dagens nya ord (upp till dagstakten), i frekvensordning. Idempotent per dag. */
   introduceToday(now: Date = new Date()): CardRec[] {
-    const day = dayKey(now);
-    const already = this.data.introduced[day] ?? 0;
+    const already = this.introducedToday(now);
     const room = Math.max(0, this.data.settings.newPerDay - already);
     if (room === 0) return [];
     // es→sv-korten först, sv→es-korten efter — så förhörs inte samma ord rygg i rygg
@@ -131,8 +145,6 @@ export class Store {
       this.putCard(b);
       fresh.push(b);
     }
-    const added = picked.length;
-    this.data.introduced[day] = already + added;
     this.save();
     return fresh;
   }
@@ -161,9 +173,7 @@ export class Store {
       else if (s === "lar") lar++;
       else kan++;
     }
-    const day = dayKey(now);
-    const introducedToday = this.data.introduced[day] ?? 0;
-    const newLeftToday = Math.max(0, this.data.settings.newPerDay - introducedToday);
+    const newLeftToday = Math.max(0, this.data.settings.newPerDay - this.introducedToday(now));
     const newAvailable = Math.min(newLeftToday, ny);
     return {
       ny, lar, kan,

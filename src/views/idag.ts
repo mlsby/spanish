@@ -141,9 +141,11 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
       <div class="hero">
         <div class="big">${totalToday}</div>
         <div class="cap"><b>${s.due}</b> repetitioner · <b>${s.newAvailable}</b> nya ord</div>
-        <button class="btn" id="startFull" ${totalToday === 0 && cloud.email ? "disabled" : ""}>
-          ${cloud.email ? "Starta dagens pass" : "Logga in för att öva"}</button>
-        <button class="btn ghost" id="startRep" ${s.due === 0 || !cloud.email ? "disabled" : ""}>Bara repetitioner (${s.due})</button>
+        <button class="btn" id="startFull"
+          ${(totalToday === 0 && cloud.email) || cloud.status === "syncing" ? "disabled" : ""}>
+          ${!cloud.email ? "Logga in för att öva" : cloud.status === "syncing" ? "Synkar …" : "Starta dagens pass"}</button>
+        <button class="btn ghost" id="startRep"
+          ${s.due === 0 || !cloud.email || cloud.status === "syncing" ? "disabled" : ""}>Bara repetitioner (${s.due})</button>
         ${cloud.email ? "" : `<p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>`}
       </div>
 
