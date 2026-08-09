@@ -1,4 +1,5 @@
 import { Session, type Pending } from "../lib/session";
+import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
 import type { CardRec } from "../lib/types";
 import { POS_LABEL } from "../lib/types";
@@ -23,6 +24,9 @@ export class PassView {
   private tRemain = 0;
   private tStart = 0;
   private paused = false;
+  private showMnem = false;          // ✎-utfällt minnesregelfält i fel-läget
+  private friendRules: FriendRule[] = [];
+  private pendingSno: string | null = null; // regelägare som får poäng om snodd regel sparas
 
   private card: HTMLElement;
   private input: HTMLInputElement;
@@ -37,7 +41,8 @@ export class PassView {
     private onDone: () => void,
     private onStartRequest: (includeNew: boolean) => void,
     private loggedIn: () => boolean = () => true,
-    private syncBusy: () => boolean = () => false
+    private syncBusy: () => boolean = () => false,
+    private social?: Social
   ) {
     el.innerHTML = `
       <div class="pass">
@@ -81,6 +86,19 @@ export class PassView {
     this.card.addEventListener("pointerdown", keepFocus);
     this.card.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
+      const sno = target.closest<HTMLElement>("[data-snoidx]");
+      if (sno) {
+        const rule = this.friendRules[Number(sno.dataset.snoidx)];
+        const ta = this.card.querySelector<HTMLTextAreaElement>("#mnemInput");
+        if (rule && ta) {
+          ta.value = rule.mnem;
+          this.pendingSno = rule.ownerId;
+          const b = this.card.querySelector<HTMLButtonElement>("#saveBtn");
+          if (b) b.disabled = false;
+          ta.focus();
+        }
+        return;
+      }
       const act = target.closest<HTMLElement>("[data-act]")?.dataset.act;
       if (act) { this.onAction(act); return; }
       if (target.closest("textarea,input,button,a")) return;
@@ -136,9 +154,36 @@ export class PassView {
     }
     const p = s.answer(raw);
     this.input.value = "";
+    this.showMnem = false;
+    this.friendRules = [];
+    this.pendingSno = null;
     if (p.grade === "good") { this.state = "good"; this.render(); this.startAuto(AUTO_MS.good); }
     else if (p.grade === "hard") { this.state = "hard"; this.render(); this.startAuto(AUTO_MS.hard); }
-    else { this.state = p.forcedMnem ? "forced" : "wrong"; this.render(); }
+    else {
+      this.state = p.forcedMnem ? "forced" : "wrong";
+      this.render();
+      if (this.state === "forced") void this.loadFriendRules(p.word.id);
+    }
+  }
+
+  /** Kompisarnas regler hämtas i bakgrunden och injiceras — utan att röra det du skriver. */
+  private async loadFriendRules(wordId: string): Promise<void> {
+    if (!this.social) return;
+    const rules = await this.social.friendRules(wordId);
+    if (this.state !== "forced" || this.session?.pending?.word.id !== wordId || !rules.length) return;
+    this.friendRules = rules;
+    const wrap = this.card.querySelector<HTMLElement>("#frwrap");
+    if (wrap) wrap.innerHTML = this.friendRulesHtml();
+  }
+
+  private friendRulesHtml(): string {
+    if (!this.friendRules.length) return "";
+    const rows = this.friendRules.map((r, i) =>
+      `<div class="frq"><span class="who">${esc(r.name)}</span>
+        <span class="q">"${esc(r.mnem)}"</span>
+        <button type="button" class="snochip" data-snoidx="${i}">sno</button></div>`
+    ).join("");
+    return `<div class="frt">Sno från kompisarna</div>${rows}`;
   }
 
   private onAction(act: string): void {
@@ -148,11 +193,20 @@ export class PassView {
     if (act === "restart") { this.onDone(); return; }
     const s = this.session;
     if (!s) return;
+    if (act === "togglemnem") {
+      this.showMnem = true;
+      this.render();
+      this.card.querySelector<HTMLTextAreaElement>("#mnemInput")?.focus();
+      return;
+    }
     if (act === "next") { this.saveMnemIfAny(); this.advance(); }
     else if (act === "save") {
       const ta = this.card.querySelector<HTMLTextAreaElement>("#mnemInput");
       if (ta && ta.value.trim() && s.pending) {
         this.store.setMnem(s.pending.word.id, ta.value);
+        if (this.pendingSno && this.social) {
+          void this.social.recordAdoption(this.pendingSno, s.pending.word.id);
+        }
         this.advance();
       }
     } else if (act === "override") {
@@ -175,6 +229,9 @@ export class PassView {
     const s = this.session;
     if (!s) return;
     this.clearTimer();
+    this.showMnem = false;
+    this.pendingSno = null;
+    this.friendRules = [];
     s.commit();
     if (s.finished) {
       this.state = "done";
@@ -246,10 +303,11 @@ export class PassView {
   }
   private mnemForm(p: Pending, required: boolean): string {
     const pre = esc(this.store.userWord(p.word.id).mnem);
-    const lbl = required ? "Minnesregel — obligatorisk nu" : "Minnesregel — frivillig, alltid din egen";
-    let h = `<div class="mnemform"><label for="mnemInput">${lbl}</label>
-      <textarea id="mnemInput" placeholder="Skriv något som får ordet att fastna …">${pre}</textarea>
-      <div class="btnrow">`;
+    let h = `<div class="mnemform">
+      <textarea id="mnemInput" aria-label="Minnesregel — alltid din egen"
+        placeholder="Skriv något som får ordet att fastna …">${pre}</textarea>`;
+    if (required) h += `<div class="frules" id="frwrap">${this.friendRulesHtml()}</div>`;
+    h += `<div class="btnrow">`;
     if (!required) h += `<button type="button" class="btn ghost" data-act="next">Gå vidare</button>`;
     h += `<button type="button" class="btn" data-act="save" id="saveBtn"${pre ? "" : " disabled"}>
         ${pre && required ? "Behåll &amp; gå vidare" : "Spara &amp; gå vidare"}</button></div></div>`;
@@ -322,18 +380,23 @@ export class PassView {
           <p class="tapnote" id="tapnote">tryck för paus · Enter för nästa</p>`;
       case "wrong":
         return `<p class="verdict v-bad">${IC_X}Fel</p>
-          <div class="cmp"><span class="cl">du skrev</span><code class="wrote">${esc(p.raw)}</code>
-          <span class="cl">rätt svar</span><code>${esc(this.facit(p))}</code></div>
+          <p class="wrote">du skrev <s>${esc(p.raw)}</s>
+            <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>
+          <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.hintLine(p.word)}${this.alsoLine(p)}
-          ${this.mnemForm(p, false)}
-          <button type="button" class="linkbtn" data-act="override">Jag hade rätt — spara mitt svar som synonym</button>`;
+          ${this.showMnem
+            ? this.mnemForm(p, false)
+            : `<div class="btnrow" style="margin-top:8px">
+                <button type="button" class="btn ghost" data-act="togglemnem">✎ Minnesregel</button>
+                <button type="button" class="btn" data-act="next">Gå vidare</button></div>`}`;
       case "forced":
         return `<p class="verdict v-bad">${IC_X}Fel — andra missen</p>
-          <div class="cmp"><span class="cl">du skrev</span><code class="wrote">${esc(p.raw)}</code>
-          <span class="cl">rätt svar</span><code>${esc(this.facit(p))}</code></div>
-          <div class="block">Nu krävs en egen minnesregel för att gå vidare — det är så orden fastnar.</div>
-          ${this.mnemForm(p, true)}
-          <button type="button" class="linkbtn" data-act="override">Jag hade rätt — spara mitt svar som synonym</button>`;
+          <p class="wrote">du skrev <s>${esc(p.raw)}</s>
+            <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>
+          <h2 class="head">${esc(this.facit(p))}</h2>
+          ${this.hintLine(p.word)}${this.alsoLine(p)}
+          <p class="mustnote">Skriv din egen minnesregel för att gå vidare</p>
+          ${this.mnemForm(p, true)}`;
     }
     return "";
   }

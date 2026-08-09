@@ -5,9 +5,12 @@ import { requestPersistence } from "./lib/storage";
 import { createSupabase } from "./lib/supabase";
 import { parseLoginInput } from "./lib/logintoken";
 import { CloudSync } from "./lib/sync";
+import { Social } from "./lib/social";
+import { activityStats } from "./lib/streak";
 import { renderIdag, type CloudUi } from "./views/idag";
 import { PassView } from "./views/pass";
 import { renderOrdlista } from "./views/ordlista";
+import { renderTopplista } from "./views/topplista";
 
 const TABS = [
   {
@@ -21,6 +24,10 @@ const TABS = [
   {
     id: "ordlista", label: "Ordlista",
     icon: '<svg viewBox="0 0 24 24"><path d="M5 4h13a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 4v14a2 2 0 0 0 2 2"/><path d="M10 9h6M10 13h4"/></svg>',
+  },
+  {
+    id: "topplista", label: "Topplista",
+    icon: '<svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8 20h8"/></svg>',
   },
 ] as const;
 
@@ -87,6 +94,7 @@ async function boot(): Promise<void> {
     <div class="screen" id="screen-idag"></div>
     <div class="screen" id="screen-pass" hidden></div>
     <div class="screen" id="screen-ordlista" hidden></div>
+    <div class="screen" id="screen-topplista" hidden></div>
     <nav class="tabbar" aria-label="Flikar">
       ${TABS.map(
         (t) => `<button type="button" data-tab="${t.id}">${t.icon}${t.label}</button>`
@@ -97,6 +105,7 @@ async function boot(): Promise<void> {
     idag: root.querySelector("#screen-idag")!,
     pass: root.querySelector("#screen-pass")!,
     ordlista: root.querySelector("#screen-ordlista")!,
+    topplista: root.querySelector("#screen-topplista")!,
   };
   const tabButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-tab]")];
   let currentTab: TabId = "idag";
@@ -112,7 +121,8 @@ async function boot(): Promise<void> {
       else b.removeAttribute("aria-current");
     });
     if (id === "idag") renderIdagTab();
-    if (id === "ordlista") renderOrdlista(screens.ordlista, store);
+    if (id === "ordlista") renderOrdlista(screens.ordlista, store, social);
+    if (id === "topplista") void renderTopplista(screens.topplista, { social, uid: sync.session?.user.id ?? null });
     if (id === "pass") { pass.refreshIdle(); pass.focusInput(); }
   }
 
@@ -138,13 +148,25 @@ async function boot(): Promise<void> {
     showTab("pass");
   }
 
+  const social = new Social(sb, () => sync.session?.user.id ?? null);
+
+  /** Ladda upp mina topplistesiffror (streak, dagar, kan det-ord). */
+  function pushMyStats(): void {
+    if (!sync.session) return;
+    const a = activityStats(store.data.days);
+    void social
+      .pushStats({ streak: a.streak, totalDays: a.totalDays, knownWords: store.stats().kan })
+      .catch(() => { /* topplistan är grädde — aldrig blockera */ });
+  }
+
   const pass = new PassView(
     screens.pass,
     store,
-    () => showTab("idag"),
+    () => { pushMyStats(); showTab("idag"); },
     (includeNew) => startPass(includeNew),
     () => sync.session !== null,
-    () => sync.status === "syncing"
+    () => sync.status === "syncing",
+    social
   );
   pass.render();
 
@@ -161,8 +183,13 @@ async function boot(): Promise<void> {
   sb.auth.onAuthStateChange((event, session) => {
     if (session && syncedUser !== session.user.id) {
       syncedUser = session.user.id;
-      void sync.initialSync(session).then(() => {
+      void sync.initialSync(session).then(async () => {
+        try {
+          await social.ensureProfile(session.user.email);
+        } catch { /* migration 0002 kanske inte körd än — topplistan förklarar */ }
+        pushMyStats();
         if (currentTab === "idag") renderIdagTab();
+        if (currentTab === "topplista") void renderTopplista(screens.topplista, { social, uid: session.user.id });
       });
     }
     if (event === "SIGNED_OUT") {

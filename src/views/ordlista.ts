@@ -1,3 +1,4 @@
+import type { Social } from "../lib/social";
 import type { Store, WordStatus } from "../lib/store";
 import { stabilityDays } from "../lib/scheduler";
 import { POS_LABEL } from "../lib/types";
@@ -7,7 +8,7 @@ const esc = (s: string) =>
 
 const PAGE = 100;
 
-export function renderOrdlista(el: HTMLElement, store: Store): void {
+export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): void {
   let query = "";
   let shown = PAGE;
   let openId: string | null = null;
@@ -66,6 +67,7 @@ export function renderOrdlista(el: HTMLElement, store: Store): void {
           <div><div class="xl">Minnesregel — din egen</div>
             <textarea data-mnem aria-label="Minnesregel"
               placeholder="Skriv något som får ordet att fastna …">${esc(uw.mnem)}</textarea></div>
+          <div class="frules" data-frw="${esc(word.id)}"></div>
           <button type="button" class="mini" data-savemnem>Spara</button>
         </div>
       </div>`;
@@ -109,8 +111,23 @@ export function renderOrdlista(el: HTMLElement, store: Store): void {
     if (t.closest(".rowbtn")) {
       openId = openId === id ? null : id;
       renderRows();
+      if (openId === id) loadFriendRules(id);
     }
   });
+
+  /** Kompisarnas regler hämtas i bakgrunden när en rad öppnas. */
+  function loadFriendRules(id: string): void {
+    if (!social) return;
+    void social.friendRules(id).then((rules) => {
+      const wrap = rowsEl.querySelector<HTMLElement>(`[data-frw="${CSS.escape(id)}"]`);
+      if (!wrap || !rules.length) return;
+      wrap.innerHTML =
+        `<div class="frt">Kompisarnas regler</div>` +
+        rules.map((r) =>
+          `<div class="frq"><span class="who">${esc(r.name)}</span><span class="q">"${esc(r.mnem)}"</span></div>`
+        ).join("");
+    });
+  }
   rowsEl.addEventListener("keydown", (e) => {
     const t = e.target as HTMLElement;
     if (e.key === "Enter" && t.matches("[data-addsyn]")) {

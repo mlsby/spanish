@@ -51,3 +51,28 @@ Ingen AI-genererad minnesregel eller minnesbild. Inga sociala funktioner, ingen 
 ## 10. Öppna beslut som kodagenten får ta
 
 Val av exakt frekvenskälla och licenskontroll av den, val av auth-leverantör och hostingdetaljer, exakt tröskel för när AI-fallbacken triggas (förslag: alltid när steg 1–2 underkänner och svaret är minst 2 tecken), samt UI-detaljer. Vid tveksamhet om produktbeslut: fråga användaren istället för att anta.
+
+## Tillägg 2026-08-09: socialt lager (beslutat av användaren, ersätter delar av §9)
+
+Appen delas med en grupp vänner — alla inloggade användare deltar automatiskt
+(inga separata grupper eller inbjudningskoder). Icke-målen "inga sociala
+funktioner, ingen gamification" utgår i motsvarande delar.
+
+- **Visningsnamn:** varje användare har ett namn (profiles-tabell, förifyllt
+  från mejlprefixet, ändringsbart under Topplista-fliken).
+- **Delade minnesregler:** alla regler delas automatiskt med gruppen (läsning;
+  skrivning är fortfarande bara egen data). Vid ett korts *andra* miss visas
+  kompisarnas regler som inspiration med en "sno"-knapp som kopierar in regeln
+  i det egna fältet; regeln blir ens egen och kan redigeras. Egna regler skrivs
+  fortfarande alltid av människor — AI-förbudet i §2 kvarstår oförändrat.
+- **Sno-poäng:** när en snodd regel sparas får regelns ägare en poäng —
+  max 1 per (snoare, ord, ägare).
+- **Topplista-flik** med fyra tavlor: 🔥 Eld i baken (längsta streak, stenhård:
+  missad dag nollar, men dagens pass räknas som ogjort först vid midnatt),
+  📅 Trotjänaren (dagar totalt), 🧠 Ordmästaren (Kan det-ord, stabilitet ≥ 30 d),
+  💡 Regelfabriken (snodda regler). Statistiken skrivs av varje klient till en
+  publik tabell (ärlighet på kompisnivå); reviews förblir privata.
+- **Fel-vyn** omdesignad: rätta svaret störst, "du skrev" som en rad med
+  "jag hade rätt"-länk, minnesregelfältet hopfällt bakom ✎ vid första missen,
+  en primär knapp. Endast ifyllbara fält ser ut som fält.
+- **Tema:** Sand (varmt papper/espresso) ersätter Azul, i både ljust och mörkt läge.

@@ -3,7 +3,7 @@
 import { deflateSync } from "node:zlib";
 import { writeFileSync } from "node:fs";
 
-const BG = [42, 79, 208], FG = [255, 255, 255], DOT = [255, 211, 77];
+const BG = [89, 69, 47], FG = [255, 249, 239], DOT = [217, 179, 102];
 // 16×16-rutnät: G-glyf + punkt
 const GRID = [
   "................",
