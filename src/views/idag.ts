@@ -109,19 +109,22 @@ function kontoHtml(cloud: CloudUi): string {
   }
   if (pendingEmail) {
     return `
-      <p class="omtext" style="margin:0 0 10px">Kod skickad till <b>${esc(pendingEmail)}</b> — hämta den i mejlen:</p>
+      <p class="omtext" style="margin:0 0 10px">Mejl skickat till <b>${esc(pendingEmail)}</b>.
+      Håll inne inloggningslänken i mejlet → <b>Kopiera länk</b> → klistra in här
+      (eller skriv engångskoden om mejlet har en):</p>
       <div class="authrow">
-        <input id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="sexsiffrig kod" aria-label="Engångskod">
+        <input id="authCode" autocomplete="one-time-code" autocapitalize="none"
+               placeholder="inklistrad länk eller kod" aria-label="Inloggningslänk eller engångskod">
         <button class="btn" id="authVerify">Logga in</button>
       </div>${err}
-      <button type="button" class="linkbtn" id="authRestart">Byt adress / skicka ny kod</button>`;
+      <button type="button" class="linkbtn" id="authRestart">Byt adress / skicka nytt mejl</button>`;
   }
   return `
-    <p class="omtext" style="margin:0 0 10px">Logga in så synkas allt mellan mobil och dator.
-    En engångskod mejlas till dig — inget lösenord behövs.</p>
+    <p class="omtext" style="margin:0 0 10px">Logga in så synkas allt mellan mobil och dator —
+    inget lösenord, du får ett mejl.</p>
     <div class="authrow">
       <input id="authEmail" type="email" autocomplete="email" placeholder="din@mejl.se" aria-label="E-postadress">
-      <button class="btn" id="authSend">Skicka kod</button>
+      <button class="btn" id="authSend">Skicka mejl</button>
     </div>${err}`;
 }
 

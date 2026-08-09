@@ -3,6 +3,7 @@ import { Store } from "./lib/store";
 import { initViewportFit } from "./lib/viewport";
 import { requestPersistence } from "./lib/storage";
 import { createSupabase } from "./lib/supabase";
+import { parseLoginInput } from "./lib/logintoken";
 import { CloudSync } from "./lib/sync";
 import { renderIdag, type CloudUi } from "./views/idag";
 import { PassView } from "./views/pass";
@@ -63,8 +64,18 @@ async function boot(): Promise<void> {
       });
       if (error) throw new Error(error.message);
     },
-    async verifyCode(email, code) {
-      const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
+    async verifyCode(email, value) {
+      const parsed = parseLoginInput(value);
+      if (!parsed) {
+        throw new Error("Skriv koden ur mejlet — eller klistra in hela inloggningslänken.");
+      }
+      const { error } =
+        parsed.kind === "link"
+          ? await sb.auth.verifyOtp({
+              token_hash: parsed.tokenHash,
+              type: parsed.type as "magiclink",
+            })
+          : await sb.auth.verifyOtp({ email, token: parsed.code, type: "email" });
       if (error) throw new Error(error.message);
     },
     async signOut() {
