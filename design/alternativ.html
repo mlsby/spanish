@@ -1,0 +1,272 @@
+<title>Glosa · designalternativ</title>
+<style>
+  :root{
+    --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF; --accent:#3A3F46;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025; --accent:#C8CCD2;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025; --accent:#C8CCD2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:clamp(30px,4.6vw,42px);margin:0;line-height:1.08}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.55;max-width:64ch;margin:12px 0 0}
+  .sub b{color:var(--ink)}
+
+  .tema{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+  .tema-head{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:baseline;margin-bottom:6px}
+  .tema-head h2{font-family:ui-serif,Georgia,serif;font-size:26px;margin:0}
+  .tag{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+       color:var(--muted)}
+  .blurb{color:var(--muted);font-size:14.5px;line-height:1.55;max-width:72ch;margin:4px 0 16px}
+  .blurb b{color:var(--ink)}
+  .sws{display:flex;gap:6px;align-items:center;margin-left:auto}
+  .sw{width:20px;height:20px;border-radius:6px;border:1px solid rgba(0,0,0,.12)}
+
+  .minirow{display:flex;gap:16px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+  .mini{flex:0 0 252px;width:252px;min-height:452px;scroll-snap-align:start;
+        background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
+        border-radius:22px;padding:14px 12px 12px;display:flex;flex-direction:column;gap:8px;
+        box-shadow:0 10px 26px rgba(20,22,26,.10)}
+  .mini,.mini *{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .mlabel{flex:none;text-align:center;font-family:ui-monospace,Menlo,monospace !important;
+          font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+  .minicol{flex:0 0 252px;display:flex;flex-direction:column}
+
+  /* ---- mini-komponenter (nedskalad kopia av appen) ---- */
+  .m-serif{font-family:ui-serif,"Iowan Old Style",Georgia,serif !important}
+  .m-mono{font-family:ui-monospace,Menlo,Consolas,monospace !important}
+  .m-apphead{display:flex;justify-content:space-between;align-items:baseline}
+  .m-brand{font-weight:600;font-size:13.5px}
+  .m-brand i{color:var(--m-accent);font-style:normal}
+  .m-date{font-size:8.5px;color:var(--m-muted)}
+  .m-hero{background:var(--m-card);border:1px solid var(--m-line);border-radius:12px;padding:12px 10px;text-align:center}
+  .m-big{font-size:28px;line-height:1}
+  .m-cap{color:var(--m-muted);font-size:8.5px;margin-top:3px}
+  .m-cap b{color:var(--m-ink)}
+  .m-btn{margin-top:9px;background:var(--m-accent);color:var(--m-on);border-radius:8px;
+         padding:8px 6px;font-size:10px;font-weight:600;text-align:center}
+  .m-btn.ghost{background:none;border:1px solid var(--m-line);color:var(--m-accent);font-weight:500;margin-top:5px}
+  .m-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+  .m-stat{background:var(--m-card);border:1px solid var(--m-line);border-radius:9px;padding:6px 2px;text-align:center}
+  .m-stat .n{font-size:13px}
+  .m-stat .l{font-size:6.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--m-muted);
+             display:flex;justify-content:center;align-items:center;gap:3px;margin-top:1px}
+  .m-dot{width:4.5px;height:4.5px;border-radius:50%}
+  .m-panel{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;padding:8px 9px}
+  .m-plabel{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-muted);margin:0 0 5px}
+  .m-meter{height:4px;background:var(--m-rule);border-radius:2px;overflow:hidden}
+  .m-meter i{display:block;height:100%;width:19%;background:var(--m-accent)}
+  .m-metercap{display:flex;justify-content:space-between;font-size:7px;color:var(--m-muted);margin-top:4px}
+  .m-heat{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+  .m-heat i{aspect-ratio:1;border-radius:2px;background:var(--m-rule)}
+  .m-heat i.h1{background:var(--m-h1)} .m-heat i.h2{background:var(--m-h2)}
+  .m-heat i.h3{background:var(--m-h3)} .m-heat i.idag{outline:1.5px solid var(--m-accent);outline-offset:-1px}
+
+  .m-pbar{height:3px;background:var(--m-rule);border-radius:2px;overflow:hidden}
+  .m-pbar i{display:block;height:100%;width:35%;background:var(--m-accent)}
+  .m-meta{display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .m-exit{color:var(--m-muted);font-size:8.5px}
+  .m-count{font-size:8px;color:var(--m-muted);margin-right:auto}
+  .m-chip{font-size:7.5px;color:var(--m-accent);background:var(--m-soft);border-radius:99px;padding:2.5px 7px}
+  .m-card{flex:1;background:var(--m-card);border:1px solid var(--m-line);border-radius:13px;
+          padding:16px 10px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:6px;text-align:center;position:relative;overflow:hidden}
+  .m-card.q{background-image:repeating-linear-gradient(to bottom,transparent 0 17px,var(--m-rule) 17px 18px)}
+  .m-card.god{background:var(--m-goodbg);border-color:var(--m-goodline)}
+  .m-card.fel{background:var(--m-badbg);border-color:var(--m-badline)}
+  .m-cd{position:absolute;top:0;left:0;height:2.5px;width:62%;background:var(--m-good);opacity:.55}
+  .m-pos{font-size:7px;letter-spacing:.09em;text-transform:uppercase;color:var(--m-muted)}
+  .m-head{font-size:22px;font-weight:600;line-height:1.1}
+  .m-hint{font-size:9.5px;font-style:italic;color:var(--m-muted)}
+  .m-verdict{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .m-verdict.g{color:var(--m-good)} .m-verdict.b{color:var(--m-bad)}
+  .m-also{font-size:8.5px;color:var(--m-muted)} .m-also b{color:var(--m-ink);font-weight:500}
+  .m-mnembox{background:var(--m-card);border:1px solid var(--m-line);border-radius:8px;padding:6px 9px;max-width:95%}
+  .m-mlbl{font-size:6.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--m-muted)}
+  .m-mtext{font-size:9.5px;font-style:italic;margin-top:2px}
+  .m-tap{font-size:7px;color:var(--m-muted)}
+  .m-cmp{display:grid;grid-template-columns:auto auto;gap:2px 8px;align-items:baseline}
+  .m-cmp .l{font-size:7px;text-transform:uppercase;letter-spacing:.05em;color:var(--m-muted);text-align:right}
+  .m-cmp code{font-size:10.5px;text-align:left}
+  .m-cmp code.w{text-decoration:line-through;opacity:.7}
+  .m-ta{width:100%;min-height:34px;border:1px solid var(--m-line);border-radius:8px;background:var(--m-card);
+        font-size:9px;font-style:italic;color:var(--m-muted);padding:5px 7px;text-align:left}
+  .m-row2{display:flex;gap:5px;width:100%}
+  .m-row2 .m-btn{flex:1;margin-top:0;padding:6px 4px;font-size:8.5px;border-radius:7px}
+  .m-link{font-size:7.5px;color:var(--m-accent);text-decoration:underline}
+  .m-answer{display:flex;gap:7px;align-items:center}
+  .m-input{flex:1;border-bottom:1.5px solid var(--m-line);color:var(--m-muted);font-size:10px;padding:5px 2px}
+  .m-send{width:24px;height:24px;border-radius:50%;background:var(--m-accent);color:var(--m-on);
+          display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
+
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:14.5px;line-height:1.6;max-width:72ch}
+  footer b{color:var(--ink)}
+
+  /* =================== TEMAN =================== */
+  .t-azul{
+    --m-app:#F7F9FC; --m-card:#FFFFFF; --m-ink:#1B2534; --m-muted:#5D6C83; --m-line:#D7DFEA; --m-rule:#EDF1F7;
+    --m-accent:#2A4FD0; --m-on:#FFFFFF; --m-soft:#E7ECFB;
+    --m-good:#177A48; --m-goodbg:#E5F4EB; --m-goodline:#BEE2CC;
+    --m-bad:#B3352C; --m-badbg:#FBE9E7; --m-badline:#EFC7C2;
+    --m-h1:#C4D2F2; --m-h2:#8FA8E8; --m-h3:#2340B8;
+  }
+  .t-black{
+    --m-app:#FAFAF7; --m-card:#FFFFFF; --m-ink:#1C1B18; --m-muted:#6F6D66; --m-line:#E3E1D9; --m-rule:#F0EEE7;
+    --m-accent:#22211E; --m-on:#FFFFFF; --m-soft:#ECEAE2;
+    --m-good:#41604B; --m-goodbg:#EFF3EE; --m-goodline:#D6DFD6;
+    --m-bad:#84463E; --m-badbg:#F5EDEA; --m-badline:#E2D1CB;
+    --m-h1:#D6D4CB; --m-h2:#9C9A90; --m-h3:#22211E;
+  }
+  .t-salvia{
+    --m-app:#F5F7F3; --m-card:#FFFFFF; --m-ink:#232B25; --m-muted:#66716A; --m-line:#DBE1D9; --m-rule:#ECF0EA;
+    --m-accent:#4E6B57; --m-on:#FFFFFF; --m-soft:#E5EDE6;
+    --m-good:#2E6B44; --m-goodbg:#E6F1E8; --m-goodline:#C6DECB;
+    --m-bad:#A2483A; --m-badbg:#F7ECE8; --m-badline:#E7CFC6;
+    --m-h1:#CFDCD0; --m-h2:#93AC98; --m-h3:#3A5344;
+  }
+  .t-sand{
+    --m-app:#F7F3EB; --m-card:#FFFDF8; --m-ink:#2B241E; --m-muted:#79695A; --m-line:#E6DCCB; --m-rule:#F0EADD;
+    --m-accent:#59452F; --m-on:#FFF9EF; --m-soft:#EFE6D6;
+    --m-good:#54683A; --m-goodbg:#EEF1E1; --m-goodline:#D8DFC2;
+    --m-bad:#A44F38; --m-badbg:#F7E9E1; --m-badline:#E8CFC0;
+    --m-h1:#E2D6BE; --m-h2:#BCA482; --m-h3:#59452F;
+  }
+</style>
+
+<div class="page" lang="sv">
+  <p class="eyebrow">Glosa · designalternativ · välj &amp; blanda</p>
+  <h1>Fyra färgspråk, samma app</h1>
+  <p class="sub">Layout, typografi och flöde är exakt som idag — bara <b>färgerna</b> byts.
+  Fyra skärmar per tema: <b>Idag</b>, <b>Fråga</b> (med ledtråd), <b>Rätt</b> och <b>Fel</b> —
+  så du ser accentfärgen och rättningsfärgerna i alla roller. Grönt = rätt och rött = fel behålls
+  överallt (olika mycket dämpade). Svara med en bokstav, eller blanda: <i>"B, men med C:s gröna"</i>.</p>
+
+  <section class="tema t-azul">
+    <div class="tema-head">
+      <h2>A · Azul</h2><span class="tag">nuvarande</span>
+      <div class="sws"><span class="sw" style="background:#F7F9FC"></span><span class="sw" style="background:#2A4FD0"></span><span class="sw" style="background:#177A48"></span><span class="sw" style="background:#B3352C"></span></div>
+    </div>
+    <p class="blurb">Referensen — kallt papper, bläckblå accent. Tydligast kontrast mellan handling (blått) och rättning (grönt/rött), men också <b>mest färg totalt</b>.</p>
+    <div class="minirow" data-screens></div>
+  </section>
+
+  <section class="tema t-black">
+    <div class="tema-head">
+      <h2>B · Bläck</h2><span class="tag">nästan svartvitt</span>
+      <div class="sws"><span class="sw" style="background:#FAFAF7"></span><span class="sw" style="background:#22211E"></span><span class="sw" style="background:#41604B"></span><span class="sw" style="background:#84463E"></span></div>
+    </div>
+    <p class="blurb">Den lugnaste: svarta knappar, varmgrått papper, färg finns <b>bara</b> i rättningsögonblicket — och även den är dammig och lågmäld. Mest "ordbok tryckt på papper" av alla.</p>
+    <div class="minirow" data-screens></div>
+  </section>
+
+  <section class="tema t-salvia">
+    <div class="tema-head">
+      <h2>C · Salvia</h2><span class="tag">grågrön</span>
+      <div class="sws"><span class="sw" style="background:#F5F7F3"></span><span class="sw" style="background:#4E6B57"></span><span class="sw" style="background:#2E6B44"></span><span class="sw" style="background:#A2483A"></span></div>
+    </div>
+    <p class="blurb">Blått ersätts av en gråmörk salviagrön, och rättningsgrönt är dess djupare kusin — hela appen hamnar i <b>en enda färgfamilj</b>, harmoniskt och naturnära. Fel-rött blir tegel.</p>
+    <div class="minirow" data-screens></div>
+  </section>
+
+  <section class="tema t-sand">
+    <div class="tema-head">
+      <h2>D · Sand</h2><span class="tag">varm anteckningsbok</span>
+      <div class="sws"><span class="sw" style="background:#F7F3EB"></span><span class="sw" style="background:#59452F"></span><span class="sw" style="background:#54683A"></span><span class="sw" style="background:#A44F38"></span></div>
+    </div>
+    <p class="blurb">Linnepapper och espressobrun accent — varmast och mysigast, som en fysisk glosbok. Rättningen dras åt jordtoner: olivgrönt rätt, terrakotta fel.</p>
+    <div class="minirow" data-screens></div>
+  </section>
+
+  <footer>
+    <b>Så väljer du:</b> svara med temats bokstav — eller mixa fritt ("B:s knappar, D:s papper").
+    Mörkt läge gör jag i samma anda som vinnaren. Allt är färg-tokens i koden, så bytet är en
+    liten ändring — och går att ångra lika lätt.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SERIF = ' class="m-serif"';
+  var MONO = ' class="m-mono"';
+
+  var IDAG =
+    '<div class="mini">' +
+      '<div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">lör 9 aug</span></div>' +
+      '<div class="m-hero"><div class="m-big m-serif">34</div><div class="m-cap"><b>24</b> repetitioner · <b>10</b> nya ord</div>' +
+        '<div class="m-btn">Starta dagens pass</div><div class="m-btn ghost">Bara repetitioner (24)</div></div>' +
+      '<div class="m-stats">' +
+        '<div class="m-stat"><div class="n m-serif">812</div><div class="l"><span class="m-dot" style="border:1px solid var(--m-muted)"></span>Nya</div></div>' +
+        '<div class="m-stat"><div class="n m-serif">156</div><div class="l"><span class="m-dot" style="background:var(--m-h2)"></span>Lär mig</div></div>' +
+        '<div class="m-stat"><div class="n m-serif">32</div><div class="l"><span class="m-dot" style="background:var(--m-good)"></span>Kan det</div></div></div>' +
+      '<div class="m-panel"><p class="m-plabel">Progression · mål 5 000</p><div class="m-meter"><i></i></div>' +
+        '<div class="m-metercap m-mono"><span>188 påbörjade</span><span>1 000 i basen</span></div></div>' +
+      '<div class="m-panel"><p class="m-plabel">Övningskalender</p><div class="m-heat">HEAT</div></div>' +
+    '</div>';
+
+  var FRAGA =
+    '<div class="mini">' +
+      '<div class="m-pbar"><i style="width:22%"></i></div>' +
+      '<div class="m-meta"><span class="m-exit">‹ Avsluta</span><span class="m-count m-mono">18 kort kvar</span><span class="m-chip m-mono">svenska → spanska</span></div>' +
+      '<div class="m-card q"><p class="m-pos">verb</p><div class="m-head m-serif">vara</div>' +
+        '<div class="m-hint m-serif">(egenskap: ’jag är svensk’)</div></div>' +
+      '<div class="m-answer"><div class="m-input m-mono">Skriv på spanska …</div><div class="m-send">→</div></div>' +
+    '</div>';
+
+  var RATT =
+    '<div class="mini">' +
+      '<div class="m-pbar"><i style="width:58%"></i></div>' +
+      '<div class="m-meta"><span class="m-exit">‹ Avsluta</span><span class="m-count m-mono">7 kort kvar</span><span class="m-chip m-mono">spanska → svenska</span></div>' +
+      '<div class="m-card god"><span class="m-cd"></span><p class="m-verdict g">✓ Rätt</p>' +
+        '<div class="m-head m-serif">göra</div>' +
+        '<div class="m-also">även: <b>tillverka</b> · <b>laga</b></div>' +
+        '<div class="m-mnembox"><div class="m-mlbl">Din minnesregel</div><div class="m-mtext m-serif">Hasse ropar: GÖR, Göran!</div></div>' +
+        '<div class="m-tap">tryck för paus · Enter för nästa</div></div>' +
+      '<div class="m-answer"><div class="m-input m-mono">Enter — nästa</div><div class="m-send">→</div></div>' +
+    '</div>';
+
+  var FEL =
+    '<div class="mini">' +
+      '<div class="m-pbar"><i style="width:74%"></i></div>' +
+      '<div class="m-meta"><span class="m-exit">‹ Avsluta</span><span class="m-count m-mono">4 kort kvar</span><span class="m-chip m-mono">spanska → svenska</span></div>' +
+      '<div class="m-card fel"><p class="m-verdict b">✕ Fel</p>' +
+        '<div class="m-cmp"><span class="l">du skrev</span><code class="m-mono w">därför</code>' +
+        '<span class="l">rätt svar</span><code class="m-mono">dock</code></div>' +
+        '<div class="m-also">även: <b>emellertid</b> · <b>ändå</b></div>' +
+        '<div class="m-ta m-serif">Skriv något som får ordet att fastna …</div>' +
+        '<div class="m-row2"><div class="m-btn ghost">Gå vidare</div><div class="m-btn">Spara &amp; gå vidare</div></div>' +
+        '<div class="m-link">Jag hade rätt — spara som synonym</div></div>' +
+      '<div class="m-answer"><div class="m-input m-mono">Enter — gå vidare</div><div class="m-send">→</div></div>' +
+    '</div>';
+
+  // kalendermönster: 36 rutor, några fyllda
+  var cells = [];
+  var fill = {3:1,7:2,8:1,12:3,13:1,16:2,19:1,22:3,23:2,27:1,29:2,32:3,34:2};
+  for (var i = 0; i < 36; i++) {
+    var cls = fill[i] ? "h" + fill[i] : "";
+    if (i === 35) cls += " idag h2";
+    cells.push('<i class="' + cls + '"></i>');
+  }
+  var heat = cells.join("");
+
+  var labels = ["Idag", "Pass · fråga", "Pass · rätt", "Pass · fel"];
+  var screens = [IDAG.replace("HEAT", heat), FRAGA, RATT, FEL];
+
+  document.querySelectorAll("[data-screens]").forEach(function (row) {
+    row.innerHTML = screens.map(function (s, i) {
+      return '<div class="minicol">' + s + '<div class="mlabel">' + labels[i] + "</div></div>";
+    }).join("");
+  });
+})();
+</script>
