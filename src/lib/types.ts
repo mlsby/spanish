@@ -16,6 +16,7 @@ export interface Word {
 export interface UserWord {
   syn: string[]; // användarens egna synonymtillägg (inkl. "jag hade rätt"-overrides)
   mnem: string;  // minnesregeln — alltid användarens egen text
+  updatedAt?: string; // för last-write-wins vid molnsynk
 }
 
 /** Serialiserat FSRS-kort: datum som ISO-strängar. */
@@ -30,6 +31,7 @@ export interface CardRec {
   fsrs: StoredFsrs;
   failCount: number; // antal felsvar totalt — driver tvåfelsregeln
   introducedAt: string;
+  updatedAt?: string; // för last-write-wins vid molnsynk
 }
 
 export type Grade = "again" | "hard" | "good";
@@ -46,7 +48,11 @@ export interface ReviewRec {
 
 export interface Settings {
   newPerDay: number;
+  updatedAt?: string; // för last-write-wins vid molnsynk
 }
+
+/** Vad som ändrats lokalt — driver vilka rader synken behöver skicka upp. */
+export type DirtyKind = "card" | "userWord" | "settings" | "snapshot" | "review";
 
 export interface AppData {
   version: 1;

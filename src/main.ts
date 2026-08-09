@@ -1,7 +1,9 @@
 import "./styles.css";
 import { Store } from "./lib/store";
 import { requestPersistence } from "./lib/storage";
-import { renderIdag } from "./views/idag";
+import { createSupabase } from "./lib/supabase";
+import { CloudSync } from "./lib/sync";
+import { renderIdag, type CloudUi } from "./views/idag";
 import { PassView } from "./views/pass";
 import { renderOrdlista } from "./views/ordlista";
 
@@ -38,7 +40,35 @@ async function boot(): Promise<void> {
   }
   store.loadUserData();
   requestPersistence();
+
+  const sb = createSupabase();
+  const sync = new CloudSync(store, sb);
+  store.onDirty = (kind, key) => sync.markDirty(kind, key);
   store.snapshotToday();
+
+  const cloud: CloudUi = {
+    get email() { return sync.session?.user.email ?? null; },
+    get status() { return sync.status; },
+    get lastSyncAt() { return sync.lastSyncAt; },
+    get lastError() { return sync.lastError; },
+    async sendCode(email) {
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: new URL(import.meta.env.BASE_URL, location.origin).href,
+        },
+      });
+      if (error) throw new Error(error.message);
+    },
+    async verifyCode(email, code) {
+      const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
+      if (error) throw new Error(error.message);
+    },
+    async signOut() {
+      await sb.auth.signOut();
+    },
+  };
 
   root.innerHTML = `
     <div class="screen" id="screen-idag"></div>
@@ -88,15 +118,36 @@ async function boot(): Promise<void> {
   pass.render();
 
   function renderIdagTab(): void {
-    renderIdag(screens.idag, store, { startPass });
+    renderIdag(screens.idag, store, { startPass }, cloud);
   }
+
+  sync.onStatus = () => {
+    if (currentTab === "idag") renderIdagTab();
+  };
+
+  let syncedUser = "";
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session && syncedUser !== session.user.id) {
+      syncedUser = session.user.id;
+      void sync.initialSync(session).then(() => {
+        if (currentTab === "idag") renderIdagTab();
+      });
+    }
+    if (event === "SIGNED_OUT") {
+      syncedUser = "";
+      sync.signedOut();
+    }
+    if (currentTab === "idag") renderIdagTab();
+  });
 
   tabButtons.forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab as TabId)));
   showTab("idag");
 
-  // uppdatera Idag-statistiken när appen får fokus igen (t.ex. ny dag)
+  // uppdatera Idag-statistiken när appen får fokus igen (t.ex. ny dag),
+  // och skicka upp osynkade ändringar när den läggs i bakgrunden
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && currentTab === "idag") renderIdagTab();
+    if (document.hidden) sync.flush();
+    else if (currentTab === "idag") renderIdagTab();
   });
 }
 

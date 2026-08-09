@@ -1,10 +1,25 @@
 import type { Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
 import { addDays, dayKey, fmtDate, weekdayMon } from "../lib/time";
+import type { SyncStatus } from "../lib/sync";
 
 export interface IdagCallbacks {
   startPass(includeNew: boolean): void;
 }
+
+export interface CloudUi {
+  email: string | null; // inloggad adress, eller null
+  status: SyncStatus;
+  lastSyncAt?: string;
+  lastError: string;
+  sendCode(email: string): Promise<void>;
+  verifyCode(email: string, code: string): Promise<void>;
+  signOut(): Promise<void>;
+}
+
+// tvåstegsflödet för engångskoden (modul-state så det överlever omrenderingar)
+let pendingEmail = "";
+let authError = "";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -78,7 +93,39 @@ function sparklineHtml(snapshots: Record<string, { kan: number; lar: number }>):
       <span>idag · ${vals[vals.length - 1]}</span></div>`;
 }
 
-export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks): void {
+function kontoHtml(cloud: CloudUi): string {
+  const err = authError ? `<p class="synkfel">${esc(authError)}</p>` : "";
+  if (cloud.email) {
+    const status =
+      cloud.status === "syncing" ? "synkar …"
+      : cloud.status === "error" ? `<span class="synkfel">synkfel — datat är säkert lokalt</span>`
+      : cloud.lastSyncAt
+        ? `synkad ${new Date(cloud.lastSyncAt).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}`
+        : "";
+    return `
+      <p class="omtext" style="margin:0 0 10px">Inloggad som <b>${esc(cloud.email)}</b>${status ? " · " + status : ""}</p>
+      ${cloud.status === "error" ? `<p class="synkfel">${esc(cloud.lastError)}</p>` : ""}
+      <button class="btn ghost" id="authOut">Logga ut</button>`;
+  }
+  if (pendingEmail) {
+    return `
+      <p class="omtext" style="margin:0 0 10px">Kod skickad till <b>${esc(pendingEmail)}</b> — hämta den i mejlen:</p>
+      <div class="authrow">
+        <input id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="sexsiffrig kod" aria-label="Engångskod">
+        <button class="btn" id="authVerify">Logga in</button>
+      </div>${err}
+      <button type="button" class="linkbtn" id="authRestart">Byt adress / skicka ny kod</button>`;
+  }
+  return `
+    <p class="omtext" style="margin:0 0 10px">Logga in så synkas allt mellan mobil och dator.
+    En engångskod mejlas till dig — inget lösenord behövs.</p>
+    <div class="authrow">
+      <input id="authEmail" type="email" autocomplete="email" placeholder="din@mejl.se" aria-label="E-postadress">
+      <button class="btn" id="authSend">Skicka kod</button>
+    </div>${err}`;
+}
+
+export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, cloud: CloudUi): void {
   const s = store.stats();
   const totalToday = s.due + s.newAvailable;
   el.innerHTML = `
@@ -126,6 +173,11 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks): vo
         </span>
       </div>
 
+      <div class="panel" id="kontoPanel">
+        <p class="plabel">Konto &amp; molnsynk</p>
+        ${kontoHtml(cloud)}
+      </div>
+
       <div class="mer">
         <button class="btn ghost" id="exportBtn">Exportera backup</button>
         <button class="btn ghost" id="importBtn">Importera</button>
@@ -148,13 +200,11 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks): vo
   el.querySelector<HTMLButtonElement>("#startFull")!.onclick = () => cb.startPass(true);
   el.querySelector<HTMLButtonElement>("#startRep")!.onclick = () => cb.startPass(false);
 
-  const paceVal = el.querySelector<HTMLElement>("#paceVal")!;
+  const rerender = () => renderIdag(el, store, cb, cloud);
+
   const bump = (d: number) => {
-    const v = Math.max(0, Math.min(50, store.data.settings.newPerDay + d));
-    store.data.settings.newPerDay = v;
-    store.save();
-    paceVal.textContent = String(v);
-    renderIdag(el, store, cb); // uppdatera "nya ord"-siffrorna
+    store.setPace(Math.max(0, Math.min(50, store.data.settings.newPerDay + d)));
+    rerender(); // uppdatera "nya ord"-siffrorna
   };
   el.querySelector<HTMLButtonElement>("#paceDown")!.onclick = () => bump(-1);
   el.querySelector<HTMLButtonElement>("#paceUp")!.onclick = () => bump(1);
@@ -167,6 +217,45 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks): vo
     a.click();
     URL.revokeObjectURL(url);
   };
+  // ----- konto & synk -----
+  const busy = (b: HTMLButtonElement, on: boolean) => { b.disabled = on; };
+  el.querySelector<HTMLButtonElement>("#authSend")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const email = el.querySelector<HTMLInputElement>("#authEmail")!.value.trim();
+    if (!email.includes("@")) { authError = "Skriv en giltig e-postadress."; rerender(); return; }
+    busy(btn, true);
+    try {
+      await cloud.sendCode(email);
+      pendingEmail = email;
+      authError = "";
+    } catch (err) {
+      authError = err instanceof Error ? err.message : String(err);
+    }
+    rerender();
+  });
+  el.querySelector<HTMLButtonElement>("#authVerify")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const code = el.querySelector<HTMLInputElement>("#authCode")!.value.trim();
+    if (!code) return;
+    busy(btn, true);
+    try {
+      await cloud.verifyCode(pendingEmail, code);
+      pendingEmail = "";
+      authError = "";
+    } catch (err) {
+      authError = err instanceof Error ? err.message : String(err);
+      busy(btn, false);
+    }
+    rerender();
+  });
+  el.querySelector<HTMLInputElement>("#authCode")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") el.querySelector<HTMLButtonElement>("#authVerify")!.click();
+  });
+  el.querySelector<HTMLButtonElement>("#authRestart")?.addEventListener("click", () => {
+    pendingEmail = ""; authError = ""; rerender();
+  });
+  el.querySelector<HTMLButtonElement>("#authOut")?.addEventListener("click", () => { void cloud.signOut(); });
+
   const fileInput = el.querySelector<HTMLInputElement>("#importFile")!;
   el.querySelector<HTMLButtonElement>("#importBtn")!.onclick = () => fileInput.click();
   fileInput.onchange = async () => {

@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.2",
     "ts-fsrs": "^5.2.1"
   },
   "devDependencies": {

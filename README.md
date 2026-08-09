@@ -23,12 +23,23 @@ Designmockup: [design/mockup.html](design/mockup.html)
 - 10 nya ord/dag (justerbart 0–50), alltid i frekvensordning, plus "bara
   repetitioner"-läge.
 
-## Lagring (v1)
+## Lagring & molnsynk
 
-All inlärningsdata ligger i webbläsarens `localStorage`, bakom ett
-`StorageAdapter`-gränssnitt (`src/lib/storage.ts`) så att Supabase kan kopplas
-på senare utan omskrivning. **Exportera backup** från startsidan då och då —
-importen återställer allt på en ny enhet.
+Lokal data (`localStorage`) är alltid primär — appen fungerar helt utan konto.
+Med konto (Supabase, engångskod via mejl — inget lösenord) synkas allt mellan
+enheter: `src/lib/sync.ts` gör last-write-wins-merge per rad på `updatedAt`,
+reviews är append-only med dedupe på `client_id`, och ändringar skickas upp
+debounce:at efter varje svar samt när appen läggs i bakgrunden.
+
+Schemat ligger i `supabase/migrations/` — fem tabeller (`settings`,
+`user_words`, `cards`, `reviews`, `snapshots`), alla med row level security
+låst till `auth.uid()`. Klientens URL + publishable key i `src/lib/supabase.ts`
+är publika by design; RLS är skyddet. Engångsuppsättning: kör migrations-SQL:en
+i Supabase SQL Editor, sätt Site URL under Authentication → URL Configuration,
+och lägg `{{ .Token }}` i Magic Link-mejlmallen så att engångskoden syns
+(koden funkar i installerad PWA där mejllänkar öppnas i fel webbläsarkontext).
+
+**Exportera backup** från startsidan är fortfarande en bra vana.
 
 ## Utveckling
 
@@ -80,13 +91,12 @@ rapporten, fyll luckor i `seed/overrides.json`, kör om, committa.
 
 ## Roadmap
 
-- **Supabase**: konto (magic link), Postgres + RLS, synk av `AppData` —
-  adapter-gränssnittet är förberett; reviewloggen (`reviews`) följer med för
-  framtida FSRS-parameteroptimering.
-- **AI-rättningsfallback** (kravspec §3 steg 3): server-side route (Supabase
-  Edge Function) som frågar Claude API vid semantiskt nära svar; godkännanden
-  cachas som synonymer. Kräver server — därför inte med i den statiska v1.
+- **AI-rättningsfallback** (kravspec §3 steg 3): Supabase Edge Function som
+  frågar Claude API vid semantiskt nära svar; godkännanden cachas som
+  synonymer. `ANTHROPIC_API_KEY` läggs som secret i Supabase (aldrig i klienten).
 - Fler batchar upp till 5 000 ord.
+- CI-körda databasmigrationer (`SUPABASE_DB_PASSWORD` finns som GitHub Secret;
+  tills vidare körs migrationer via SQL Editor).
 
 ## Attribution
 

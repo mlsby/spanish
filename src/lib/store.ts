@@ -1,4 +1,4 @@
-import type { AppData, CardRec, Dir, ReviewRec, UserWord, Word } from "./types";
+import type { AppData, CardRec, Dir, DirtyKind, ReviewRec, UserWord, Word } from "./types";
 import { cardKey } from "./types";
 import { dueDate, isKnown, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
@@ -16,8 +16,14 @@ export class Store {
   byId = new Map<string, Word>();
   data: AppData = emptyData();
   attribution: string[] = [];
+  /** Anropas när lokal data ändras — synken använder den för att veta vad som ska skickas upp. */
+  onDirty?: (kind: DirtyKind, key?: string) => void;
 
   constructor(private adapter: StorageAdapter = new LocalStorageAdapter()) {}
+
+  private dirty(kind: DirtyKind, key?: string): void {
+    this.onDirty?.(kind, key);
+  }
 
   async loadWords(baseUrl: string): Promise<void> {
     const index = await (await fetch(`${baseUrl}data/index.json`)).json();
@@ -47,22 +53,32 @@ export class Store {
 
   setMnem(wordId: string, mnem: string): void {
     const uw = this.userWord(wordId);
-    this.data.userWords[wordId] = { ...uw, mnem: mnem.trim() };
+    this.data.userWords[wordId] = { ...uw, mnem: mnem.trim(), updatedAt: new Date().toISOString() };
     this.save();
+    this.dirty("userWord", wordId);
   }
 
   addUserSyn(wordId: string, syn: string): void {
     const uw = this.userWord(wordId);
     const s = syn.trim();
     if (!s || uw.syn.some((x) => x.toLowerCase() === s.toLowerCase())) return;
-    this.data.userWords[wordId] = { ...uw, syn: [...uw.syn, s] };
+    this.data.userWords[wordId] = { ...uw, syn: [...uw.syn, s], updatedAt: new Date().toISOString() };
     this.save();
+    this.dirty("userWord", wordId);
   }
 
   removeUserSyn(wordId: string, syn: string): void {
     const uw = this.userWord(wordId);
-    this.data.userWords[wordId] = { ...uw, syn: uw.syn.filter((x) => x !== syn) };
+    this.data.userWords[wordId] = { ...uw, syn: uw.syn.filter((x) => x !== syn), updatedAt: new Date().toISOString() };
     this.save();
+    this.dirty("userWord", wordId);
+  }
+
+  setPace(v: number): void {
+    this.data.settings.newPerDay = v;
+    this.data.settings.updatedAt = new Date().toISOString();
+    this.save();
+    this.dirty("settings");
   }
 
   /** Facit + synonymer i svarsriktningen (huvudöversättning först). */
@@ -78,7 +94,9 @@ export class Store {
   }
 
   putCard(rec: CardRec): void {
+    rec.updatedAt = new Date().toISOString();
     this.data.cards[cardKey(rec.wordId, rec.dir)] = rec;
+    this.dirty("card", cardKey(rec.wordId, rec.dir));
   }
 
   /** Förfallna kort (due ≤ slutet av idag), äldst först. */
@@ -122,6 +140,7 @@ export class Store {
     this.data.reviews.push(rec);
     const day = dayKey(new Date(rec.ts));
     this.data.days[day] = (this.data.days[day] ?? 0) + 1;
+    this.dirty("review");
   }
 
   wordStatus(word: Word): WordStatus {
@@ -160,5 +179,6 @@ export class Store {
     const { kan, lar } = this.stats(now);
     this.data.snapshots[dayKey(now)] = { kan, lar };
     this.save();
+    this.dirty("snapshot", dayKey(now));
   }
 }
