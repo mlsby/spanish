@@ -23,7 +23,7 @@
 }
 
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{margin:0;background:var(--app);color:var(--ink);font-family:var(--sans);
      -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
      -webkit-tap-highlight-color:transparent}
@@ -31,11 +31,13 @@ body{margin:0;background:var(--app);color:var(--ink);font-family:var(--sans);
 button{font-family:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
-#app{max-width:520px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--app)}
+/* appen är exakt lika hög som den SYNLIGA ytan (--vvh sätts av viewport.ts,
+   krymper när mobiltangentbordet öppnas) — allt rullande sker inuti .screen */
+#app{max-width:520px;margin:0 auto;height:var(--vvh,100dvh);display:flex;flex-direction:column;background:var(--app)}
 @media (min-width:560px){
-  #app{min-height:100dvh;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  #app{border-left:1px solid var(--line);border-right:1px solid var(--line)}
 }
-.screen{flex:1;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;
+.screen{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;
         padding-bottom:calc(env(safe-area-inset-bottom))}
 .screen[hidden]{display:none}
 
@@ -217,28 +219,33 @@ details.om summary{cursor:pointer;font-size:13.5px;font-weight:600;padding:2px 0
             font-size:12.5px;border-radius:9px;padding:7px 14px}
 .visafler{align-self:center;margin:4px 0 10px}
 
-/* ---------- tangentbordet uppe = grundläget: kompakt pass-layout på låga viewports ---------- */
-@media (max-height:620px){
-  .pass{gap:8px;padding:8px 14px 8px}
-  .pmeta{margin-top:6px}
-  .card{padding:14px 14px 12px;gap:6px}
-  .head{font-size:23px}
-  .pos{font-size:9.5px}
-  .hintled{font-size:13px}
-  .also{font-size:12px}
-  .fine,.tapnote{display:none}
-  .cmp code{font-size:15px}
-  .mnembox{padding:7px 12px}
-  .mtext{font-size:13.5px}
-  .mnemform textarea{min-height:42px;font-size:15px}
-  .btnrow .btn{padding:9px 8px;font-size:13px}
-  .answerbar input{padding:7px 2px;font-size:16px}
-  .answerbar .send{width:38px;height:38px}
-}
+/* ---------- tangentbordet uppe = grundläget: kompakt pass-layout ----------
+   html.kbd sätts av viewport.ts när den synliga ytan är < 620px
+   (tangentbord uppe på mobil, eller ett litet fönster) */
+html.kbd .pass{gap:8px;padding:8px 14px 8px}
+html.kbd .pmeta{margin-top:6px}
+html.kbd .card{padding:14px 14px 12px;gap:6px}
+html.kbd .head{font-size:23px}
+html.kbd .pos{font-size:9.5px}
+html.kbd .hintled{font-size:13px}
+html.kbd .also{font-size:12px}
+html.kbd .fine,html.kbd .tapnote{display:none}
+html.kbd .cmp code{font-size:15px}
+html.kbd .mnembox{padding:7px 12px}
+html.kbd .mtext{font-size:13.5px}
+html.kbd .mnemform textarea{min-height:42px;font-size:16px}
+html.kbd .btnrow .btn{padding:9px 8px;font-size:13px}
+html.kbd .answerbar input{padding:7px 2px;font-size:16px}
+html.kbd .answerbar .send{width:38px;height:38px}
 
 .pulse{animation:pulse 1.4s ease}
 @keyframes pulse{0%,100%{outline:2px solid transparent;outline-offset:2px}
   25%,75%{outline:2px solid var(--accent);outline-offset:2px}}
+
+/* iOS auto-zoomar på fält med font-size < 16px — förhindra det på touchskärmar */
+@media (pointer:coarse){
+  .authrow input,.search input,.rowx textarea,.syns input{font-size:16px}
+}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}

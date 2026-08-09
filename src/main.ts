@@ -1,5 +1,6 @@
 import "./styles.css";
 import { Store } from "./lib/store";
+import { initViewportFit } from "./lib/viewport";
 import { requestPersistence } from "./lib/storage";
 import { createSupabase } from "./lib/supabase";
 import { CloudSync } from "./lib/sync";
@@ -25,6 +26,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 async function boot(): Promise<void> {
+  initViewportFit();
   const root = document.getElementById("app")!;
   root.innerHTML = `<div class="tomt" style="min-height:60dvh"><div class="stor">Glosa</div><p>Laddar ordbasen …</p></div>`;
 
