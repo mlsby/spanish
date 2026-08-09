@@ -1,4 +1,4 @@
-<title>Glosa · Sand — utkast 2</title>
+<title>Glosa · Sand — utkast 3</title>
 <style>
   :root{
     --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF;
@@ -31,7 +31,7 @@
 
   .minirow{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
   .minicol{flex:0 0 262px;display:flex;flex-direction:column}
-  .mini{width:262px;min-height:470px;scroll-snap-align:start;
+  .mini{width:262px;min-height:474px;scroll-snap-align:start;
         background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
         border-radius:22px;padding:14px 12px 10px;display:flex;flex-direction:column;gap:8px;
         box-shadow:0 10px 26px rgba(30,24,16,.12)}
@@ -77,7 +77,7 @@
   .m-heat i.h3{background:var(--m-h3)} .m-heat i.idag{outline:1.5px solid var(--m-accent);outline-offset:-1px}
   .m-tabbar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-top:1px solid var(--m-line);
             margin:auto -12px -10px;padding:7px 0 8px}
-  .m-tab{text-align:center;font-size:6.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--m-muted)}
+  .m-tab{text-align:center;font-size:6.3px;letter-spacing:.05em;text-transform:uppercase;color:var(--m-muted)}
   .m-tab::before{content:"";display:block;width:12px;height:12px;margin:0 auto 2px;border-radius:3.5px;
                  border:1.3px solid currentColor;opacity:.75}
   .m-tab.on{color:var(--m-accent)}
@@ -102,35 +102,39 @@
   .m-actions{display:flex;gap:6px;width:100%;margin-top:4px}
   .m-actions .ghost{flex:0 0 auto;padding:7px 9px;font-size:8.5px;border-radius:7px}
   .m-actions .m-btn:not(.ghost){flex:1;padding:7px 6px;font-size:9.5px;border-radius:7px}
-  .m-banner{font-size:8px;font-weight:600;color:var(--m-bad);background:var(--m-card);
-            border:1px solid var(--m-badline);border-radius:8px;padding:5px 8px;width:100%}
-  .m-ta{width:100%;min-height:30px;border:1px solid var(--m-line);border-radius:8px;background:var(--m-card);
-        font-size:9px;font-style:italic;color:var(--m-muted);padding:5px 7px;text-align:left}
-  .m-frules{width:100%;text-align:left;display:flex;flex-direction:column;gap:4px}
-  .m-frules .t{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-muted)}
-  .m-fr{display:flex;align-items:center;gap:6px;background:var(--m-card);border:1px solid var(--m-line);
-        border-radius:8px;padding:5px 7px}
-  .m-fr .who{font-size:7.5px;color:var(--m-muted);flex:none}
-  .m-fr .q{font-size:8.5px;font-style:italic;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .m-fr .use{font-size:7px;color:var(--m-accent);border:1px solid var(--m-soft);background:var(--m-soft);
-             border-radius:99px;padding:2px 6px;flex:none}
+  /* uppmaningen är ren text — INGEN vit ruta (bara ifyllbara fält ser ut som fält) */
+  .m-must{font-size:8.5px;font-weight:700;color:var(--m-bad)}
+  .m-ta{width:100%;min-height:34px;border:1px solid var(--m-line);border-radius:8px;background:var(--m-card);
+        font-size:9px;font-style:italic;color:var(--m-muted);padding:6px 7px;text-align:left}
+  /* kompisars regler = citatrader, inte rutor */
+  .m-frules{width:100%;text-align:left;display:flex;flex-direction:column;gap:3px}
+  .m-frules .t{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-muted);margin-bottom:1px}
+  .m-frq{display:flex;align-items:baseline;gap:5px;font-size:8.5px;padding:1.5px 0}
+  .m-frq .who{color:var(--m-muted);flex:none;font-size:7.5px}
+  .m-frq .q{font-style:italic;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .m-frq .use{font-size:7px;color:var(--m-accent);background:var(--m-soft);border-radius:99px;padding:2px 7px;flex:none}
   .m-answer{display:flex;gap:7px;align-items:center}
   .m-input{flex:1;border-bottom:1.5px solid var(--m-line);color:var(--m-muted);font-size:10px;padding:5px 2px}
   .m-send{width:24px;height:24px;border-radius:50%;background:var(--m-accent);color:var(--m-on);
           display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
 
-  .m-lbrow{display:grid;grid-template-columns:14px 1fr 34px 34px 34px;gap:4px;align-items:baseline;
-           padding:6px 7px;border-radius:8px;font-size:9.5px}
-  .m-lbrow.head{font-size:6.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--m-muted);padding:2px 7px}
-  .m-lbrow .num{text-align:right;font-variant-numeric:tabular-nums}
-  .m-lbrow .top{font-weight:700;color:var(--m-accent)}
-  .m-lbrow.du{background:var(--m-soft);border:1px solid var(--m-line)}
-  .m-lbrow .rank{color:var(--m-muted);font-size:8px}
-  .m-lbcap{font-size:7px;color:var(--m-muted);line-height:1.5;margin-top:6px}
+  /* topplistor */
   .m-namerow{display:flex;justify-content:space-between;align-items:center;background:var(--m-card);
-             border:1px solid var(--m-line);border-radius:10px;padding:7px 9px;font-size:9px}
+             border:1px solid var(--m-line);border-radius:10px;padding:6px 9px;font-size:9px}
   .m-namerow b{font-size:10px}
   .m-namerow .edit{color:var(--m-accent);font-size:8px;text-decoration:underline}
+  .m-lb{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;padding:7px 9px 6px}
+  .m-lbtitle{display:flex;align-items:baseline;gap:5px;margin-bottom:4px}
+  .m-lbtitle .name{font-weight:700;font-size:9.5px}
+  .m-lbtitle .what{font-size:7px;color:var(--m-muted);margin-left:auto}
+  .m-lbr{display:grid;grid-template-columns:11px 1fr 36px;gap:4px;align-items:baseline;
+         font-size:9px;padding:2.5px 4px;border-radius:6px}
+  .m-lbr .rank{color:var(--m-muted);font-size:7.5px}
+  .m-lbr .val{text-align:right;font-variant-numeric:tabular-nums}
+  .m-lbr.etta .val,.m-lbr.etta .who{font-weight:700;color:var(--m-accent)}
+  .m-lbr.du{background:var(--m-soft)}
+  .m-lbr .du-tag{color:var(--m-muted);font-size:7px}
+
   .m-search{background:var(--m-card);border:1px solid var(--m-line);border-radius:9px;padding:6px 9px;
             font-size:9px;color:var(--m-muted)}
   .m-row{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;overflow:hidden}
@@ -150,24 +154,41 @@
 </style>
 
 <div class="page" lang="sv">
-  <p class="eyebrow">Sand vald ✓ · utkast 2 · fejkdata · inget byggt än</p>
-  <h1>Sand — lugnare fel-vy &amp; vänner</h1>
-  <p class="sub">Tre nyheter att tycka till om: <b>fel-vyn omgjord</b> (rätta svaret är stjärnan,
-  minnesregeln hopfälld tills du ber om den, en enda knapp), <b>vännernas minnesregler</b> som
-  inspiration precis när du behöver dem, och en <b>leaderboard</b> under en ny fjärde flik.</p>
+  <p class="eyebrow">Sand · utkast 3 · fejkdata · inget byggt än</p>
+  <h1>Topplistor &amp; städad fel-vy</h1>
+  <p class="sub">Ändrat sedan sist: fliken heter <b>Topplista</b> (alla som kör appen är med —
+  ingen inbjudningskod, inga grupper), <b>fyra tavlor</b> med lagom mycket kul, poäng när någon
+  <b>snor din minnesregel</b> — och i fel-vyn är <b>bara det ifyllbara fältet en vit ruta</b>.</p>
 
   <section>
-    <h2>Fel-vyn, lugnad</h2>
+    <h2>Fel · andra missen — bara en vit ruta</h2>
     <div class="blurb">
-      Vad som ändrats mot dagens plottriga variant:
-      <ul>
-        <li><b>Rätta svaret är störst</b> — det är ju det du ska lära dig. "Du skrev" krymper till en rad.</li>
-        <li><b>Minnesregelfältet är hopfällt</b> bakom en liten ✎-knapp vid första missen — öppnas bara om du vill.</li>
-        <li><b>En primär knapp.</b> "Jag hade rätt" flyttar upp som liten länk intill ditt svar.</li>
-        <li>Vid <b>andra missen</b> öppnas fältet (obligatoriskt som förut) — och där dyker <b>vännernas regler</b> upp som inspiration, med "sno"-knapp som kopierar in en regel så att du kan göra den till din.</li>
-      </ul>
+      Uppmaningen är nu <b>ren text</b> (ingen ruta som ser ut som ett fält), kompisarnas regler är
+      <b>citatrader</b> med en liten sno-knapp — det enda som ser ut som ett fält <b>är</b> fältet.
+      Snor du en regel kopieras den in i rutan så att du kan göra den till din (och ägaren får poäng 💡).
     </div>
     <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-pbar"><i style="width:80%"></i></div>
+          <div class="m-meta"><span class="m-exit">‹ Avsluta</span><span class="m-count m-mono">3 kort kvar</span><span class="m-chip m-mono">spanska → svenska</span></div>
+          <div class="m-card2 fel">
+            <p class="m-verdict b">✕ Fel — andra missen</p>
+            <div class="m-head m-serif">dock</div>
+            <p class="m-also">även: <b>emellertid</b> · <b>ändå</b></p>
+            <p class="m-must">Skriv din egen minnesregel för att gå vidare</p>
+            <div class="m-ta m-serif">Skriv något som får ordet att fastna …</div>
+            <div class="m-frules">
+              <div class="t">Sno från kompisarna</div>
+              <div class="m-frq"><span class="who">Sara</span><span class="q m-serif">"Dock-teatern stoppar hela showen"</span><span class="use">sno</span></div>
+              <div class="m-frq"><span class="who">Anton</span><span class="q m-serif">"docka in handbromsen — dock!"</span><span class="use">sno</span></div>
+            </div>
+            <div class="m-actions"><div class="m-btn">Spara &amp; gå vidare</div></div>
+          </div>
+          <div class="m-answer"><div class="m-input m-mono"></div><div class="m-send">→</div></div>
+        </div>
+        <div class="mlabel">Fel · andra missen — städad</div>
+      </div>
       <div class="minicol">
         <div class="mini">
           <div class="m-pbar"><i style="width:74%"></i></div>
@@ -184,61 +205,53 @@
           </div>
           <div class="m-answer"><div class="m-input m-mono">Enter — gå vidare</div><div class="m-send">→</div></div>
         </div>
-        <div class="mlabel">Fel · första missen — ny</div>
-      </div>
-      <div class="minicol">
-        <div class="mini">
-          <div class="m-pbar"><i style="width:80%"></i></div>
-          <div class="m-meta"><span class="m-exit">‹ Avsluta</span><span class="m-count m-mono">3 kort kvar</span><span class="m-chip m-mono">spanska → svenska</span></div>
-          <div class="m-card2 fel">
-            <p class="m-verdict b">✕ Fel — andra missen</p>
-            <div class="m-head m-serif" style="font-size:19px">dock</div>
-            <div class="m-banner">Skriv din egen minnesregel för att gå vidare</div>
-            <div class="m-ta m-serif">Skriv något som får ordet att fastna …</div>
-            <div class="m-frules">
-              <div class="t">Vännernas regler — sno fritt</div>
-              <div class="m-fr"><span class="who">Sara</span><span class="q m-serif">"Dock-teatern stoppar hela showen"</span><span class="use">använd</span></div>
-              <div class="m-fr"><span class="who">Anton</span><span class="q m-serif">"docka in handbromsen — dock!"</span><span class="use">använd</span></div>
-            </div>
-            <div class="m-actions"><div class="m-btn">Spara &amp; gå vidare</div></div>
-          </div>
-          <div class="m-answer"><div class="m-input m-mono"></div><div class="m-send">→</div></div>
-        </div>
-        <div class="mlabel">Fel · andra missen + vänner</div>
+        <div class="mlabel">Fel · första missen (oförändrad)</div>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Vänner &amp; leaderboard</h2>
+    <h2>Topplistan — fyra tavlor</h2>
     <div class="blurb">
-      Ny fjärde flik: <b>Vänner</b>. Överst väljer du vad du visas som (sparas på kontot).
-      Tavlan visar de tre måtten du bad om — <b>streak</b> (dagar i rad med minst ett pass),
-      <b>dagar totalt</b> och <b>inlärda ord</b> (Kan det, stabilitet ≥ 30 d). Ledaren i varje
-      kolumn markeras; din rad är tonad. I <b>Ordlistan</b> syns vännernas regler under din egen.
+      Alla som använder appen är med, automatiskt. Fyra tavlor med varsin ledare:
+      <b>🔥 Eld i baken</b> (längsta streak), <b>📅 Trotjänaren</b> (flest dagar totalt),
+      <b>🧠 Ordmästaren</b> (flest inlärda ord) och <b>💡 Regelfabriken</b> — poäng varje gång
+      någon snor din minnesregel. Etta i brunt, din rad tonad.
     </div>
     <div class="minirow">
       <div class="minicol">
         <div class="mini">
-          <div class="m-apphead"><span class="m-brand m-serif">Vänner</span><span class="m-date m-mono">4 kompisar</span></div>
+          <div class="m-apphead"><span class="m-brand m-serif">Topplistan</span><span class="m-date m-mono">4 spelare</span></div>
           <div class="m-namerow"><span>Du visas som <b class="m-serif">Lucas</b></span><span class="edit">ändra</span></div>
-          <div class="m-panel" style="padding:8px 6px">
-            <div class="m-lbrow head"><span></span><span>namn</span><span class="num">streak</span><span class="num">dagar</span><span class="num">ord</span></div>
-            <div class="m-lbrow"><span class="rank">1</span><span>Sara</span><span class="num top">14</span><span class="num">38</span><span class="num top">112</span></div>
-            <div class="m-lbrow du"><span class="rank">2</span><span>Lucas <span class="rank">(du)</span></span><span class="num">12</span><span class="num top">41</span><span class="num">98</span></div>
-            <div class="m-lbrow"><span class="rank">3</span><span>Anton</span><span class="num">9</span><span class="num">22</span><span class="num">75</span></div>
-            <div class="m-lbrow"><span class="rank">4</span><span>Elin</span><span class="num">3</span><span class="num">19</span><span class="num">41</span></div>
-            <div class="m-lbcap">streak = dagar i rad med minst ett pass · ord = Kan det (≥ 30 d stabilitet) · ledare per kolumn i brunt</div>
+          <div class="m-lb">
+            <div class="m-lbtitle"><span class="name">🔥 Eld i baken</span><span class="what">dagar i rad</span></div>
+            <div class="m-lbr etta"><span class="rank">1</span><span class="who">Sara</span><span class="val">14</span></div>
+            <div class="m-lbr du"><span class="rank">2</span><span class="who">Lucas <span class="du-tag">(du)</span></span><span class="val">12</span></div>
+            <div class="m-lbr"><span class="rank">3</span><span class="who">Anton</span><span class="val">9</span></div>
           </div>
-          <div class="m-panel">
-            <p class="m-plabel">Bjud in en vän</p>
-            <div class="m-actions" style="margin:0"><div class="m-btn ghost" style="flex:1">Kopiera inbjudningskod · GLOSA-7F3K</div></div>
+          <div class="m-lb">
+            <div class="m-lbtitle"><span class="name">📅 Trotjänaren</span><span class="what">dagar totalt</span></div>
+            <div class="m-lbr etta du"><span class="rank">1</span><span class="who">Lucas <span class="du-tag">(du)</span></span><span class="val">41</span></div>
+            <div class="m-lbr"><span class="rank">2</span><span class="who">Sara</span><span class="val">38</span></div>
+            <div class="m-lbr"><span class="rank">3</span><span class="who">Anton</span><span class="val">22</span></div>
+          </div>
+          <div class="m-lb">
+            <div class="m-lbtitle"><span class="name">🧠 Ordmästaren</span><span class="what">kan det-ord</span></div>
+            <div class="m-lbr etta"><span class="rank">1</span><span class="who">Sara</span><span class="val">112</span></div>
+            <div class="m-lbr du"><span class="rank">2</span><span class="who">Lucas <span class="du-tag">(du)</span></span><span class="val">98</span></div>
+            <div class="m-lbr"><span class="rank">3</span><span class="who">Anton</span><span class="val">75</span></div>
+          </div>
+          <div class="m-lb">
+            <div class="m-lbtitle"><span class="name">💡 Regelfabriken</span><span class="what">snodda regler</span></div>
+            <div class="m-lbr etta"><span class="rank">1</span><span class="who">Sara</span><span class="val">23</span></div>
+            <div class="m-lbr"><span class="rank">2</span><span class="who">Anton</span><span class="val">11</span></div>
+            <div class="m-lbr du"><span class="rank">3</span><span class="who">Lucas <span class="du-tag">(du)</span></span><span class="val">7</span></div>
           </div>
           <div class="m-tabbar">
-            <div class="m-tab">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab on">Vänner</div>
+            <div class="m-tab">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab on">Topplista</div>
           </div>
         </div>
-        <div class="mlabel">Vänner · leaderboard</div>
+        <div class="mlabel">Topplistan · fyra tavlor</div>
       </div>
       <div class="minicol">
         <div class="mini">
@@ -252,26 +265,26 @@
                 <div class="m-mine m-serif">Embargot stoppar allt — "dock" stoppar min mening.</div>
               </div>
               <div class="m-frules">
-                <div class="t">Vännernas regler</div>
-                <div class="m-fr"><span class="who">Sara</span><span class="q m-serif">"Dock-teatern stoppar hela showen"</span></div>
-                <div class="m-fr"><span class="who">Anton</span><span class="q m-serif">"docka in handbromsen — dock!"</span></div>
+                <div class="t">Kompisarnas regler</div>
+                <div class="m-frq"><span class="who">Sara</span><span class="q m-serif">"Dock-teatern stoppar hela showen"</span></div>
+                <div class="m-frq"><span class="who">Anton</span><span class="q m-serif">"docka in handbromsen — dock!"</span></div>
               </div>
             </div>
           </div>
           <div class="m-row"><div class="m-rowtop"><span class="es m-serif">el embargo</span><span class="sv">embargo</span><span class="stab m-mono">—</span></div></div>
           <div style="flex:1"></div>
           <div class="m-tabbar">
-            <div class="m-tab">Idag</div><div class="m-tab">Pass</div><div class="m-tab on">Ordlista</div><div class="m-tab">Vänner</div>
+            <div class="m-tab">Idag</div><div class="m-tab">Pass</div><div class="m-tab on">Ordlista</div><div class="m-tab">Topplista</div>
           </div>
         </div>
-        <div class="mlabel">Ordlista · med vänregler</div>
+        <div class="mlabel">Ordlista · med kompisregler</div>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Idag — med fjärde fliken</h2>
-    <div class="blurb">Startsidan är orörd (den gillar du ju) — enda skillnaden är fliken <b>Vänner</b> längst ner.</div>
+    <h2>Idag — fjärde fliken</h2>
+    <div class="blurb">Startsidan orörd — fliken heter nu <b>Topplista</b>.</div>
     <div class="minirow">
       <div class="minicol">
         <div class="mini">
@@ -291,7 +304,7 @@
             </div></div>
           <div style="flex:1"></div>
           <div class="m-tabbar">
-            <div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Vänner</div>
+            <div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div>
           </div>
         </div>
         <div class="mlabel">Idag · 4 flikar</div>
@@ -300,12 +313,12 @@
   </section>
 
   <footer>
-    <b>Beslut jag behöver innan bygget:</b>
+    <b>Kvar att besluta innan bygget:</b>
     <ol>
-      <li><b>Gruppmodellen:</b> en enda kompisgrupp som man går med i via inbjudningskod (som i mockupen) — räcker det, eller vill du kunna ha flera grupper?</li>
-      <li><b>När syns vännernas regler i passet?</b> Mockupen visar dem först vid <i>andra</i> missen (så du tvingas tänka själv först). Alternativ: redan vid första felet.</li>
-      <li><b>Delning på/av:</b> ska allt man skriver delas automatiskt med gruppen, eller vill du ha en "privat"-bock per regel?</li>
-      <li><b>Streak-räddning:</b> är streaken hård (missad dag = noll) eller ska en "frysdag" per vecka finnas? Hård är ärligast — men fråga dina vänner. 😄</li>
+      <li><b>Sno-poängen:</b> jag föreslår 1 poäng per person och ord (Sara får poäng när du snor hennes dock-regel, men inte igen om du snor om den) — ok?</li>
+      <li><b>När syns kompisreglerna i passet?</b> Mockupen: först vid <i>andra</i> missen, så du tvingas tänka själv först. Alternativ: redan vid första.</li>
+      <li><b>Delning:</b> alla regler delas automatiskt — eller vill du ha en "privat"-bock per regel?</li>
+      <li><b>Streak:</b> stenhård (missad dag = noll) eller en frysdag per vecka?</li>
     </ol>
   </footer>
 </div>
