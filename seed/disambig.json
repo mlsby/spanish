@@ -60,7 +60,7 @@
     "hint": "fristående: 'den är min'"
   },
   "mi|n": {
-    "hint": "framför substantiv: 'mi casa'"
+    "hint": "framför substantivet: min bil"
   },
   "cuando|conj": {
     "hint": "ej fråga: 'när jag var ung'"
@@ -93,7 +93,7 @@
     ]
   },
   "sin|prep": {
-    "hint": "utan något: 'sin azúcar'"
+    "hint": "saknar något: kaffe utan socker"
   },
   "sino|conj": {
     "hint": "utan tvärtom: 'inte A utan B'"
@@ -112,7 +112,7 @@
       "något",
       "viss"
     ],
-    "hint": "någon av flera: 'algún día'"
+    "hint": "någon av flera, en viss"
   },
   "señor|n": {
     "hint": "titel & 'herre'"
@@ -123,7 +123,7 @@
       "gåva",
       "talang"
     ],
-    "hint": "framför förnamn: 'don Juan'"
+    "hint": "titeln framför förnamnet; även: gåva"
   },
   "llevar|v": {
     "sv": "ta med",
@@ -220,7 +220,7 @@
     "hint": "person: 'ingen kom'"
   },
   "ninguno|determiner": {
-    "hint": "ingen av dem: 'ninguno de ellos'"
+    "hint": "ingen av dem — om saker i ett urval"
   },
   "claro|adj": {
     "hint": "tydlig, ljus"
@@ -240,7 +240,7 @@
     "alt": [
       "preparado"
     ],
-    "hint": "estar listo = redo; ser listo = smart"
+    "hint": "redo för stunden — eller skärpt som egenskap"
   },
   "forma|n": {
     "alt": [
@@ -475,7 +475,7 @@
       "grav",
       "djup"
     ],
-    "hint": "svår/grav: 'estado grave'",
+    "hint": "svårt läge: skada, sjukdom, kris",
     "alt": [
       "serio"
     ]
@@ -590,7 +590,7 @@
     ]
   },
   "plan|n": {
-    "hint": "planen man har"
+    "hint": "det man tänker göra"
   },
   "proyecto|n": {
     "sv": "projekt",
@@ -625,7 +625,7 @@
       "tjusa",
       "hänföra"
     ],
-    "hint": "om saker: 'me encanta el café'"
+    "hint": "om saker man älskar: kaffe, musik"
   },
   "extraño|adj": {
     "sv": "konstig",
@@ -655,10 +655,10 @@
     "hint": "även: kvart, fjärdedel"
   },
   "tras|prep": {
-    "hint": "tätt efter/bakom: 'tras la puerta'"
+    "hint": "tätt efter — i följd eller jakt"
   },
   "detrás|adv": {
-    "hint": "fristående: 'detrás de mí'"
+    "hint": "fristående: bakom mig, där bakom"
   },
   "negocio|n": {
     "hint": "business, affärer"
@@ -671,7 +671,7 @@
     ]
   },
   "par|n": {
-    "hint": "två stycken: 'un par de'"
+    "hint": "två stycken som hör ihop"
   },
   "pareja|n": {
     "hint": "kärlekspar; partner"
@@ -1024,10 +1024,10 @@
     ]
   },
   "así|adv": {
-    "hint": "på det sättet: 'así es'"
+    "hint": "på det sättet, på det viset"
   },
   "tan|adv": {
-    "hint": "framför adjektiv: 'tan grande'"
+    "hint": "framför adjektiv: så stor, så bra"
   },
   "tal|pron": {
     "sv": "sådan",
@@ -1169,7 +1169,7 @@
       "dit",
       "därborta"
     ],
-    "hint": "långt bort, riktning: 'hasta allá'"
+    "hint": "långt bort, med riktning: dit bort"
   },
   "lugar|n": {
     "alt": [
@@ -1198,7 +1198,7 @@
     "alt": [
       "terminar"
     ],
-    "hint": "acabar de = just ha gjort"
+    "hint": "ta slut, sluta; även: nyss ha gjort något"
   },
   "terminar|v": {
     "sv": "sluta",
@@ -1230,7 +1230,7 @@
       "intentar",
       "pretender"
     ],
-    "hint": "tratar de; även: behandla"
+    "hint": "försöka; även: behandla, handla om"
   },
   "intentar|v": {
     "sv": "försöka",
@@ -1292,7 +1292,7 @@
       "förnuft",
       "grund"
     ],
-    "hint": "tener razón = ha rätt"
+    "hint": "skälet bakom; även förnuftet"
   },
   "base|n": {
     "hint": "fundament"
@@ -1412,7 +1412,7 @@
     ]
   },
   "vez|n": {
-    "hint": "una vez = en gång"
+    "hint": "tillfället: en gång, nästa gång"
   },
   "marcha|n": {
     "sv": "marsch",
@@ -1423,19 +1423,19 @@
     ]
   },
   "ese|determiner": {
-    "hint": "nära dig, framför substantiv: 'ese libro'",
+    "hint": "nära dig; framför ett substantiv",
     "alt": [
       "ése"
     ]
   },
   "ése|pron": {
-    "hint": "nära dig, fristående: 'dame ése'",
+    "hint": "nära dig; står ensamt utan substantiv",
     "alt": [
       "ese"
     ]
   },
   "serio|adj": {
-    "hint": "seriös; på allvar",
+    "hint": "allvarsam min, inte skämtsam",
     "alt": [
       "grave"
     ]
