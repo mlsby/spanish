@@ -1,0 +1,440 @@
+<title>Glosa · Startsidan — fyra förslag</title>
+<style>
+  :root{
+    --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:clamp(30px,4.6vw,42px);margin:0;line-height:1.08;text-wrap:balance}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.55;max-width:66ch;margin:12px 0 0}
+  .sub b{color:var(--ink)}
+  .sub ul{margin:10px 0 0;padding-left:20px}
+  .sub li{margin-bottom:5px}
+
+  section{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+  section h2{font-family:ui-serif,Georgia,serif;font-size:25px;margin:0 0 4px}
+  .blurb{color:var(--muted);font-size:14.5px;line-height:1.6;max-width:74ch;margin:4px 0 16px}
+  .blurb b{color:var(--ink)}
+
+  .minirow{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+  .minicol{flex:0 0 262px;display:flex;flex-direction:column}
+  .mini{width:262px;min-height:474px;scroll-snap-align:start;
+        background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
+        border-radius:22px;padding:14px 12px 10px;display:flex;flex-direction:column;gap:8px;
+        box-shadow:0 10px 26px rgba(30,24,16,.12)}
+  .mini,.mini *{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .mlabel{text-align:center;font-family:ui-monospace,Menlo,monospace !important;
+          font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+
+  /* ---------- Sand-tokens (frames är alltid ljusa — det är artwork) ---------- */
+  .mini{
+    --m-app:#F7F3EB; --m-card:#FFFDF8; --m-ink:#2B241E; --m-muted:#79695A; --m-line:#E6DCCB; --m-rule:#F0EADD;
+    --m-accent:#59452F; --m-on:#FFF9EF; --m-soft:#EFE6D6;
+    --m-good:#54683A; --m-goodbg:#EEF1E1; --m-goodline:#D8DFC2;
+    --m-h1:#E2D6BE; --m-h2:#BCA482; --m-h3:#59452F;
+  }
+
+  .m-serif{font-family:ui-serif,"Iowan Old Style",Georgia,serif !important}
+  .m-mono{font-family:ui-monospace,Menlo,Consolas,monospace !important}
+  .m-apphead{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+  .m-brand{font-weight:600;font-size:13.5px}
+  .m-brand i{color:var(--m-accent);font-style:normal}
+  .m-date{font-size:8.5px;color:var(--m-muted);margin-left:auto}
+  .m-gear{width:14px;height:14px;border:1.2px solid var(--m-muted);border-radius:50%;position:relative;flex:none;align-self:center}
+  .m-gear::after{content:"";position:absolute;inset:3.5px;border-radius:50%;border:1.2px solid var(--m-muted)}
+
+  .m-streak{display:flex;gap:5px;align-items:center;font-size:8.5px;color:var(--m-muted)}
+  .m-streak b{color:var(--m-ink);font-weight:600}
+  .m-streak .sep{opacity:.5}
+
+  .m-hero{background:var(--m-card);border:1px solid var(--m-line);border-radius:12px;padding:12px 10px;text-align:center}
+  .m-plabel{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-muted);margin:0 0 5px}
+  .m-big{font-size:30px;line-height:1}
+  .m-big small{font-size:12px;color:var(--m-muted);font-weight:400;margin-left:2px}
+  .m-cap{color:var(--m-muted);font-size:8.5px;margin-top:4px}
+  .m-cap b{color:var(--m-ink)}
+  .m-btn{background:var(--m-accent);color:var(--m-on);border-radius:8px;
+         padding:8px 6px;font-size:10px;font-weight:600;text-align:center}
+  .m-btn.ghost{background:none;border:1px solid var(--m-line);color:var(--m-accent);font-weight:500}
+  .m-hero .m-btn{margin-top:9px}
+  .m-ghostrow{display:flex;gap:5px;margin-top:5px}
+  .m-ghostrow .m-btn{flex:1;margin-top:0;padding:6px 4px;font-size:8.5px}
+
+  .m-done{color:var(--m-good);font-weight:700;font-size:11px}
+  .m-hero.klar{background:var(--m-goodbg);border-color:var(--m-goodline)}
+
+  /* checklistan (B) — rader inuti hero-kortet, ingen ruta ser ut som ett fält */
+  .m-task{display:flex;align-items:center;gap:7px;text-align:left;font-size:9.5px;
+          padding:6px 2px;border-bottom:1px solid var(--m-rule)}
+  .m-task:last-of-type{border-bottom:none}
+  .m-task .box{width:11px;height:11px;border:1.3px solid var(--m-line);border-radius:3.5px;flex:none}
+  .m-task.done .box{background:var(--m-good);border-color:var(--m-good);position:relative}
+  .m-task.done .box::after{content:"✓";position:absolute;inset:0;color:#fff;font-size:8px;line-height:11px;text-align:center}
+  .m-task.done .t{color:var(--m-muted);text-decoration:line-through;text-decoration-thickness:.5px}
+  .m-task .t{flex:1}
+  .m-task .n{color:var(--m-muted);font-size:8px;font-variant-numeric:tabular-nums}
+  .m-task.bonus .box{border-style:dashed;border-radius:50%}
+  .m-task.bonus .t{color:var(--m-muted)}
+
+  .m-panel{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;padding:8px 9px}
+  .m-meter{height:5px;background:var(--m-rule);border-radius:3px;overflow:hidden;margin:2px 0 4px}
+  .m-meter i{display:block;height:100%;background:var(--m-accent);border-radius:3px}
+  .m-metercap{display:flex;justify-content:space-between;font-size:7.5px;color:var(--m-muted)}
+  .m-metercap b{color:var(--m-ink)}
+  .m-legend{display:flex;gap:8px;margin-top:5px;font-size:7.5px;color:var(--m-muted)}
+  .m-legend b{color:var(--m-ink);font-weight:600}
+  .m-dot{display:inline-block;width:4.5px;height:4.5px;border-radius:50%;margin-right:2px;vertical-align:1px}
+  .m-dot.ny{background:var(--m-h1)} .m-dot.lar{background:var(--m-h2)} .m-dot.kan{background:var(--m-h3)}
+
+  .m-heat{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+  .m-heat i{aspect-ratio:1;border-radius:2px;background:var(--m-rule)}
+  .m-heat i.h1{background:var(--m-h1)} .m-heat i.h2{background:var(--m-h2)}
+  .m-heat i.h3{background:var(--m-h3)}
+  .m-heat i.idag{outline:1.5px solid var(--m-accent);outline-offset:-1px}
+  .m-heatcap{display:flex;justify-content:space-between;font-size:6.8px;color:var(--m-muted);margin-top:4px}
+
+  .m-spark{display:block;width:100%;height:34px}
+
+  .m-actionbar{background:var(--m-card);border:1px solid var(--m-line);border-radius:12px;padding:9px 10px;
+               display:flex;align-items:center;gap:8px;text-align:left}
+  .m-actionbar .txt{flex:1;min-width:0}
+  .m-actionbar .n{font-size:13px;font-weight:600;line-height:1.1}
+  .m-actionbar .d{font-size:7.5px;color:var(--m-muted);margin-top:1px}
+  .m-actionbar .m-btn{padding:7px 12px;font-size:9.5px;flex:none}
+
+  .m-ringwrap{display:flex;flex-direction:column;align-items:center;gap:6px;
+              background:var(--m-card);border:1px solid var(--m-line);border-radius:12px;padding:12px 10px}
+  .m-ring{width:92px;height:92px}
+  .m-ringtxt{text-align:center}
+  .m-ringtxt .n{font-size:9px;color:var(--m-muted)}
+
+  .m-more{text-align:center;font-size:7px;color:var(--m-muted);letter-spacing:.05em;opacity:.85}
+
+  .m-tabbar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-top:1px solid var(--m-line);
+            margin:auto -12px -10px;padding:7px 0 8px}
+  .m-tab{text-align:center;font-size:6.3px;letter-spacing:.05em;text-transform:uppercase;color:var(--m-muted)}
+  .m-tab::before{content:"";display:block;width:12px;height:12px;margin:0 auto 2px;border-radius:3.5px;
+                 border:1.3px solid currentColor;opacity:.75}
+  .m-tab.on{color:var(--m-accent)}
+
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:14.5px;line-height:1.65;max-width:74ch}
+  footer b{color:var(--ink)}
+  footer ol{margin:10px 0 0;padding-left:20px}
+  footer li{margin-bottom:7px}
+</style>
+
+<div class="page" lang="sv">
+  <p class="eyebrow">Sand · startsidan · fyra layoutförslag · inget byggt än</p>
+  <h1>Fyra sätt att öppna Glosa</h1>
+  <p class="sub">Samma innehåll, fyra hierarkier. Siffrorna är <b>dina riktiga från idag</b>:
+  19 repetitioner + 14 nya ord (28 kort) = <b>47 kort</b> — så du ser direkt hur räknefixen känns.
+  Gemensamt i alla fyra:
+  <ul>
+    <li><b>Kort räknas överallt</b> — stora talet är samma tal som passet visar, med uträkningen synlig.</li>
+    <li><b>Bonusord</b> går alltid att plocka, inte bara när dagens kvot är slut.</li>
+    <li><b>Streaken 🔥 syns på startsidan</b> (idag bor den bara i Topplistan).</li>
+    <li>Konto, backup och "om" flyttar ned/bakom <b>kugghjulet</b> — mindre brus ovanför vecket. Takten (nya ord/dag) följer med dit.</li>
+  </ul></p>
+
+  <!-- ============ A ============ -->
+  <section>
+    <h2>A · Passet först</h2>
+    <div class="blurb">Sidan svarar på <b>"vad gör jag nu?"</b> innan något annat: ett stort tal (i kort),
+    uträkningen under, en primär knapp. Resa och kalender kommer sen. Ärlig nackdel: kalendern —
+    som du ville ha på startsidan från början — hamnar en bit ner.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-streak"><span>🔥 <b>5 dagar i rad</b></span><span class="sep">·</span><span>öva idag så blir det 6</span></div>
+          <div class="m-hero">
+            <p class="m-plabel">Dagens pass</p>
+            <div class="m-big m-serif">47<small>kort</small></div>
+            <p class="m-cap"><b>19</b> repetitioner + <b>14</b> nya ord <span class="m-mono">(2 kort/ord)</span></p>
+            <div class="m-btn">Starta</div>
+            <div class="m-ghostrow"><div class="m-btn ghost">Bara repetitioner · 19</div><div class="m-btn ghost">+ bonusord</div></div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Din resa · mål 5 000 ord</p>
+            <div class="m-meter"><i style="width:15%"></i></div>
+            <div class="m-metercap"><span><b>148</b> påbörjade</span><span>1 000 i basen</span></div>
+            <div class="m-legend"><span><i class="m-dot ny"></i><b>852</b> nya</span><span><i class="m-dot lar"></i><b>127</b> lär mig</span><span><i class="m-dot kan"></i><b>21</b> kan det</span></div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="morgon"></div>
+            <div class="m-heatcap"><span>övat 9 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ kan det-graf · om Glosa</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">A · morgonläget</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-streak"><span>🔥 <b>6 dagar i rad</b></span><span class="sep">·</span><span>säkrad till midnatt</span></div>
+          <div class="m-hero klar">
+            <p class="m-plabel">Dagens pass</p>
+            <p class="m-done">✓ Klart för idag</p>
+            <p class="m-cap"><b>47</b> kort · 21 rätt direkt · 5 stavfel</p>
+            <div class="m-btn ghost" style="margin-top:9px">+5 bonusord</div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Din resa · mål 5 000 ord</p>
+            <div class="m-meter"><i style="width:16%"></i></div>
+            <div class="m-metercap"><span><b>162</b> påbörjade</span><span>1 000 i basen</span></div>
+            <div class="m-legend"><span><i class="m-dot ny"></i><b>838</b> nya</span><span><i class="m-dot lar"></i><b>140</b> lär mig</span><span><i class="m-dot kan"></i><b>22</b> kan det</span></div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="klart"></div>
+            <div class="m-heatcap"><span>övat 10 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ kan det-graf · om Glosa</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">A · klart för idag</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section>
+    <h2>B · Checklistan</h2>
+    <div class="blurb">Dagen som <b>bockrader</b>: repetitioner, nya ord, bonus. Det unika är
+    <b>halvvägsläget</b> — delar du upp passet över dagen ser du exakt vad som återstår, och det
+    avbockade stryks. Ärlig nackdel: mest "att göra-app"-känsla av de fyra.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-streak"><span>🔥 <b>5 dagar i rad</b></span></div>
+          <div class="m-hero" style="text-align:left">
+            <p class="m-plabel">Idag · 47 kort</p>
+            <div class="m-task"><span class="box"></span><span class="t">Repetitioner</span><span class="n m-mono">19 kort</span></div>
+            <div class="m-task"><span class="box"></span><span class="t">Nya ord</span><span class="n m-mono">14 ord · 28 kort</span></div>
+            <div class="m-task bonus"><span class="box"></span><span class="t">Bonusord — plocka när du vill</span><span class="n m-mono">+5</span></div>
+            <div class="m-btn">Starta · 47 kort</div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="morgon"></div>
+            <div class="m-heatcap"><span>övat 9 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ resa · graf · om</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">B · morgonläget</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-streak"><span>🔥 <b>6 dagar i rad</b></span><span class="sep">·</span><span>19 av 47 kort gjorda</span></div>
+          <div class="m-hero" style="text-align:left">
+            <p class="m-plabel">Idag · 28 kort kvar</p>
+            <div class="m-task done"><span class="box"></span><span class="t">Repetitioner</span><span class="n m-mono">19 ✓</span></div>
+            <div class="m-task"><span class="box"></span><span class="t">Nya ord</span><span class="n m-mono">14 ord · 28 kort</span></div>
+            <div class="m-task bonus"><span class="box"></span><span class="t">Bonusord — plocka när du vill</span><span class="n m-mono">+5</span></div>
+            <div class="m-btn">Fortsätt · 28 kort</div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="klart"></div>
+            <div class="m-heatcap"><span>övat 10 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ resa · graf · om</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">B · halvvägs — det stryks</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-streak"><span>🔥 <b>6 dagar i rad</b></span><span class="sep">·</span><span>säkrad till midnatt</span></div>
+          <div class="m-hero klar" style="text-align:left">
+            <p class="m-plabel">Idag · klart</p>
+            <div class="m-task done"><span class="box"></span><span class="t">Repetitioner</span><span class="n m-mono">19 ✓</span></div>
+            <div class="m-task done"><span class="box"></span><span class="t">Nya ord</span><span class="n m-mono">28 ✓</span></div>
+            <div class="m-btn ghost">+5 bonusord?</div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="klart"></div>
+            <div class="m-heatcap"><span>övat 10 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ resa · graf · om</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">B · klart + bonus</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ C ============ -->
+  <section>
+    <h2>C · Kalendern främst</h2>
+    <div class="blurb">Din ursprungstanke, renodlad: det första du ser är <b>mönstret</b> —
+    kalendern och streaken — och direkt under en smal <b>handlingsrad</b> med talet och knappen.
+    Morgonritual: se rutorna, fyll dagens. Ärlig nackdel: knappen ligger ett snäpp ner,
+    och på riktigt små skärmar kan den hamna vid vecket.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-panel">
+            <p class="m-plabel">🔥 5 i rad · övat 9 av senaste 30</p>
+            <div class="m-heat" data-seed="morgon"></div>
+            <div class="m-heatcap"><span>maj</span><span>juni</span><span>juli</span><span>aug</span></div>
+          </div>
+          <div class="m-actionbar">
+            <div class="txt"><div class="n m-serif">47 kort väntar</div>
+              <div class="d">19 rep + 14 nya ord (28 kort)</div></div>
+            <div class="m-btn">Starta</div>
+          </div>
+          <div class="m-ghostrow"><div class="m-btn ghost">Bara repetitioner · 19</div><div class="m-btn ghost">+ bonusord</div></div>
+          <div class="m-panel">
+            <p class="m-plabel">Din resa · mål 5 000 ord</p>
+            <div class="m-meter"><i style="width:15%"></i></div>
+            <div class="m-metercap"><span><b>148</b> påbörjade · <b>21</b> kan det</span><span>1 000 i basen</span></div>
+          </div>
+          <p class="m-more">↓ graf · om</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">C · morgonläget</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-panel">
+            <p class="m-plabel">🔥 6 i rad · dagens ruta ifylld</p>
+            <div class="m-heat" data-seed="klart"></div>
+            <div class="m-heatcap"><span>maj</span><span>juni</span><span>juli</span><span>aug</span></div>
+          </div>
+          <div class="m-actionbar" style="background:var(--m-goodbg);border-color:var(--m-goodline)">
+            <div class="txt"><div class="n m-serif" style="color:var(--m-good)">Klart för idag ✓</div>
+              <div class="d">47 kort · streaken säkrad</div></div>
+            <div class="m-btn ghost">+5 bonus</div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Din resa · mål 5 000 ord</p>
+            <div class="m-meter"><i style="width:16%"></i></div>
+            <div class="m-metercap"><span><b>162</b> påbörjade · <b>22</b> kan det</span><span>1 000 i basen</span></div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Kan det · över tid</p>
+            <svg class="m-spark" viewBox="0 0 100 30" preserveAspectRatio="none" role="img" aria-label="Kan det-kurva">
+              <path d="M2 27 L14 26 L26 25 L38 25 L50 23 L62 21 L74 20 L86 17 L98 15" fill="none" stroke="#59452F" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="98" cy="15" r="2.2" fill="#59452F"/>
+            </svg>
+          </div>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">C · klart för idag</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ D ============ -->
+  <section>
+    <h2>D · Ringen</h2>
+    <div class="blurb">Dagens kort som en <b>ring som fylls</b> medan du övar — belöningen syns
+    direkt när du öppnar appen, och bonusord förlänger ringen förbi 100 %. Mest lekfull av de fyra.
+    Ärlig nackdel: ringen är snyggast men <b>minst informationstät</b> — den säger inget som
+    raden under inte redan säger.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-ringwrap">
+            <svg class="m-ring" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#F0EADD" stroke-width="9"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#59452F" stroke-width="9" stroke-linecap="round"
+                      stroke-dasharray="4 247.3" transform="rotate(-90 50 50)"/>
+              <text x="50" y="47" text-anchor="middle" font-size="22" font-family="Georgia,serif" fill="#2B241E">47</text>
+              <text x="50" y="61" text-anchor="middle" font-size="8" fill="#79695A">kort idag</text>
+            </svg>
+            <div class="m-ringtxt"><div class="n">19 rep + 14 nya ord (28 kort) · 🔥 5</div></div>
+            <div class="m-btn" style="width:100%">Starta</div>
+            <div class="m-ghostrow" style="width:100%"><div class="m-btn ghost">Bara rep · 19</div><div class="m-btn ghost">+ bonus</div></div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="morgon"></div>
+            <div class="m-heatcap"><span>övat 9 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ resa · graf · om</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">D · morgonläget</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-apphead"><span class="m-brand m-serif">Glosa<i>.</i></span><span class="m-date m-mono">sön 10 aug</span><span class="m-gear"></span></div>
+          <div class="m-ringwrap">
+            <svg class="m-ring" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#F0EADD" stroke-width="9"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#54683A" stroke-width="9" stroke-linecap="round"
+                      stroke-dasharray="251.3 0" transform="rotate(-90 50 50)"/>
+              <text x="50" y="47" text-anchor="middle" font-size="20" font-family="Georgia,serif" fill="#54683A">✓</text>
+              <text x="50" y="61" text-anchor="middle" font-size="8" fill="#79695A">47 av 47</text>
+            </svg>
+            <div class="m-ringtxt"><div class="n">🔥 <b>6 dagar i rad</b> · säkrad till midnatt</div></div>
+            <div class="m-btn ghost" style="width:100%">+5 bonusord — förläng ringen</div>
+          </div>
+          <div class="m-panel">
+            <p class="m-plabel">Övningskalender</p>
+            <div class="m-heat" data-seed="klart"></div>
+            <div class="m-heatcap"><span>övat 10 av senaste 30</span><span>12 veckor</span></div>
+          </div>
+          <p class="m-more">↓ resa · graf · om</p>
+          <div class="m-tabbar"><div class="m-tab on">Idag</div><div class="m-tab">Pass</div><div class="m-tab">Ordlista</div><div class="m-tab">Topplista</div></div>
+        </div>
+        <div class="mlabel">D · klart + bonus</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Så väljer du:</b> svara "A", "B", "C" eller "D" — eller mixa fritt
+    ("C:s kalender överst men med B:s bockrader"). Detaljer att ta ställning till samtidigt:
+    <ol>
+      <li><b>Bonusord</b> — ska de räknas av mot morgondagens kvot eller vara gratis?
+        Förslagen ovan antar <b>gratis</b> (bonus ska kännas som bonus).</li>
+      <li><b>Kugghjulet</b> — alla fyra flyttar takt-stegaren, konto/synk, backup och "om"
+        bakom ⚙ uppe till höger. Säg till om något av det ska bo kvar på sidan.</li>
+      <li>Progressionsmätaren visar <b>andel av basens 1 000 ord</b> (med målet 5 000 i texten) —
+        mot 5 000 ser mätaren tom ut i månader.</li>
+    </ol>
+    Allt är fejkdata utom dagens siffror (19 + 14 → 47, direkt ur din skärmdump). Inget av detta
+    är byggt — appen är orörd tills du valt.
+  </footer>
+</div>
+
+<script>
+  // Deterministisk heatmap: 12 veckor × 7 dagar, aktivitet bara sista ~2 veckorna
+  // (appen är ny). "morgon": dagens ruta tom. "klart": dagens ruta fylld.
+  const HISTORY = [0,0,0,1,2,2,3,0,2,3,2,1,2]; // d-13 … d-1 (nollan = hålet som bröt förra streaken)
+  document.querySelectorAll(".m-heat").forEach((el) => {
+    const today = el.dataset.seed === "klart" ? 3 : 0;
+    const vals = new Array(84).fill(0);
+    HISTORY.forEach((v, i) => { vals[84 - 1 - HISTORY.length + i] = v; });
+    vals[83] = today;
+    el.innerHTML = vals.map((v, i) =>
+      `<i class="${v ? "h" + v : ""}${i === 83 ? " idag" : ""}"></i>`).join("");
+  });
+</script>

@@ -31,7 +31,10 @@ annars alltid intill varandra), omkösning via Again (+3) och korta köer.
    `introducedToday` (bonus idag = färre imorgon) eller inte? Luta åt *inte* —
    bonus ska kännas gratis.
 3. **Allmän logiköversyn av Idag-fliken** — ordning och hierarki (vad är
-   handling, vad är statistik), Lucas återkommer med detaljer.
+   handling, vad är statistik). Mockupförslag finns i `design/startsida.html`:
+   A Passet först · B Checklistan · C Kalendern främst · D Ringen — alla med
+   kort-räkning, bonusord, streak på startsidan och ⚙ för konto/inställningar.
+   Väntar på Lucas val (eller mix).
 
 ## Feedback-vyn: längre visning vid stavfel + håll-för-paus (antecknad 2026-08-10)
 
