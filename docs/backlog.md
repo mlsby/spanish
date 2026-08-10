@@ -33,6 +33,22 @@ annars alltid intill varandra), omkösning via Again (+3) och korta köer.
 3. **Allmän logiköversyn av Idag-fliken** — ordning och hierarki (vad är
    handling, vad är statistik), Lucas återkommer med detaljer.
 
+## Feedback-vyn: längre visning vid stavfel + håll-för-paus (antecknad 2026-08-10)
+
+1. **Rätt-med-stavfel ska visas längre.** Idag: good 1500 ms, hard/override
+   2600 ms (`AUTO_MS` i `pass.ts`) — hard är alltså redan längre, men inte
+   tillräckligt. Förslag: hard/override ≈ 4000 ms, och markera själva stavfelet
+   visuellt (t.ex. rätt stavning med de avvikande tecknen betonade) så att den
+   extra tiden faktiskt används till att se vad som blev fel.
+2. **Håll in kortet för att pausa.** Idag finns tap-toggle ("tryck för paus")
+   och nedräkningsbaren fryser redan via `.card.paused .cdbar
+   {animation-play-state:paused}`. Ändra interaktionen till *håll*: pointerdown
+   på kortet → paus så länge fingret ligger kvar, pointerup → fortsätt.
+   Fällor: kortets befintliga pointerdown-hanterare (keepFocus, preventDefault)
+   ska samsas med detta; iOS långtryck behöver `-webkit-touch-callout:none` +
+   `user-select:none` på kortet i feedbacklägena så inte textmarkering/
+   delningsmenyn triggas; behåll Enter-för-nästa.
+
 ## Övrigt öppet (sedan tidigare)
 
 - **Brevo-SMTP felsöks**: "Error sending magic link email" vid testet — orsaken
