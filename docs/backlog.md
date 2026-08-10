@@ -15,6 +15,24 @@ bara syskonen kvar på slutet) får de ligga intill — bättre än att tappa ko
 Testfall: nyintroducerade ord (båda riktningarna skapas samtidigt och hamnar
 annars alltid intill varandra), omkösning via Again (+3) och korta köer.
 
+## Hemskärmen görs om (antecknad 2026-08-10)
+
+1. **Siffrorna går inte ihop.** Heron visar `due + newAvailable` — men `due` är
+   *kort* och `newAvailable` är *ord*, och varje nytt ord blir två kort. Lucas
+   såg "33" på hemskärmen och "47 kort kvar" i passet (19 rep + 14 nya ord →
+   19 + 28 kort). Fix: räkna kort överallt och visa uträkningen öppet, t.ex.
+   "19 repetitioner + 14 nya ord (28 kort)". Gäller även knappen
+   "Bara repetitioner (N)" — den är redan i kort, behåll.
+2. **Bonusord.** Man ska alltid kunna plocka fler nya ord utöver dagstakten
+   (t.ex. "+5 bonusord" när dagens nya är slut). Obs: `introduceToday()` är
+   idempotent per dag via `introducedToday()` — bonus behöver ett eget API som
+   medvetet går förbi dagsbudgeten, annars äter bonusorden morgondagens kvot
+   på andra enheter efter synk (eller tvärtom). Bestäm: ska bonus räknas in i
+   `introducedToday` (bonus idag = färre imorgon) eller inte? Luta åt *inte* —
+   bonus ska kännas gratis.
+3. **Allmän logiköversyn av Idag-fliken** — ordning och hierarki (vad är
+   handling, vad är statistik), Lucas återkommer med detaljer.
+
 ## Övrigt öppet (sedan tidigare)
 
 - **Brevo-SMTP felsöks**: "Error sending magic link email" vid testet — orsaken
