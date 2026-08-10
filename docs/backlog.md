@@ -98,9 +98,23 @@ Tänkt upplägg:
   rätta svaret) släpps böjningarna in några i taget — jag-formen först funkar
   fint pedagogiskt (och är oftast ändå bland de frekventaste), sen 3:e person
   sing. som är spanskans arbetshäst.
-- **Grundform i facit, alltid:** på böjningskortens feedback en stödrad i stil
-  med "*puedo* → jag kan · av **poder** = kunna". (Kan byggas oberoende av
-  resten och är nästan gratis.)
+- **Grundverb i facit på varje böjningskort — detaljerat (Lucas 2026-08-10):**
+  - *Datakrav:* varje formkort bär `parentId` + etikett (tempus + person,
+    t.ex. "presens · jag").
+  - *Frågesidan visar ALDRIG grundverbet* — det skulle avslöja stammen
+    (sv→es) eller betydelsen (es→sv). Kortets lilla etikett säger bara
+    "VERB · PRESENS" — **utan person** i es→sv-riktningen, eftersom personen
+    är en del av svaret ("quiero" → *jag* vill).
+  - *Facit es→sv:* huvudrad **jag vill** · stödrad "av **querer** = vilja".
+  - *Facit sv→es:* huvudrad **quiero** · stödrad "av **querer** = vilja".
+  - *Stödraden visas i ALLA feedbacklägen* — rätt, rätt-med-stavfel, override,
+    fel, tvingad minnesregel och "visste inte" (extra viktig där) — på samma
+    plats som dagens hint-rad: under huvudfacit, muted, grundverbet i fet.
+  - *Ordlistan:* expanderad formrad visar samma stödrad + hopp till
+    moderverbets rad.
+  - *Krockar inte* med alt-raden ("även rätt: …") — den gäller formens egna
+    alternativ; stödraden är alltid moderverbets.
+  - Kan byggas oberoende av resten av böjningspaketet och är nästan gratis.
 - **Minnesregeln delas med moderverbet** — regeln för poder gäller alla former
   (tvåfelsregeln räknas per kort som vanligt). Rimligt? Lucas bekräftar.
 - **Öppet beslut:** ska böjningskort äta av samma dagsbudget som nya ord, eller
@@ -119,6 +133,40 @@ Tänkt upplägg:
   toppformer låses upp direkt och dominerar kön några veckor (lätta poäng,
   throttlat av budgeten). Preteritum/imperfekt behöver parentesledtrådar
   eftersom svenskan inte skiljer dem ("ville" = quería/quise) — fas 2.
+
+## Anpassning till förkunskaper (diskussion öppnad 2026-08-10)
+
+Lucas: de flesta kan redan ett gäng ord — appen ska ta vara på det, utan
+"vad kan du?"-enkäter. Hans hypotes: rätt svar vid *första mötet* ⇒ ordet är
+nog redan känt ⇒ borde ge utrymme för fler nya ord. Föreslagen design
+(tre mekanismer som samverkar, ej beslutad):
+
+1. **Auto-fast-track (osynlig):** första recensionen någonsin på ett kort
+   (reps === 0) + **exakt** rätt (inte fuzzy, inte AI) ⇒ betygsätt **Easy**
+   istället för Good. ts-fsrs ger då lång startstabilitet (~2 v) istället för
+   dagar — kända ord schemalägger ut sig själva ur vardagen utan något UI.
+   Stavfelsrätt första gången förblir Hard (osäkert ⇒ ingen fast-track).
+2. **"Kan redan"-länk vid första mötet:** på ett korts allra första visning
+   finns (bredvid "vet inte") en diskret "kan redan →". Effekt: båda
+   riktningarnas kort får Easy-behandling direkt utan att sv→es-kortet ens
+   behöver visas. Bara synlig när reps === 0 — efteråt gäller ärligt svar.
+3. **Budgetåterbäring:** ett ord vars båda kort klarades exakt vid första
+   mötet (eller markerades "kan redan") kostar ingen introduktionsplats —
+   nästa frekvensord låses upp samma dag. Cap: max 3× dagstakten i totala
+   introduktioner/dag, som skydd mot repetitionslavin veckan efter.
+
+Viktiga egenskaper:
+- **Självkorrigerande:** gissningsbara ord (importante) som fast-trackas fel
+  åker på en lapse vid 2-veckors-recensionen och faller tillbaka i vanlig
+  inlärning + tvåfelsregeln. Ingen skada skedd — bara en ärlig omväg.
+- **"Kan det"-etiketten förblir förtjänad:** fast-track sätter INTE stabilitet
+  ≥ 30 d direkt — den kommer när första långintervallsrecensionen klaras.
+  Känt ord ⇒ "kan det" på ~2–3 veckor istället för ~2 månader.
+- **Nybörjare påverkas inte alls:** utan exakta förstasvar är allt som idag.
+- Passar böjningsplanen: formkort ärver samma regler (kan redan på puedo
+  fast-trackar puedo, inte poder).
+- Öppet: ska "kan redan" även synas i ordlistan för o-introducerade ord?
+  (Lutning: nej — flödet räcker, enkäter var uttryckligen oönskade.)
 
 ## Övrigt öppet (sedan tidigare)
 
