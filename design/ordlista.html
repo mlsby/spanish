@@ -1,0 +1,274 @@
+<title>Glosa · Ordlistan — nivåer & markering</title>
+<style>
+  :root{
+    --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:clamp(30px,4.6vw,42px);margin:0;line-height:1.08;text-wrap:balance}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.55;max-width:70ch;margin:12px 0 0}
+  .sub b{color:var(--ink)}
+  section{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+  section h2{font-family:ui-serif,Georgia,serif;font-size:25px;margin:0 0 4px}
+  .blurb{color:var(--muted);font-size:14.5px;line-height:1.6;max-width:74ch;margin:4px 0 16px}
+  .blurb b{color:var(--ink)}
+  .minirow{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+  .minicol{flex:0 0 262px;display:flex;flex-direction:column}
+  .mini{width:262px;min-height:440px;scroll-snap-align:start;
+        background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
+        border-radius:22px;padding:14px 12px 12px;display:flex;flex-direction:column;gap:7px;
+        box-shadow:0 10px 26px rgba(30,24,16,.12)}
+  .mini,.mini *{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .mlabel{text-align:center;font-family:ui-monospace,Menlo,monospace !important;
+          font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+
+  .mini{
+    --m-app:#F7F3EB; --m-card:#FFFDF8; --m-ink:#2B241E; --m-muted:#79695A; --m-line:#E6DCCB; --m-rule:#F0EADD;
+    --m-accent:#59452F; --m-on:#FFF9EF; --m-soft:#EFE6D6;
+    --m-good:#54683A; --m-goodbg:#EEF1E1; --m-goodline:#D8DFC2;
+    --m-warn:#96660F; --m-warnbg:#F8EFD9;
+    --m-brons:#9A7F5B; --m-bronsbg:#EFE4D2;
+  }
+  .m-serif{font-family:ui-serif,"Iowan Old Style",Georgia,serif !important}
+  .m-mono{font-family:ui-monospace,Menlo,Consolas,monospace !important}
+  .m-search{background:var(--m-card);border:1px solid var(--m-line);border-radius:9px;padding:6px 9px;
+            font-size:9px;color:var(--m-muted)}
+  .m-row{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;overflow:hidden}
+  .m-rowtop{display:flex;align-items:center;gap:6px;padding:7px 9px}
+  .m-rowtop .es{font-weight:600;font-size:10.5px;flex:none}
+  .m-rowtop .sv{color:var(--m-muted);font-size:8.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .m-rowx{border-top:1px solid var(--m-line);padding:8px 9px;display:flex;flex-direction:column;gap:7px;text-align:left}
+  .m-xl{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-muted)}
+
+  /* nivåpiller */
+  .m-lvl{font-size:7px;font-weight:600;border-radius:99px;padding:2.5px 7px;flex:none;letter-spacing:.02em}
+  .m-lvl.ny{color:var(--m-muted);border:1px solid var(--m-line);background:none}
+  .m-lvl.ovar{color:var(--m-warn);background:var(--m-warnbg)}
+  .m-lvl.pagang{color:var(--m-brons);background:var(--m-bronsbg)}
+  .m-lvl.kan{color:var(--m-good);background:var(--m-goodbg)}
+
+  /* B: prickstege */
+  .m-path{display:flex;align-items:center;gap:3px;flex:none}
+  .m-path i{width:5px;height:5px;border-radius:50%;background:var(--m-rule);border:1px solid var(--m-line)}
+  .m-path i.fill-ovar{background:var(--m-warn);border-color:var(--m-warn)}
+  .m-path i.fill-pagang{background:var(--m-brons);border-color:var(--m-brons)}
+  .m-path i.fill-kan{background:var(--m-good);border-color:var(--m-good)}
+  .m-bigpath{display:flex;align-items:center;gap:0;margin:4px 0 2px}
+  .m-bigpath .stop{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+  .m-bigpath .stop i{width:11px;height:11px;border-radius:50%;background:var(--m-rule);border:1.5px solid var(--m-line)}
+  .m-bigpath .stop.on i{background:var(--m-brons);border-color:var(--m-brons)}
+  .m-bigpath .stop.past i{background:var(--m-brons);border-color:var(--m-brons);opacity:.35}
+  .m-bigpath .stop span{font-size:6px;color:var(--m-muted)}
+  .m-bigpath .stop.on span{color:var(--m-ink);font-weight:700}
+  .m-bigpath .leg{height:1.5px;background:var(--m-line);flex:1;margin-bottom:11px}
+
+  /* C: snabbknappar i raden */
+  .m-quick{display:flex;gap:4px;flex:none}
+  .m-quick button,.m-quick .qb{width:20px;height:20px;border-radius:6px;border:1px solid var(--m-line);
+      background:var(--m-card);color:var(--m-muted);font-size:9px;display:flex;align-items:center;justify-content:center}
+  .m-quick .qb.done{background:var(--m-goodbg);border-color:var(--m-goodline);color:var(--m-good)}
+  .m-toast{background:var(--m-accent);color:var(--m-on);font-size:8px;border-radius:99px;
+           padding:4px 10px;align-self:center;margin-top:2px}
+
+  .m-btn{background:var(--m-accent);color:var(--m-on);border-radius:7px;padding:6px 8px;font-size:8.5px;font-weight:600;text-align:center}
+  .m-btn.ghost{background:none;border:1px solid var(--m-line);color:var(--m-accent);font-weight:500}
+  .m-btnrow{display:flex;gap:5px}
+  .m-btnrow .m-btn{flex:1}
+  .m-mnem{font-size:8.5px;font-style:italic;background:var(--m-soft);border-radius:7px;padding:5px 7px}
+  .m-linkbtn{font-size:7.5px;color:var(--m-muted);text-decoration:underline;text-align:center}
+
+  .lvltable{border-collapse:collapse;margin:14px 0 0;font-size:14px}
+  .lvltable td,.lvltable th{padding:7px 14px 7px 0;text-align:left;vertical-align:top}
+  .lvltable th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .pill{font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 10px;white-space:nowrap}
+  .pill.ny{color:var(--muted);border:1px solid var(--line)}
+  .pill.ovar{color:#96660F;background:#F8EFD9}
+  .pill.pagang{color:#9A7F5B;background:#EFE4D2}
+  .pill.kan{color:#54683A;background:#EEF1E1}
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:14.5px;line-height:1.65;max-width:74ch}
+  footer b{color:var(--ink)}
+</style>
+
+<div class="page" lang="sv">
+  <p class="eyebrow">Sand · ordlistan · nivåer & markering · inget byggt än</p>
+  <h1>Ordlistan: nivå istället för rank</h1>
+  <p class="sub">"Rank 482" åker ut ur radexpansionen (ordklassen står kvar). Istället får varje ord
+  en <b>nivå</b> — och du kan <b>flytta den själv</b>: markera "kan redan" eller "öva nu".
+  Markeringarna är ärliga mot FSRS: "kan redan" ger ~30 dagars stabilitet på båda korten
+  (kollas vid nästa recension — failar du då börjar vanlig inlärning), "öva nu" lägger ordet
+  i dagens pass direkt.</p>
+
+  <h2 style="margin-top:34px">Föreslagna nivåer</h2>
+  <table class="lvltable">
+    <tr><th>Nivå</th><th>Betyder</th><th>FSRS</th></tr>
+    <tr><td><span class="pill ny">Ny</span></td><td>inte mött än</td><td>inga kort</td></tr>
+    <tr><td><span class="pill ovar">Övar</span></td><td>under inlärning</td><td>stabilitet &lt; 7 dagar</td></tr>
+    <tr><td><span class="pill pagang">På gång</span></td><td>sitter nästan</td><td>7–30 dagar</td></tr>
+    <tr><td><span class="pill kan">Kan det</span></td><td>sitter</td><td>≥ 30 dagar på båda riktningarna</td></tr>
+  </table>
+
+  <!-- ============ A ============ -->
+  <section>
+    <h2>A · Pillret + knappar i expansionen</h2>
+    <div class="blurb">Raden visar en <b>textad nivåpill</b> (ingen mer naken prick eller "34 d").
+    Öppnar du raden finns två tydliga knappar: <b>Kan redan</b> och <b>Öva nu</b>. Lugnast och
+    tydligast — men markering kräver två tryck (öppna + välj).</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">poder</span><span class="sv">kunna</span><span class="m-lvl kan">Kan det</span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">entender</span><span class="sv">förstå</span><span class="m-lvl pagang">På gång</span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span><span class="m-lvl ovar">Övar</span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span><span class="m-lvl ny">Ny</span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span><span class="m-lvl ovar">Övar</span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la orilla</span><span class="sv">strand</span><span class="m-lvl ny">Ny</span></div></div>
+        </div>
+        <div class="mlabel">A · listan — nivåpiller</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 sombra</div>
+          <div class="m-row">
+            <div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span><span class="m-lvl ovar">Övar</span></div>
+            <div class="m-rowx">
+              <div><div class="m-xl">substantiv</div></div>
+              <div class="m-btnrow"><div class="m-btn ghost">✓ Kan redan</div><div class="m-btn">Öva nu</div></div>
+              <div><div class="m-xl">Synonymer</div><div style="font-size:8.5px">skygd · skumrask</div></div>
+              <div><div class="m-xl">Minnesregel — din egen</div>
+                <div class="m-mnem">"sombrero ger skugga"</div></div>
+            </div>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el sombrero</span><span class="sv">hatt</span><span class="m-lvl kan">Kan det</span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">asombrar</span><span class="sv">förvåna</span><span class="m-lvl ny">Ny</span></div></div>
+        </div>
+        <div class="mlabel">A · expanderad — två knappar</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section>
+    <h2>B · Nivåstegen</h2>
+    <div class="blurb">Nivån som en <b>fyrstegsstege</b> — små prickar i raden, stor stege med
+    namn i expansionen. Att markera = trycka på steget man vill hoppa till ("Kan det" eller
+    tillbaka till "Övar"). Snyggast och mest "resa", men prickarna kräver att man lärt sig
+    vad de betyder, och markering kräver fortfarande expansion.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">poder</span><span class="sv">kunna</span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">entender</span><span class="sv">förstå</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span>
+            <span class="m-path"><i class="fill-ovar"></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">vivir</span><span class="sv">bo, leva</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la orilla</span><span class="sv">strand</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">B · listan — prickstege</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 sombra</div>
+          <div class="m-row">
+            <div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span></div>
+            <div class="m-rowx">
+              <div class="m-bigpath">
+                <span class="stop past"><i></i><span>Ny</span></span><span class="leg"></span>
+                <span class="stop on"><i></i><span>Övar</span></span><span class="leg"></span>
+                <span class="stop"><i></i><span>På gång</span></span><span class="leg"></span>
+                <span class="stop"><i></i><span>Kan det</span></span>
+              </div>
+              <p style="font-size:7px;color:var(--m-muted);margin:0;text-align:center">tryck på ett steg för att flytta ordet</p>
+              <div><div class="m-xl">substantiv</div></div>
+              <div><div class="m-xl">Minnesregel — din egen</div>
+                <div class="m-mnem">"sombrero ger skugga"</div></div>
+            </div>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el sombrero</span><span class="sv">hatt</span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">asombrar</span><span class="sv">förvåna</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">B · expanderad — tryckbar stege</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ C ============ -->
+  <section>
+    <h2>C · Snabbmarkering direkt i listan</h2>
+    <div class="blurb">Nivåpillret från A — plus en <b>✓-knapp direkt i varje rad</b>: ett tryck
+    markerar "kan redan" utan att öppna något. Perfekt för att <b>svepa igenom hela listan</b>
+    och beta av allt man redan kan (samma anda som Plocka fler-läget). "Öva nu" och detaljer
+    bor kvar i expansionen. Ärlig nackdel: en knapp till i varje rad — lite tätare lista.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">poder</span><span class="sv">kunna</span><span class="m-lvl kan">Kan det</span><span class="m-quick"><span class="qb done">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">entender</span><span class="sv">förstå</span><span class="m-lvl pagang">På gång</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span><span class="m-lvl ovar">Övar</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span><span class="m-lvl ny">Ny</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span><span class="m-lvl ovar">Övar</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la orilla</span><span class="sv">strand</span><span class="m-lvl ny">Ny</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+        </div>
+        <div class="mlabel">C · listan — ✓ i varje rad</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">poder</span><span class="sv">kunna</span><span class="m-lvl kan">Kan det</span><span class="m-quick"><span class="qb done">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">entender</span><span class="sv">förstå</span><span class="m-lvl kan">Kan det</span><span class="m-quick"><span class="qb done">✓</span></span></div></div>
+          <div class="m-toast">Markerat: kan det — kollas om 30 dagar</div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span><span class="m-lvl ovar">Övar</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row">
+            <div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span><span class="m-lvl ny">Ny</span></div>
+            <div class="m-rowx">
+              <div><div class="m-xl">substantiv</div></div>
+              <div class="m-btnrow"><div class="m-btn ghost">✓ Kan redan</div><div class="m-btn">Öva nu</div></div>
+              <div class="m-linkbtn">nollställ ordet (börja om från Ny)</div>
+            </div>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span><span class="m-lvl ovar">Övar</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la orilla</span><span class="sv">strand</span><span class="m-lvl ny">Ny</span><span class="m-quick"><span class="qb">✓</span></span></div></div>
+        </div>
+        <div class="mlabel">C · ett tryck markerat + expansion</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Min rekommendation: C</b> — snabbmarkeringen är hela poängen med din idé (svep igenom
+    listan, bocka av det du kan), och den bär A:s tydliga piller. B är vackrast men långsammast
+    i praktiken. Svara "A", "B", "C" eller en mix.
+    Detaljer att ta ställning till:
+    <b>(1)</b> "Kan redan" sätter ~30 dagars stabilitet och kollas ärligt vid nästa recension —
+    okej? <b>(2)</b> "Öva nu" lägger ordet i dagens pass (introducerar det om det är Nytt, utanför
+    dagsbudgeten) — okej? <b>(3)</b> ska "nollställ" finnas (liten länk i expansionen, C-frame 2)
+    eller är det onödigt? <b>(4)</b> nivånamnen: Ny · Övar · På gång · Kan det — döp om fritt.
+    Rank är borttagen ur expansionen i alla tre förslagen; ordklassen står kvar.
+  </footer>
+</div>
