@@ -64,6 +64,36 @@ tvåfelsregeln, omkösning +3) — men utan "du skrev"-raden, och med rubriken
 bara den explicita länken betyder "vet inte", annars kostar en slarv-enter
 ett kort. Mockup: sista sektionen i `design/startsida.html`.
 
+## Verbböjningar (antecknad 2026-08-10) — störst av backlogpunkterna
+
+Lucas idé, tre delar: (1) de vanligaste böjningarna ska förhöras, (2) när ett
+nytt verb introduceras kommer böjningarna i vettig ordning (jag-formen först
+osv.), (3) verbets grundform ska alltid stå med i facit.
+
+Tänkt upplägg:
+- **Böjningskort = egna FSRS-kort** knutna till moderverbet (`poder#pres.1sg`
+  e.d.), båda riktningarna som vanligt. Svenskan böjs inte efter person, så
+  promten bär pronomenet: "jag kan" → *puedo*, "vi kan" → *podemos* — det gör
+  sv→es-riktningen entydig på köpet.
+- **Urval per verb = verklig korpusfrekvens**, inte hela paradigmet: ta verbets
+  former ur morfologikällan (doozan/es-wiktionary-datat) × hermitdaves
+  es-full-frekvenser och plocka topp ~4–6 (presens först; preteritum/imperfekt
+  som senare påfyllnad). "Vanligaste böjningarna" blir då bokstavligt sant.
+- **Introduktionsordning:** grundformen först; när den suttit (t.ex. första
+  rätta svaret) släpps böjningarna in några i taget — jag-formen först funkar
+  fint pedagogiskt (och är oftast ändå bland de frekventaste), sen 3:e person
+  sing. som är spanskans arbetshäst.
+- **Grundform i facit, alltid:** på böjningskortens feedback en stödrad i stil
+  med "*puedo* → jag kan · av **poder** = kunna". (Kan byggas oberoende av
+  resten och är nästan gratis.)
+- **Minnesregeln delas med moderverbet** — regeln för poder gäller alla former
+  (tvåfelsregeln räknas per kort som vanligt). Rimligt? Lucas bekräftar.
+- **Öppet beslut:** ska böjningskort äta av samma dagsbudget som nya ord, eller
+  ha egen takt? Lutning: samma budget (annars exploderar dagarna), men det
+  saktar ner nya ord — värt att känna på.
+- Kollisionsmaskineriet (hints/disambig) återanvänds när former krockar
+  ("kan" utan pronomen, är/es-klassikern osv.).
+
 ## Övrigt öppet (sedan tidigare)
 
 - **Brevo-SMTP felsöks**: "Error sending magic link email" vid testet — orsaken
