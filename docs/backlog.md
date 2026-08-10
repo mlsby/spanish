@@ -153,18 +153,33 @@ nog redan känt ⇒ borde ge utrymme för fler nya ord. Föreslagen design
    betyget till **Easy** före commit (samma regrade-mekanik som "jag hade
    rätt"-overriden). Claimet är alltså alltid förankrat i bevis: du träffade
    nästan. Visas bara när reps === 0; efteråt gäller ärligt svar.
-3. **Budgetåterbäring i vanliga passet:** ett ord vars båda kort klarades
-   exakt vid första mötet kostar ingen introduktionsplats — nästa
-   frekvensord låses upp samma dag. Cap 3× dagstakten så vardagsdagen
-   förblir förutsägbar; den som vill mer använder Plocka fler-läget (nedan).
-4. **"Plocka fler"-läget = bonusord och turbo-onboarding i samma knapp
+3. **Syskonuppskov vid exakt träff (Lucas 2026-08-10):** klaras första
+   riktningen (es→sv) **exakt** vid första mötet introduceras andra
+   riktningen INTE samma session — dess första visning skjuts ~2 veckor
+   fram, fortfarande som ett orört "första möte" (inga fejkbetyg; kortet är
+   New med due +14 d, så auto-Easy/kan redan-reglerna gäller när det väl
+   dyker upp). Kända ord kostar därmed ETT kort nu + ett om två veckor.
+   Ärlig brasklapp: es→sv-träff bevisar att man kan *betydelsen*, inte att
+   man kan *producera* spanskan — men självkorrigeringen täcker det (failar
+   man sv→es om två veckor startar vanlig inlärning, bara två veckor senare,
+   för ett ord man bevisligen halvkan). Fuzzy/fel på första riktningen ⇒
+   andra riktningen kommer samma session som vanligt.
+4. **Budgetåterbäring i vanliga passet:** exakt träff på första riktningen
+   vid första mötet ⇒ ordet kostar ingen introduktionsplats — nästa
+   frekvensord låses upp samma dag (ingen clawback om sv→es failar senare —
+   kompisnivå-ärlighet). Cap 3× dagstakten så vardagsdagen förblir
+   förutsägbar; den som vill mer använder Plocka fler-läget (nedan).
+5. **"Plocka fler"-läget = bonusord och turbo-onboarding i samma knapp
    (Lucas 2026-08-10: "man borde kunna gå igenom mycket snabbare om man
    verkligen vill").** Startsidans bonusknapp blir öppen istället för "+5":
-   ett introduktionsläge som fortsätter servera nya ord i frekvensordning så
-   länge man orkar — exakt rätt ⇒ Easy, stavfel ⇒ Hard + kan redan-länken,
-   fel ⇒ vanlig inlärning. Ingen övre gräns: den som kan 300–400 ord betar
-   av dem på en helg (~2 kort × ~5 s ≈ en timmes skrivande för 350 ord);
-   nybörjaren använder samma knapp för att plocka 5 extra. Skyddsräcken
+   ett introduktionsläge som BARA serverar nya ord (inga repetitioner
+   inblandade) i frekvensordning så länge man orkar — exakt rätt ⇒ Easy +
+   syskonuppskov (punkt 3) ⇒ nästa ord direkt, stavfel ⇒ Hard + kan
+   redan-länken, fel ⇒ vanlig inlärning (dyker upp i morgondagens vanliga
+   pass). Ingen övre gräns: tack vare syskonuppskovet kostar ett känt ord
+   ETT kort à ~5 s ⇒ 350 kända ord ≈ 30–40 min i soffan; om två veckor
+   kommer sv→es-hållet som snabba första möten. Nybörjaren använder samma
+   knapp för att plocka 5 extra. Skyddsräcken
    istället for tak: (a) ärlig prognosrad i läget — "det här ger ~120
    repetitioner nästa vecka" — uppdaterad live, (b) mjuk broms: om exakt-
    träffen sjunker under ~60 % på sista ~20 orden föreslår appen vänligt att
