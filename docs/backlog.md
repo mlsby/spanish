@@ -146,14 +146,33 @@ nog redan känt ⇒ borde ge utrymme för fler nya ord. Föreslagen design
    istället för Good. ts-fsrs ger då lång startstabilitet (~2 v) istället för
    dagar — kända ord schemalägger ut sig själva ur vardagen utan något UI.
    Stavfelsrätt första gången förblir Hard (osäkert ⇒ ingen fast-track).
-2. **"Kan redan"-länk vid första mötet:** på ett korts allra första visning
-   finns (bredvid "vet inte") en diskret "kan redan →". Effekt: båda
-   riktningarnas kort får Easy-behandling direkt utan att sv→es-kortet ens
-   behöver visas. Bara synlig när reps === 0 — efteråt gäller ärligt svar.
-3. **Budgetåterbäring:** ett ord vars båda kort klarades exakt vid första
-   mötet (eller markerades "kan redan") kostar ingen introduktionsplats —
-   nästa frekvensord låses upp samma dag. Cap: max 3× dagstakten i totala
-   introduktioner/dag, som skydd mot repetitionslavin veckan efter.
+2. **"Kan redan"-länk EFTER svar med stavfel (Lucas ändring 2026-08-10):**
+   ingen skippknapp före svaret — man skriver alltid först (produktion är
+   poängen). Men vid *första mötet* + fuzzy-rätt (stavfel ⇒ normalt Hard)
+   visas en länk i feedbacken: "kan redan — bara stavfel →" som uppgraderar
+   betyget till **Easy** före commit (samma regrade-mekanik som "jag hade
+   rätt"-overriden). Claimet är alltså alltid förankrat i bevis: du träffade
+   nästan. Visas bara när reps === 0; efteråt gäller ärligt svar.
+3. **Budgetåterbäring i vanliga passet:** ett ord vars båda kort klarades
+   exakt vid första mötet kostar ingen introduktionsplats — nästa
+   frekvensord låses upp samma dag. Cap 3× dagstakten så vardagsdagen
+   förblir förutsägbar; den som vill mer använder Plocka fler-läget (nedan).
+4. **"Plocka fler"-läget = bonusord och turbo-onboarding i samma knapp
+   (Lucas 2026-08-10: "man borde kunna gå igenom mycket snabbare om man
+   verkligen vill").** Startsidans bonusknapp blir öppen istället för "+5":
+   ett introduktionsläge som fortsätter servera nya ord i frekvensordning så
+   länge man orkar — exakt rätt ⇒ Easy, stavfel ⇒ Hard + kan redan-länken,
+   fel ⇒ vanlig inlärning. Ingen övre gräns: den som kan 300–400 ord betar
+   av dem på en helg (~2 kort × ~5 s ≈ en timmes skrivande för 350 ord);
+   nybörjaren använder samma knapp för att plocka 5 extra. Skyddsräcken
+   istället for tak: (a) ärlig prognosrad i läget — "det här ger ~120
+   repetitioner nästa vecka" — uppdaterad live, (b) mjuk broms: om exakt-
+   träffen sjunker under ~60 % på sista ~20 orden föreslår appen vänligt att
+   gå tillbaka till vanlig takt (turbo är fel verktyg då), (c) avsluta när
+   som helst, allt sparas per kort. Repetitionslavinen är hanterbar: kända
+   ord repeteras på sekunder, FSRS-fuzz sprider förfallodagarna, och varje
+   klarad recension skjuter kortet månader framåt. Mockupernas "+5
+   bonusord"-copy ändras till "plocka fler ord" när startsidan byggs.
 
 Viktiga egenskaper:
 - **Självkorrigerande:** gissningsbara ord (importante) som fast-trackas fel
