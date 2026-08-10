@@ -77,8 +77,17 @@ Tänkt upplägg:
   sv→es-riktningen entydig på köpet.
 - **Urval per verb = verklig korpusfrekvens**, inte hela paradigmet: ta verbets
   former ur morfologikällan (doozan/es-wiktionary-datat) × hermitdaves
-  es-full-frekvenser och plocka topp ~4–6 (presens först; preteritum/imperfekt
+  es-frekvenser och plocka topp ~4–6 (presens först; preteritum/imperfekt
   som senare påfyllnad). "Vanligaste böjningarna" blir då bokstavligt sant.
+- **Formlistan hittad & verifierad (2026-08-10):**
+  `hermitdave/FrequencyWords` → `content/2018/es/es_50k.txt` (finns även
+  `es_full.txt` för längre svans). Ren ytformslista ur OpenSubtitles 2018 —
+  samma korpusfamilj som både doozans lemmalista och vår svenska ranking, så
+  registret (talspråk) blir konsekvent. Licens: MIT för koden,
+  **CC BY-SA 4.0 för innehållet** — samma attributionsmodell vi redan har i
+  "Om Glosa". Kvitto på Lucas poäng: *puedo* #65, *puede* #83, *puedes* #119,
+  *podría* #153, *podemos* #182, *pueden* #289 — alla vanligare än
+  grundformen *poder* på #362.
 - **Introduktionsordning:** grundformen först; när den suttit (t.ex. första
   rätta svaret) släpps böjningarna in några i taget — jag-formen först funkar
   fint pedagogiskt (och är oftast ändå bland de frekventaste), sen 3:e person
