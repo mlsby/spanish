@@ -66,6 +66,12 @@ ett kort. Mockup: sista sektionen i `design/startsida.html`.
 
 ## Verbböjningar (antecknad 2026-08-10) — störst av backlogpunkterna
 
+> **Research klar (2026-08-10):** se `docs/research-bojningar.md`. Kortversion:
+> formkort har direkt vetenskapligt stöd (formfrekvens > lemmafrekvens, snål
+> transfer mellan former), presens först (~40 % av verbanvändningen) sedan
+> preteritum, interleava introduktionen (max 1–2 former/verb/dag), imperativ &
+> subjunktiv väntar på meningskontext. Ingen mainstream-app gör detta fullt ut.
+
 Lucas idé, tre delar: (1) de vanligaste böjningarna ska förhöras, (2) när ett
 nytt verb introduceras kommer böjningarna i vettig ordning (jag-formen först
 osv.), (3) verbets grundform ska alltid stå med i facit.
