@@ -1,8 +1,11 @@
-import type { AppData, CardRec, Dir, DirtyKind, ReviewRec, UserWord, Word } from "./types";
-import { cardKey } from "./types";
+import type { AppData, CardRec, Dir, DirtyKind, ReviewRec, UserWord, VerbForm, Word } from "./types";
+import { cardKey, PERSON_SV } from "./types";
 import { dueDate, isKnown, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
 import { dayKey, endOfToday } from "./time";
+
+/** Nästa enhet i introduktionskön: ett nytt ord eller en upplåst verbböjning. */
+export type IntroUnit = { kind: "word"; word: Word } | { kind: "form"; form: VerbForm };
 
 export interface WordStatus {
   word: Word;
@@ -14,6 +17,9 @@ export interface WordStatus {
 export class Store {
   words: Word[] = [];
   byId = new Map<string, Word>();
+  forms: VerbForm[] = [];
+  formById = new Map<string, VerbForm>();
+  formsByParent = new Map<string, VerbForm[]>();
   data: AppData = emptyData();
   attribution: string[] = [];
   /** Anropas när lokal data ändras — synken använder den för att veta vad som ska skickas upp. */
@@ -36,6 +42,56 @@ export class Store {
     all.sort((a, b) => a.rank - b.rank);
     this.words = all;
     this.byId = new Map(all.map((w) => [w.id, w]));
+    try {
+      await this.loadForms(baseUrl);
+    } catch { /* böjningsdata är valfri — appen funkar med bara orden */ }
+  }
+
+  private async loadForms(baseUrl: string): Promise<void> {
+    const res = await fetch(`${baseUrl}data/verbforms.json`);
+    if (!res.ok) return;
+    const json = await res.json();
+    this.forms = json.forms as VerbForm[];
+    this.formById = new Map(this.forms.map((f) => [f.id, f]));
+    this.formsByParent = new Map();
+    const byEs = new Map<string, VerbForm[]>();
+    for (const f of this.forms) {
+      if (!this.formsByParent.has(f.parent)) this.formsByParent.set(f.parent, []);
+      this.formsByParent.get(f.parent)!.push(f);
+      if (!byEs.has(f.es)) byEs.set(f.es, []);
+      byEs.get(f.es)!.push(f);
+    }
+    // extra godkända sv→es-svar:
+    //  1. moderverbets alt-verb i samma person (elegir/escoger-paren)
+    //  2. krockande sv-promptar ("jag går" → voy ELLER ando) — men bara när
+    //     moderverbet saknar hint; med hint är prompten redan entydig
+    const formsByParentEs = new Map<string, Map<string, string>>(); // verbets es → person → formens es
+    for (const f of this.forms) {
+      const parentEs = this.byId.get(f.parent)?.es;
+      if (!parentEs) continue;
+      if (!formsByParentEs.has(parentEs)) formsByParentEs.set(parentEs, new Map());
+      formsByParentEs.get(parentEs)!.set(f.person, f.es);
+    }
+    const byPrompt = new Map<string, VerbForm[]>();
+    for (const f of this.forms) {
+      const key = `${PERSON_SV[f.person]} ${f.svPres}`;
+      if (!byPrompt.has(key)) byPrompt.set(key, []);
+      byPrompt.get(key)!.push(f);
+    }
+    for (const f of this.forms) {
+      const acc = new Set<string>();
+      const parent = this.byId.get(f.parent);
+      for (const altEs of parent?.alt ?? []) {
+        const alt = formsByParentEs.get(altEs)?.get(f.person);
+        if (alt) acc.add(alt);
+      }
+      if (!parent?.hint) {
+        for (const other of byPrompt.get(`${PERSON_SV[f.person]} ${f.svPres}`) ?? []) {
+          if (other.parent !== f.parent) acc.add(other.es);
+        }
+      }
+      if (acc.size) f.accept = [...acc];
+    }
   }
 
   loadUserData(): void {
@@ -90,6 +146,29 @@ export class Store {
     return [word.es, ...(word.alt ?? []), ...uw.syn];
   }
 
+  /** Facit för ett kort — hanterar både ord och böjningsformer. */
+  targetsFor(card: CardRec): string[] {
+    const form = this.formById.get(card.wordId);
+    if (form) {
+      // es→sv: "jag kan" är huvudfacit, blotta verbet accepteras också
+      if (card.dir === "es2sv") return [`${PERSON_SV[form.person]} ${form.svPres}`, form.svPres];
+      return [form.es, ...(form.accept ?? [])];
+    }
+    return this.targets(this.wordFor(card), card.dir);
+  }
+
+  /** Moderordet för ett kort (formkort → föräldern, vanliga kort → ordet självt). */
+  wordFor(card: CardRec): Word {
+    const form = this.formById.get(card.wordId);
+    const w = this.byId.get(form ? form.parent : card.wordId);
+    if (!w) throw new Error(`okänt ord: ${card.wordId}`);
+    return w;
+  }
+
+  formFor(card: CardRec): VerbForm | undefined {
+    return this.formById.get(card.wordId);
+  }
+
   card(wordId: string, dir: Dir): CardRec | undefined {
     return this.data.cards[cardKey(wordId, dir)];
   }
@@ -123,44 +202,83 @@ export class Store {
     return n;
   }
 
-  /** Introducerar dagens nya ord (upp till dagstakten), i frekvensordning. Idempotent per dag. */
-  introduceToday(now: Date = new Date()): CardRec[] {
-    const already = this.introducedToday(now);
-    const room = Math.max(0, this.data.settings.newPerDay - already);
-    return this.introduceWords(room, now);
+  /** Är böjningen upplåst? Moderverbets es→sv-kort ska ha klarats minst en gång. */
+  private formUnlocked(f: VerbForm): boolean {
+    const pc = this.card(f.parent, "es2sv");
+    return !!pc && pc.fsrs.reps >= 1 && pc.fsrs.stability >= 1;
   }
 
   /**
-   * Bonusord: plockar n extra ord utanför dagstaktens rumskoll. Eftersom
-   * introducedToday() bara räknar dagens kalenderdag påverkas inte
-   * morgondagens kvot — bonus är gratis imorgon. (Plockas bonus innan dagens
-   * vanliga ord är slut räknas de dock in i dagens tak.)
+   * Nästa `count` enheter ur den förenade introduktionskön: nya ord i
+   * frekvensordning, upplåsta böjningar via sin korpus-slot (tengo slår de
+   * flesta substantiv). Max en ny form per verb och dag. Ändrar ingenting.
    */
-  introduceBonus(n: number, now: Date = new Date()): CardRec[] {
-    return this.introduceWords(n, now);
+  nextIntroUnits(count: number, now: Date = new Date()): IntroUnit[] {
+    if (count <= 0) return [];
+    const day = dayKey(now);
+    const parentToday = new Set<string>();
+    for (const key in this.data.cards) {
+      const c = this.data.cards[key];
+      if (c.dir !== "es2sv") continue;
+      const form = this.formById.get(c.wordId);
+      if (form && dayKey(new Date(c.introducedAt)) === day) parentToday.add(form.parent);
+    }
+    const formQueue = this.forms
+      .filter((f) => !this.card(f.id, "es2sv") && this.formUnlocked(f) && !parentToday.has(f.parent))
+      .sort((a, b) => a.slot - b.slot || a.r - b.r);
+    const out: IntroUnit[] = [];
+    let fi = 0, wi = 0;
+    while (out.length < count) {
+      while (wi < this.words.length && this.card(this.words[wi].id, "es2sv")) wi++;
+      while (fi < formQueue.length && parentToday.has(formQueue[fi].parent)) fi++;
+      const nf = formQueue[fi];
+      const nw = this.words[wi];
+      if (!nf && !nw) break;
+      if (nf && (!nw || nf.slot <= nw.rank)) {
+        out.push({ kind: "form", form: nf });
+        parentToday.add(nf.parent); // max 1 per verb även inom samma omgång
+        fi++;
+      } else {
+        out.push({ kind: "word", word: nw });
+        wi++;
+      }
+    }
+    return out;
   }
 
-  private introduceWords(count: number, now: Date): CardRec[] {
-    if (count <= 0) return [];
-    // es→sv-korten först, sv→es-korten efter — så förhörs inte samma ord rygg i rygg
-    const picked: string[] = [];
-    for (const w of this.words) {
-      if (picked.length >= count) break;
-      if (!this.card(w.id, "es2sv")) picked.push(w.id);
+  /** Introducerar `count` enheter (två kort vardera; es→sv-korten först i kön). */
+  introduceUnits(count: number, now: Date = new Date()): CardRec[] {
+    const units = this.nextIntroUnits(count, now);
+    const first: CardRec[] = [];
+    const second: CardRec[] = [];
+    for (const u of units) {
+      const id = u.kind === "word" ? u.word.id : u.form.id;
+      first.push(newCardRec(id, "es2sv", now));
+      second.push(newCardRec(id, "sv2es", new Date(now.getTime() + 1)));
     }
-    const fresh: CardRec[] = [];
-    for (const id of picked) {
-      const a = newCardRec(id, "es2sv", now);
-      this.putCard(a);
-      fresh.push(a);
-    }
-    for (const id of picked) {
-      const b = newCardRec(id, "sv2es", new Date(now.getTime() + 1));
-      this.putCard(b);
-      fresh.push(b);
-    }
-    this.save();
+    const fresh = [...first, ...second];
+    for (const c of fresh) this.putCard(c);
+    if (fresh.length) this.save();
     return fresh;
+  }
+
+  /** Introducerar dagens nya enheter (upp till dagstakten). Idempotent per dag. */
+  introduceToday(now: Date = new Date()): CardRec[] {
+    const room = Math.max(0, this.data.settings.newPerDay - this.introducedToday(now));
+    return this.introduceUnits(room, now);
+  }
+
+  /**
+   * Bonus: n extra enheter utanför dagstaktens rumskoll. introducedToday()
+   * räknar per kalenderdag, så morgondagens kvot påverkas inte.
+   */
+  introduceBonus(n: number, now: Date = new Date()): CardRec[] {
+    return this.introduceUnits(n, now);
+  }
+
+  /** Budgetåterbäring vid fast-track: en extra enhet, utanför dagstakten. */
+  introduceExtra(now: Date = new Date()): CardRec[] {
+    return this.introduceUnits(1, now);
   }
 
   logReview(rec: ReviewRec): void {
@@ -188,7 +306,7 @@ export class Store {
       else kan++;
     }
     const newLeftToday = Math.max(0, this.data.settings.newPerDay - this.introducedToday(now));
-    const newAvailable = Math.min(newLeftToday, ny);
+    const newAvailable = newLeftToday > 0 ? this.nextIntroUnits(newLeftToday, now).length : 0;
     return {
       ny, lar, kan,
       started: lar + kan,

@@ -94,6 +94,22 @@ Redan utgivna ord hoppas över (id:n är stabila: `lemma|ordklass`), befintliga
 batchfiler röres aldrig, och `public/data/index.json` uppdateras. Granska
 rapporten, fyll luckor i `seed/overrides.json`, kör om, committa.
 
+### Verbböjningar (presens)
+
+`public/data/verbforms.json` byggs av `seed/build-forms.mjs`: Fred Jehles
+verbdatabas (CC BY-NC-SA 3.0, via ghidinelli/fred-jehle-spanish-verbs) ger
+paradigmen för ~640 vanliga verb, regelbunden generering täcker resten, och
+bara former som förekommer i es_50k-korpusen tas med (topp 4 per verb, rankade
+efter formens egen frekvens). Svensk presens hämtas ur Lexins uppslagsformer.
+Former introduceras i den förenade kön via sin korpus-slot när moderverbet
+klarats en gång, max en ny form per verb och dag. OBS: NC-licensen gör
+böjningsdatat icke-kommersiellt — Glosa är ett personligt hobbyprojekt.
+
+```bash
+node seed/build-forms.mjs --jehle jehle_verb_database.csv \
+  --es50k es_50k.txt --lexin swe_spa.xml
+```
+
 ## Roadmap
 
 - **AI-rättningsfallback** (kravspec §3 steg 3): Supabase Edge Function som

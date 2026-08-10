@@ -148,7 +148,7 @@ async function boot(): Promise<void> {
     showTab("pass");
   }
 
-  /** +5 bonusord utöver dagstakten — startar (eller utökar) dagens pass. */
+  /** "Plocka fler"-läget: öppet introduktionspass — bonusord och turbo-onboarding. */
   function startBonus(): void {
     if (!sync.session) {
       showTab("idag");
@@ -156,8 +156,7 @@ async function boot(): Promise<void> {
       return;
     }
     if (sync.status === "syncing") return;
-    store.introduceBonus(5);
-    pass.start(store.dueCards());
+    pass.startTurbo();
     showTab("pass");
   }
 

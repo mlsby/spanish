@@ -41,9 +41,14 @@ const GRADE_TO_RATING: Record<Grade, FsrsGrade> = {
   good: Rating.Good,
 };
 
-/** Applicerar en repetition. Muterar inte — returnerar nytt CardRec. */
-export function applyReview(rec: CardRec, grade: Grade, now: Date): CardRec {
-  const { card } = scheduler.next(toLive(rec.fsrs), now, GRADE_TO_RATING[grade]);
+/**
+ * Applicerar en repetition. Muterar inte — returnerar nytt CardRec.
+ * `easy: true` uppgraderar ett good-betyg till FSRS Easy (fast-track för
+ * förkunskaper: hoppar över korttidsstegen, rakt till dagar/veckor).
+ */
+export function applyReview(rec: CardRec, grade: Grade, now: Date, opts?: { easy?: boolean }): CardRec {
+  const rating = opts?.easy && grade === "good" ? Rating.Easy : GRADE_TO_RATING[grade];
+  const { card } = scheduler.next(toLive(rec.fsrs), now, rating);
   return {
     ...rec,
     fsrs: toStored(card),

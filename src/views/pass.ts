@@ -3,7 +3,7 @@ import { Session, type Pending } from "../lib/session";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
 import type { CardRec } from "../lib/types";
-import { POS_LABEL } from "../lib/types";
+import { PERSON_SV, POS_LABEL } from "../lib/types";
 
 type UiState =
   | "idle" | "question" | "good" | "hard" | "override"
@@ -144,6 +144,20 @@ export class PassView {
     this.focusInput();
   }
 
+  /** "Plocka fler"-läget: bara nya enheter, fylls på tills man slutar själv. */
+  startTurbo(): void {
+    this.clearTimer();
+    this.session = new Session(this.store, [], { turbo: true });
+    if (this.session.finished) {
+      this.state = "done"; // hela basen är redan introducerad
+      this.render();
+      return;
+    }
+    this.state = "question";
+    this.render();
+    this.focusInput();
+  }
+
   get active(): boolean {
     return this.session !== null && !this.session.finished;
   }
@@ -231,6 +245,14 @@ export class PassView {
       this.state = p.forcedMnem ? "forced" : "wrong";
       this.render();
       if (this.state === "forced") void this.loadFriendRules(p.word.id);
+      return;
+    }
+    if (act === "claim") {
+      // "kan redan — bara stavfel": uppgradera till Easy och gå vidare direkt
+      if (s.pending?.firstExposure && s.pending.grade === "hard") {
+        s.claimKnown();
+        this.advance();
+      }
       return;
     }
     if (act === "togglemnem") {
@@ -322,7 +344,17 @@ export class PassView {
     return p.word.art ? `${p.word.art} ${p.word.es}` : p.word.es;
   }
   private facit(p: Pending): string {
+    if (p.form) {
+      return p.card.dir === "es2sv"
+        ? `${PERSON_SV[p.form.person]} ${p.form.svPres}`
+        : p.form.es;
+    }
     return p.card.dir === "es2sv" ? p.word.sv : this.displayEs(p);
+  }
+  /** Stödraden på böjningskort: alltid moderverbet i facit (kravet från Lucas). */
+  private parentLine(p: Pending): string {
+    if (!p.form) return "";
+    return `<p class="parentline">av <b>${esc(p.word.es)}</b> = ${esc(p.word.sv)}</p>`;
   }
   private mnemBox(wordId: string): string {
     const m = this.store.userWord(wordId).mnem;
@@ -337,6 +369,7 @@ export class PassView {
       .join("");
   }
   private alsoLine(p: Pending): string {
+    if (p.form) return ""; // formkort: stödraden med moderverbet räcker
     if (p.card.dir === "es2sv") {
       const uw = this.store.userWord(p.word.id);
       const syns = [...p.word.syn, ...uw.syn];
@@ -388,6 +421,14 @@ export class PassView {
     if (this.state === "done") {
       const c = s.counts;
       const answered = c.good + c.hard + c.again;
+      if (s.turbo) {
+        return `<p class="verdict v-good">${IC_OK}${answered ? "Bra plockat!" : "Hela basen är redan igång"}</p>
+          <h2 class="head">${s.turboPicked} enheter</h2>
+          <p class="also">rätt direkt <b>${c.good}</b> · med hjälp <b>${c.hard}</b> · att lära <b>${c.again}</b></p>
+          <p class="fine">~${s.forecastAdded()} repetitioner läggs på kommande vecka.</p>
+          <div class="btnrow" style="max-width:230px">
+            <button type="button" class="btn" data-act="restart">Till startsidan</button></div>`;
+      }
       return `<p class="verdict v-good">${IC_OK}Passet klart</p>
         <h2 class="head">${c.good + c.hard} av ${answered}</h2>
         <p class="also">rätt <b>${c.good}</b> · med hjälp <b>${c.hard}</b> · fel <b>${c.again}</b></p>
@@ -398,10 +439,16 @@ export class PassView {
     if (this.state === "question") {
       const card = s.current!;
       const w = s.word(card);
-      const prompt = card.dir === "es2sv" ? (w.art ? `${w.art} ${w.es}` : w.es) : w.sv;
+      const form = this.store.formFor(card);
+      const prompt = form
+        ? card.dir === "es2sv" ? form.es : `${PERSON_SV[form.person]} ${form.svPres}`
+        : card.dir === "es2sv" ? (w.art ? `${w.art} ${w.es}` : w.es) : w.sv;
+      const posLabel = form ? "verb · presens" : (POS_LABEL[w.pos] ?? w.pos);
       // ledtråden särskiljer svenska dubbletter — visas bara åt sv→es-hållet
       const hint = card.dir === "sv2es" ? this.hintLine(w) : "";
-      return `<p class="pos">${esc(POS_LABEL[w.pos] ?? w.pos)}</p><h2 class="head">${esc(prompt)}</h2>${hint}`;
+      const brake = s.turboBrake
+        ? `<p class="brakenote">Många nya på raken — vanlig takt imorgon är också fint.</p>` : "";
+      return `<p class="pos">${esc(posLabel)}</p><h2 class="head">${esc(prompt)}</h2>${hint}${brake}`;
     }
     if (!p) return "";
     switch (this.state) {
@@ -409,22 +456,25 @@ export class PassView {
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--good)"></i></div>
           <p class="verdict v-good">${IC_OK}Rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.hintLine(p.word)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
           <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "hard":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.hintLine(p.word)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}
           <div class="cmp"><span class="cl">du skrev</span><code>${esc(p.raw)}</code>
           <span class="cl">rättstavat</span><code>${this.markedTarget(p)}</code></div>
           ${this.mnemBox(p.word.id)}
-          <p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>
+          ${p.firstExposure
+            ? `<button type="button" class="linkbtn" data-act="claim">kan redan — bara stavfel</button>`
+            : `<p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>`}
           <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "override":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
+          ${this.parentLine(p)}
           <p class="also">»<b>${esc(p.raw)}</b>« sparas som synonym — nästa gång rättas den direkt.</p>
           <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "wrong":
@@ -432,7 +482,7 @@ export class PassView {
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
             <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.hintLine(p.word)}${this.alsoLine(p)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.alsoLine(p)}
           ${this.showMnem
             ? this.mnemForm(p, false)
             : `<div class="btnrow" style="margin-top:8px">
@@ -443,7 +493,7 @@ export class PassView {
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
             <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.hintLine(p.word)}${this.alsoLine(p)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.alsoLine(p)}
           <p class="mustnote">Skriv din egen minnesregel för att gå vidare</p>
           ${this.mnemForm(p, true)}`;
     }
@@ -465,7 +515,11 @@ export class PassView {
     if (s && this.state !== "idle") {
       const pr = s.progress();
       this.bar.style.width = pr.total ? `${(pr.done / pr.total) * 100}%` : "100%";
-      this.count.textContent = this.state === "done" ? "klart" : `${s.queue.length} kort kvar`;
+      this.count.textContent = this.state === "done"
+        ? "klart"
+        : s.turbo
+          ? `${s.turboPicked} plockade · ~${s.forecastAdded()} rep/vecka`
+          : `${s.queue.length} kort kvar`;
       const cur = s.pending?.card ?? s.current;
       if (cur) {
         this.chip.textContent = cur.dir === "es2sv" ? "spanska → svenska" : "svenska → spanska";

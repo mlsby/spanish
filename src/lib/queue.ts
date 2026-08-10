@@ -1,4 +1,4 @@
-import type { CardRec } from "./types";
+import { parentKey, type CardRec } from "./types";
 
 /**
  * Ser till att kort som delar ord (es→sv + sv→es-syskon) inte hamnar rygg i
@@ -12,7 +12,7 @@ export function spaceSiblings(cards: CardRec[], minGap = 3): CardRec[] {
   const rest = [...cards];
   while (rest.length) {
     const recent = out.slice(-(minGap - 1));
-    let idx = rest.findIndex((c) => !recent.some((o) => o.wordId === c.wordId));
+    let idx = rest.findIndex((c) => !recent.some((o) => parentKey(o.wordId) === parentKey(c.wordId)));
     if (idx === -1) idx = 0;
     out.push(rest.splice(idx, 1)[0]);
   }
@@ -28,7 +28,7 @@ export function insertSpaced(queue: CardRec[], card: CardRec, startIdx: number, 
     const from = Math.max(0, pos - (minGap - 1));
     const to = Math.min(queue.length, pos + (minGap - 1));
     for (let j = from; j < to; j++) {
-      if (queue[j].wordId === card.wordId) return true;
+      if (parentKey(queue[j].wordId) === parentKey(card.wordId)) return true;
     }
     return false;
   };

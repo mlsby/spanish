@@ -23,6 +23,26 @@ export interface UserWord {
   updatedAt?: string; // för last-write-wins vid molnsynk
 }
 
+/** Verbböjning (fas 1: presens). Kort-id:t blir `${parent}#pres.${person}`. */
+export interface VerbForm {
+  id: string;      // "poder|v#pres.1s"
+  parent: string;  // moderverbets ord-id ("poder|v")
+  es: string;      // "puedo"
+  person: "1s" | "2s" | "3s" | "1p" | "3p";
+  svPres: string;  // svensk presens ("kan") — prompten blir "jag kan"
+  r: number;       // formens egen korpusrank (es_50k)
+  slot: number;    // lemma-position där formen hör hemma i intro-kön
+  /** extra godkända svar sv→es (krockande former utan hint + moderverbets alt-former) */
+  accept?: string[];
+}
+
+export const PERSON_SV: Record<VerbForm["person"], string> = {
+  "1s": "jag", "2s": "du", "3s": "han/hon", "1p": "vi", "3p": "de",
+};
+
+/** Nyckeln som håller isär "syskon" i passkön — formkort delar moderverbets nyckel. */
+export const parentKey = (wordId: string): string => wordId.split("#")[0];
+
 /** Serialiserat FSRS-kort: datum som ISO-strängar. */
 export type StoredFsrs = Omit<FsrsCard, "due" | "last_review"> & {
   due: string;

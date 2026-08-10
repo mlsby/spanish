@@ -141,13 +141,13 @@ function heroHtml(store: Store, cloud: CloudUi): string {
   const doneToday = store.data.days[dayKey()] ?? 0;
   const busy = cloud.status === "syncing";
 
-  const bonus = `<button class="btn ghost" id="bonusBtn" ${busy ? "disabled" : ""}>+5 bonusord</button>`;
+  const bonus = `<button class="btn ghost" id="bonusBtn" ${busy ? "disabled" : ""}>Plocka fler ord</button>`;
 
   if (!cloud.email) {
     return `<div class="hero">
       <p class="plabel">Dagens pass</p>
       <div class="big">${totalCards}<small> kort</small></div>
-      <div class="cap"><b>${s.due}</b> repetitioner + <b>${s.newAvailable}</b> nya ord <span class="capfine">(2 kort/ord)</span></div>
+      <div class="cap"><b>${s.due}</b> repetitioner + <b>${s.newAvailable}</b> nya <span class="capfine">(2 kort/st)</span></div>
       <button class="btn" id="startFull" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
       <p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>
     </div>`;
@@ -164,7 +164,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
 
   const capParts: string[] = [];
   if (s.due > 0) capParts.push(`<b>${s.due}</b> repetitioner`);
-  if (s.newAvailable > 0) capParts.push(`<b>${s.newAvailable}</b> nya ord <span class="capfine">(2 kort/ord)</span>`);
+  if (s.newAvailable > 0) capParts.push(`<b>${s.newAvailable}</b> nya <span class="capfine">(2 kort/st)</span>`);
   return `<div class="hero">
     <p class="plabel">Dagens pass</p>
     <div class="big">${totalCards}<small> kort</small></div>

@@ -2,7 +2,38 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
-## Verbböjningar (antecknad 2026-08-10) — störst av backlogpunkterna
+## Klart (byggt 2026-08-10, släpp "förkunskaper + verbböjningar")
+
+- **Förkunskapspaketet:** exakt rätt vid ett korts allra första möte ⇒ FSRS
+  Easy (dagar/veckor direkt, ingen 10-minutersvända); "kan redan — bara
+  stavfel"-länk vid första mötets fuzzy-träff uppgraderar till Easy;
+  syskonuppskov (andra riktningen väntar ~2 veckor som orört första möte);
+  budgetåterbäring med 3×-tak (nästa enhet introduceras i bakgrunden, dyker
+  upp i nästa pass); "Plocka fler"-läget ersätter +5-knappen — öppet
+  introduktionspass med live-prognos ("~N rep/vecka") och mjuk broms vid
+  <60 % exaktträff på sista 20.
+- **Verbböjningar fas 1 (presens):** 2 843 former för 964 verb ur Jehle
+  (CC BY-NC-SA) + regelbunden generering, filtrerade och rankade mot es_50k,
+  svensk presens ur Lexin + 140 manuella mappningar ("vara"→"är"!). Egna
+  FSRS-kort (`poder|v#pres.1s`), introduceras via korpus-slot i den förenade
+  kön när moderverbet klarats en gång (max 1 form/verb/dag), delar dagsbudget.
+  Prompt bär pronomenet ("jag kan" → puedo), facit bär alltid stödraden
+  "av **poder** = kunna" (alla feedbacklägen), minnesregeln delas med
+  moderverbet, syskonavståndet räknar per moderverb, ordlistan visar formerna
+  med statusprickar under sitt verb. Tvetydiga former (creo → creer/crear)
+  utelämnade; sv-promptkrockar utan hint korsaccepteras (voy/ando för "jag
+  går"), med hint gäller bara egna formen (soy/estoy). Preteritum = fas 2.
+
+
+## Verbböjningar fas 2 — preteritum/imperfekt (kvar)
+
+Fas 1 (presens) är byggd. Kvar: preteritum + imperfekt som nya tempuspaket i
+`build-forms.mjs` (Jehle har alla tempus), med parentesledtrådar eftersom
+svenskan inte skiljer dem ("ville" = quería/quise). Imperativ & subjunktiv
+väntar på meningskontext (cloze-nivå). Originalanteckningen nedan behålls som
+designreferens.
+
+## Verbböjningar (ursprunglig anteckning, fas 1 GENOMFÖRD)
 
 > **Research klar (2026-08-10):** se `docs/research-bojningar.md`. Kortversion:
 > formkort har direkt vetenskapligt stöd (formfrekvens > lemmafrekvens, snål
@@ -72,7 +103,7 @@ Tänkt upplägg:
   throttlat av budgeten). Preteritum/imperfekt behöver parentesledtrådar
   eftersom svenskan inte skiljer dem ("ville" = quería/quise) — fas 2.
 
-## Anpassning till förkunskaper (diskussion öppnad 2026-08-10)
+## Anpassning till förkunskaper (GENOMFÖRD 2026-08-10 — behålls som referens)
 
 Lucas: de flesta kan redan ett gäng ord — appen ska ta vara på det, utan
 "vad kan du?"-enkäter. Hans hypotes: rätt svar vid *första mötet* ⇒ ordet är

@@ -37,6 +37,19 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     return out;
   }
 
+  /** Verbets böjningsformer med status-prick (grå = inte introducerad än). */
+  function formsHtml(wordId: string): string {
+    const forms = store.formsByParent.get(wordId);
+    if (!forms?.length) return "";
+    const chips = [...forms].sort((a, b) => a.r - b.r).map((f) => {
+      const a = store.card(f.id, "es2sv");
+      const b = store.card(f.id, "sv2es");
+      const cls = a && b && [a, b].every((c) => c.fsrs.stability >= 30) ? "kan" : a || b ? "lar" : "ny";
+      return `<span class="syn formchip" title="${esc(f.svPres)}"><i class="dot ${cls}"></i>${esc(f.es)}</span>`;
+    }).join("");
+    return `<div><div class="xl">Böjningar · presens</div><div class="syns">${chips}</div></div>`;
+  }
+
   function rowHtml(ws: WordStatus): string {
     const { word, status, cards } = ws;
     const uw = store.userWord(word.id);
@@ -64,6 +77,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
           <div><div class="xl">Synonymer</div>
             <div class="syns">${baseSyns}${ownSyns}
               <input type="text" data-addsyn placeholder="+ lägg till" aria-label="Lägg till synonym"></div></div>
+          ${formsHtml(word.id)}
           <div><div class="xl">Minnesregel — din egen</div>
             <textarea data-mnem aria-label="Minnesregel"
               placeholder="Skriv något som får ordet att fastna …">${esc(uw.mnem)}</textarea></div>
