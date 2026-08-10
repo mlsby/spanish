@@ -52,6 +52,18 @@ annars alltid intill varandra), omkösning via Again (+3) och korta köer.
    `user-select:none` på kortet i feedbacklägena så inte textmarkering/
    delningsmenyn triggas; behåll Enter-för-nästa.
 
+## "Vet inte" i passet (antecknad 2026-08-10)
+
+Man måste kunna ge upp ett kort utan att hitta på ett svar — idag är enda
+vägen att medvetet skriva fel (tomt svar skakar bara). Diskret **"vet inte"**-
+länk under svarsfältet, med samma pointerdown/preventDefault-knep som övriga
+knappar så tangentbordet inte fälls ihop. Beteende: räknas som Again och går
+in i **exakt samma fel-flöde** som ett felsvar (facit, minnesregel,
+tvåfelsregeln, omkösning +3) — men utan "du skrev"-raden, och med rubriken
+"Visste inte" istället för "Fel". Tomt svar + enter ska *fortsätta* skaka —
+bara den explicita länken betyder "vet inte", annars kostar en slarv-enter
+ett kort. Mockup: sista sektionen i `design/startsida.html`.
+
 ## Övrigt öppet (sedan tidigare)
 
 - **Brevo-SMTP felsöks**: "Error sending magic link email" vid testet — orsaken
