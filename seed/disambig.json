@@ -57,7 +57,10 @@
     "hint": "vardagligt flertal, Spanien"
   },
   "mío|determiner": {
-    "hint": "fristående: 'den är min'"
+    "hint": "fristående: 'den är min'",
+    "alt": [
+      "mía"
+    ]
   },
   "mi|n": {
     "hint": "framför substantivet: min bil"
@@ -112,7 +115,10 @@
       "något",
       "viss"
     ],
-    "hint": "någon av flera, en viss"
+    "hint": "någon av flera, en viss",
+    "alt": [
+      "alguna"
+    ]
   },
   "señor|n": {
     "hint": "titel & 'herre'"
@@ -220,10 +226,16 @@
     "hint": "person: 'ingen kom'"
   },
   "ninguno|determiner": {
-    "hint": "ingen av dem — om saker i ett urval"
+    "hint": "ingen av dem — om saker i ett urval",
+    "alt": [
+      "ninguna"
+    ]
   },
   "claro|adj": {
-    "hint": "tydlig, ljus"
+    "hint": "tydlig, ljus",
+    "alt": [
+      "clara"
+    ]
   },
   "preparado|adj": {
     "sv": "redo",
@@ -233,7 +245,8 @@
       "beredd"
     ],
     "alt": [
-      "listo"
+      "listo",
+      "preparada"
     ]
   },
   "listo|adj": {
@@ -412,6 +425,9 @@
     "syn": [
       "allmän",
       "publik"
+    ],
+    "alt": [
+      "pública"
     ]
   },
   "enviar|v": {
@@ -553,7 +569,8 @@
   },
   "próximo|adj": {
     "alt": [
-      "siguiente"
+      "siguiente",
+      "próxima"
     ]
   },
   "siguiente|adj": {
@@ -612,7 +629,8 @@
       "tydlig"
     ],
     "alt": [
-      "diferente"
+      "diferente",
+      "distinta"
     ]
   },
   "amar|v": {
@@ -635,12 +653,14 @@
       "märklig"
     ],
     "alt": [
-      "raro"
+      "raro",
+      "extraña"
     ]
   },
   "raro|adj": {
     "alt": [
-      "extraño"
+      "extraño",
+      "rara"
     ]
   },
   "habitación|n": {
@@ -737,7 +757,8 @@
       "stupid"
     ],
     "alt": [
-      "idiota"
+      "idiota",
+      "estúpida"
     ]
   },
   "probar|v": {
@@ -764,13 +785,19 @@
     ]
   },
   "lleno|adj": {
-    "hint": "fylld"
+    "hint": "fylld",
+    "alt": [
+      "llena"
+    ]
   },
   "entero|adj": {
     "sv": "hel",
     "syn": [
       "full",
       "oavkortad"
+    ],
+    "alt": [
+      "entera"
     ]
   },
   "escapar|v": {
@@ -852,7 +879,8 @@
   },
   "divertido|adj": {
     "alt": [
-      "gracioso"
+      "gracioso",
+      "divertida"
     ]
   },
   "gracioso|adj": {
@@ -863,7 +891,8 @@
       "komisk"
     ],
     "alt": [
-      "divertido"
+      "divertido",
+      "graciosa"
     ]
   },
   "trato|n": {
@@ -1437,7 +1466,8 @@
   "serio|adj": {
     "hint": "allvarsam min, inte skämtsam",
     "alt": [
-      "grave"
+      "grave",
+      "seria"
     ]
   },
   "muestra|n": {
@@ -1451,5 +1481,360 @@
   },
   "preguntar|v": {
     "hint": "att fråga någon"
+  },
+  "uno|num": {
+    "alt": [
+      "una"
+    ]
+  },
+  "suyo|determiner": {
+    "alt": [
+      "suya"
+    ]
+  },
+  "todo|determiner": {
+    "alt": [
+      "toda"
+    ]
+  },
+  "tuyo|determiner": {
+    "alt": [
+      "tuya"
+    ]
+  },
+  "otro|determiner": {
+    "alt": [
+      "otra"
+    ]
+  },
+  "nuestro|determiner": {
+    "alt": [
+      "nuestra"
+    ]
+  },
+  "mismo|adj": {
+    "alt": [
+      "misma"
+    ]
+  },
+  "nuevo|adj": {
+    "alt": [
+      "nueva"
+    ]
+  },
+  "primero|adj": {
+    "alt": [
+      "primera"
+    ]
+  },
+  "seguro|adj": {
+    "alt": [
+      "segura"
+    ]
+  },
+  "último|adj": {
+    "alt": [
+      "última"
+    ]
+  },
+  "pequeño|adj": {
+    "alt": [
+      "pequeña"
+    ]
+  },
+  "único|adj": {
+    "alt": [
+      "única"
+    ]
+  },
+  "muerto|adj": {
+    "alt": [
+      "muerta"
+    ]
+  },
+  "cierto|adj": {
+    "alt": [
+      "cierta"
+    ]
+  },
+  "segundo|adj": {
+    "alt": [
+      "segunda"
+    ]
+  },
+  "propio|adj": {
+    "alt": [
+      "propia"
+    ]
+  },
+  "cuánto|determiner": {
+    "alt": [
+      "cuánta"
+    ]
+  },
+  "llamado|adj": {
+    "alt": [
+      "llamada"
+    ]
+  },
+  "alto|adj": {
+    "alt": [
+      "alta"
+    ]
+  },
+  "rápido|adj": {
+    "alt": [
+      "rápida"
+    ]
+  },
+  "largo|adj": {
+    "alt": [
+      "larga"
+    ]
+  },
+  "vivo|adj": {
+    "alt": [
+      "viva"
+    ]
+  },
+  "justo|adj": {
+    "alt": [
+      "justa"
+    ]
+  },
+  "humano|adj": {
+    "alt": [
+      "humana"
+    ]
+  },
+  "blanco|adj": {
+    "alt": [
+      "blanca"
+    ]
+  },
+  "negro|adj": {
+    "alt": [
+      "negra"
+    ]
+  },
+  "duro|adj": {
+    "alt": [
+      "dura"
+    ]
+  },
+  "correcto|adj": {
+    "alt": [
+      "correcta"
+    ]
+  },
+  "unido|adj": {
+    "alt": [
+      "unida"
+    ]
+  },
+  "hermoso|adj": {
+    "alt": [
+      "hermosa"
+    ]
+  },
+  "bonito|adj": {
+    "alt": [
+      "bonita"
+    ]
+  },
+  "necesario|adj": {
+    "alt": [
+      "necesaria"
+    ]
+  },
+  "perfecto|adj": {
+    "alt": [
+      "perfecta"
+    ]
+  },
+  "verdadero|adj": {
+    "alt": [
+      "verdadera"
+    ]
+  },
+  "maldito|adj": {
+    "alt": [
+      "maldita"
+    ]
+  },
+  "lindo|adj": {
+    "alt": [
+      "linda"
+    ]
+  },
+  "tonto|adj": {
+    "alt": [
+      "tonta"
+    ]
+  },
+  "conocido|adj": {
+    "alt": [
+      "conocida"
+    ]
+  },
+  "abierto|adj": {
+    "alt": [
+      "abierta"
+    ]
+  },
+  "cuyo|determiner": {
+    "alt": [
+      "cuya"
+    ]
+  },
+  "vuestro|determiner": {
+    "alt": [
+      "vuestra"
+    ]
+  },
+  "tercero|adj": {
+    "alt": [
+      "tercera"
+    ]
+  },
+  "antiguo|adj": {
+    "alt": [
+      "antigua"
+    ]
+  },
+  "económico|adj": {
+    "alt": [
+      "económica"
+    ]
+  },
+  "rojo|adj": {
+    "alt": [
+      "roja"
+    ]
+  },
+  "querido|adj": {
+    "alt": [
+      "querida"
+    ]
+  },
+  "completo|adj": {
+    "alt": [
+      "completa"
+    ]
+  },
+  "maravilloso|adj": {
+    "alt": [
+      "maravillosa"
+    ]
+  },
+  "privado|adj": {
+    "alt": [
+      "privada"
+    ]
+  },
+  "peligroso|adj": {
+    "alt": [
+      "peligrosa"
+    ]
+  },
+  "debido|adj": {
+    "alt": [
+      "debida"
+    ]
+  },
+  "equivocado|adj": {
+    "alt": [
+      "equivocada"
+    ]
+  },
+  "casado|adj": {
+    "alt": [
+      "casada"
+    ]
+  },
+  "corto|adj": {
+    "alt": [
+      "corta"
+    ]
+  },
+  "cerrado|adj": {
+    "alt": [
+      "cerrada"
+    ]
+  },
+  "contrario|adj": {
+    "alt": [
+      "contraria"
+    ]
+  },
+  "entendido|adj": {
+    "alt": [
+      "entendida"
+    ]
+  },
+  "americano|adj": {
+    "alt": [
+      "americana"
+    ]
+  },
+  "preocupado|adj": {
+    "alt": [
+      "preocupada"
+    ]
+  },
+  "sentado|adj": {
+    "alt": [
+      "sentada"
+    ]
+  },
+  "cansado|adj": {
+    "alt": [
+      "cansada"
+    ]
+  },
+  "oscuro|adj": {
+    "alt": [
+      "oscura"
+    ]
+  },
+  "físico|adj": {
+    "alt": [
+      "física"
+    ]
+  },
+  "nervioso|adj": {
+    "alt": [
+      "nerviosa"
+    ]
+  },
+  "científico|adj": {
+    "alt": [
+      "científica"
+    ]
+  },
+  "falso|adj": {
+    "alt": [
+      "falsa"
+    ]
+  },
+  "dispuesto|adj": {
+    "alt": [
+      "dispuesta"
+    ]
+  },
+  "directo|adj": {
+    "alt": [
+      "directa"
+    ]
+  },
+  "limpio|adj": {
+    "alt": [
+      "limpia"
+    ]
+  },
+  "europeo|adj": {
+    "alt": [
+      "europea"
+    ]
   }
 }
