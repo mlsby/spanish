@@ -2,6 +2,21 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-10, släpp "en-knapps-modellen")
+
+- **Dagens övning + Öva mer (Lucas modell):** tre knappar och en
+  tempo-inställning blev EN handling. Dagens första övning = förfallna
+  repetitioner + upp till **10 nya** (ställbart 0–50). Varje övning därefter
+  = "Öva mer": det som förfallit + **5 nya** per omgång (ställbart 0–20,
+  0 = bara repetitioner). "Första övningen" = ingen repetition loggad idag.
+  Avbruten övning: osedda ord ärvs av nästa och räknas av mot målet —
+  nya staplas aldrig ovanpå. Klart-skärmen har egen "Öva mer"-knapp +
+  prognosrad ("~N repetitioner läggs på kommande vecka", baslinje mätt
+  före introduktionen). Mjuka bromsen gäller nu alla övningar.
+  Borttaget: "Bara rep.", "Plocka fler ord", turbo-läget i session.ts.
+  Synk: settings-kolumnen new_per_day bär numera newFirst; newMore är
+  lokal per enhet tills en migrationskolumn läggs till.
+
 ## Klart (byggt 2026-08-10, släpp "nivåstegen i ordlistan")
 
 - **Nivåstegen (design B, Lucas val):** "Rank X" borta ur ordlistan

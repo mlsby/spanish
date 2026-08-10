@@ -133,7 +133,8 @@ async function boot(): Promise<void> {
     window.setTimeout(() => p?.classList.remove("pulse"), 1500);
   }
 
-  function startPass(includeNew: boolean): void {
+  /** Dagens övning / Öva mer — samma väg: fyll på nya enligt målet + allt förfallet. */
+  function startPass(): void {
     // inlogg krävs för att öva — annars riskerar ett helt pass att aldrig sparas i molnet
     if (!sync.session) {
       showTab("idag");
@@ -142,21 +143,10 @@ async function boot(): Promise<void> {
     }
     // vänta in första synken — annars kan en andra enhet dubbla dagens nya ord
     if (sync.status === "syncing") return;
-    if (includeNew) store.introduceToday();
+    const baseline = store.dueSoonCount(); // före introduktionen — prognosen räknar de nya
+    store.introduceForSession();
     const cards = store.dueCards();
-    pass.start(cards);
-    showTab("pass");
-  }
-
-  /** "Plocka fler"-läget: öppet introduktionspass — bonusord och turbo-onboarding. */
-  function startBonus(): void {
-    if (!sync.session) {
-      showTab("idag");
-      flashKonto();
-      return;
-    }
-    if (sync.status === "syncing") return;
-    pass.startTurbo();
+    pass.start(cards, baseline);
     showTab("pass");
   }
 
@@ -175,7 +165,7 @@ async function boot(): Promise<void> {
     screens.pass,
     store,
     () => { pushMyStats(); showTab("idag"); },
-    (includeNew) => startPass(includeNew),
+    () => startPass(),
     () => sync.session !== null,
     () => sync.status === "syncing",
     social
@@ -183,7 +173,7 @@ async function boot(): Promise<void> {
   pass.render();
 
   function renderIdagTab(): void {
-    renderIdag(screens.idag, store, { startPass, startBonus }, cloud);
+    renderIdag(screens.idag, store, { startPass }, cloud);
   }
 
   sync.onStatus = () => {

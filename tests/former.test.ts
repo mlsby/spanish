@@ -36,7 +36,8 @@ function makeStore(): Store {
     store.formsByParent.get(f.parent)!.push(f);
   }
   store.data = emptyData();
-  store.data.settings.newPerDay = 10;
+  store.data.settings.newFirst = 10;
+  store.data.settings.newMore = 10;
   return store;
 }
 
@@ -71,7 +72,7 @@ describe("böjningsformer: introduktion", () => {
 
   it("upplåsta former slår ord med sämre korpusläge (slot före rank)", () => {
     store.introduceUnits(2); // poder + casa
-    store.data.settings.newPerDay = 0; // stäng av återbäringen (tak 0) för ren ordningstest
+    store.data.settings.newFirst = 0; // stäng av återbäringen (tak 0) för ren ordningstest
     unlockParent(store, "poder|v");
     const units = store.nextIntroUnits(2);
     // puedo (slot 1) ska komma före querer (rank 3)

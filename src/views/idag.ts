@@ -5,8 +5,7 @@ import { addDays, dayKey, fmtDate, weekdayMon } from "../lib/time";
 import type { SyncStatus } from "../lib/sync";
 
 export interface IdagCallbacks {
-  startPass(includeNew: boolean): void;
-  startBonus(): void;
+  startPass(): void;
 }
 
 export interface CloudUi {
@@ -134,46 +133,41 @@ function kontoHtml(cloud: CloudUi): string {
     </div>${err}`;
 }
 
-/** Hero-kortet: dagens pass i KORT (samma tal som passet visar), eller klart-läget. */
+/** Hero-kortet: nästa övning i KORT (samma tal som övningen visar), eller klart-läget. */
 function heroHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
-  const totalCards = s.due + s.newAvailable * 2;
+  const totalCards = s.due + s.nextNew * 2;
   const doneToday = store.data.days[dayKey()] ?? 0;
   const busy = cloud.status === "syncing";
-
-  const bonus = `<button class="btn ghost" id="bonusBtn" ${busy ? "disabled" : ""}>Plocka fler ord</button>`;
+  const plabel = s.firstToday ? "Dagens övning" : "Öva mer";
+  const cta = s.firstToday ? "Starta dagens övning" : "Öva mer";
 
   if (!cloud.email) {
     return `<div class="hero">
-      <p class="plabel">Dagens pass</p>
+      <p class="plabel">${plabel}</p>
       <div class="big">${totalCards}<small> kort</small></div>
-      <div class="cap"><b>${s.due}</b> repetitioner + <b>${s.newAvailable}</b> nya <span class="capfine">(2 kort/st)</span></div>
-      <button class="btn" id="startFull" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
+      <div class="cap"><b>${s.due}</b> repetitioner + <b>${s.nextNew}</b> nya <span class="capfine">(2 kort/st)</span></div>
+      <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
       <p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>
     </div>`;
   }
 
   if (totalCards === 0) {
     return `<div class="hero klar">
-      <p class="plabel">Dagens pass</p>
+      <p class="plabel">Dagens övning</p>
       <div class="klartxt">✓ Klart för idag</div>
       <div class="cap">${doneToday > 0 ? `<b>${doneToday}</b> kort idag — streaken säkrad` : "inget förfallet just nu"}</div>
-      <div class="ghostrow">${bonus}</div>
     </div>`;
   }
 
   const capParts: string[] = [];
   if (s.due > 0) capParts.push(`<b>${s.due}</b> repetitioner`);
-  if (s.newAvailable > 0) capParts.push(`<b>${s.newAvailable}</b> nya <span class="capfine">(2 kort/st)</span>`);
+  if (s.nextNew > 0) capParts.push(`<b>${s.nextNew}</b> nya <span class="capfine">(2 kort/st)</span>`);
   return `<div class="hero">
-    <p class="plabel">Dagens pass</p>
+    <p class="plabel">${plabel}</p>
     <div class="big">${totalCards}<small> kort</small></div>
     <div class="cap">${capParts.join(" + ")}</div>
-    <button class="btn" id="startFull" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Starta"}</button>
-    <div class="ghostrow">
-      <button class="btn ghost" id="startRep" ${s.due === 0 || busy ? "disabled" : ""}>Bara repetitioner · ${s.due}</button>
-      ${bonus}
-    </div>
+    <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : cta}</button>
   </div>`;
 }
 
@@ -219,11 +213,19 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
 function settingsHtml(store: Store, cloud: CloudUi): string {
   return `
     <div class="panel setting">
-      <span class="t">Nya ord per dag</span>
+      <span class="t">Nya ord — dagens första övning</span>
       <span class="stepper">
-        <button type="button" aria-label="Färre nya ord" id="paceDown">−</button>
-        <span class="v" id="paceVal">${store.data.settings.newPerDay}</span>
-        <button type="button" aria-label="Fler nya ord" id="paceUp">+</button>
+        <button type="button" aria-label="Färre nya ord i första övningen" id="firstDown">−</button>
+        <span class="v">${store.data.settings.newFirst}</span>
+        <button type="button" aria-label="Fler nya ord i första övningen" id="firstUp">+</button>
+      </span>
+    </div>
+    <div class="panel setting">
+      <span class="t">Nya ord — per "Öva mer"</span>
+      <span class="stepper">
+        <button type="button" aria-label="Färre nya ord per extra övning" id="moreDown">−</button>
+        <span class="v">${store.data.settings.newMore}</span>
+        <button type="button" aria-label="Fler nya ord per extra övning" id="moreUp">+</button>
       </span>
     </div>
     <div class="panel" id="kontoPanel">
@@ -272,16 +274,20 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
     settingsOpen = !settingsOpen;
     rerender();
   };
-  el.querySelector<HTMLButtonElement>("#startFull")?.addEventListener("click", () => cb.startPass(true));
-  el.querySelector<HTMLButtonElement>("#startRep")?.addEventListener("click", () => cb.startPass(false));
-  el.querySelector<HTMLButtonElement>("#bonusBtn")?.addEventListener("click", () => cb.startBonus());
+  el.querySelector<HTMLButtonElement>("#startBtn")?.addEventListener("click", () => cb.startPass());
 
-  const bump = (d: number) => {
-    store.setPace(Math.max(0, Math.min(50, store.data.settings.newPerDay + d)));
+  const bumpFirst = (d: number) => {
+    store.setNewFirst(Math.max(0, Math.min(50, store.data.settings.newFirst + d)));
     rerender();
   };
-  el.querySelector<HTMLButtonElement>("#paceDown")?.addEventListener("click", () => bump(-1));
-  el.querySelector<HTMLButtonElement>("#paceUp")?.addEventListener("click", () => bump(1));
+  const bumpMore = (d: number) => {
+    store.setNewMore(Math.max(0, Math.min(20, store.data.settings.newMore + d)));
+    rerender();
+  };
+  el.querySelector<HTMLButtonElement>("#firstDown")?.addEventListener("click", () => bumpFirst(-1));
+  el.querySelector<HTMLButtonElement>("#firstUp")?.addEventListener("click", () => bumpFirst(1));
+  el.querySelector<HTMLButtonElement>("#moreDown")?.addEventListener("click", () => bumpMore(-1));
+  el.querySelector<HTMLButtonElement>("#moreUp")?.addEventListener("click", () => bumpMore(1));
 
   el.querySelector<HTMLButtonElement>("#exportBtn")?.addEventListener("click", () => {
     const url = URL.createObjectURL(exportBlob(store.data));

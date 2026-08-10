@@ -84,7 +84,10 @@ export interface ReviewRec {
 }
 
 export interface Settings {
-  newPerDay: number;
+  /** nya ord i dagens första övning (synkas som new_per_day i molnet) */
+  newFirst: number;
+  /** nya ord per "Öva mer"-omgång (lokal inställning tills en molnkolumn finns) */
+  newMore: number;
   updatedAt?: string; // för last-write-wins vid molnsynk
 }
 

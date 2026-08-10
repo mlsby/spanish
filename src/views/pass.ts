@@ -42,7 +42,7 @@ export class PassView {
     private el: HTMLElement,
     private store: Store,
     private onDone: () => void,
-    private onStartRequest: (includeNew: boolean) => void,
+    private onStartRequest: () => void,
     private loggedIn: () => boolean = () => true,
     private syncBusy: () => boolean = () => false,
     private social?: Social
@@ -131,25 +131,11 @@ export class PassView {
     });
   }
 
-  start(cards: CardRec[]): void {
+  start(cards: CardRec[], dueSoonBaseline?: number): void {
     this.clearTimer();
-    this.session = new Session(this.store, cards);
+    this.session = new Session(this.store, cards, { dueSoonBaseline });
     if (this.session.finished) {
       this.state = "done";
-      this.render();
-      return;
-    }
-    this.state = "question";
-    this.render();
-    this.focusInput();
-  }
-
-  /** "Plocka fler"-läget: bara nya enheter, fylls på tills man slutar själv. */
-  startTurbo(): void {
-    this.clearTimer();
-    this.session = new Session(this.store, [], { turbo: true });
-    if (this.session.finished) {
-      this.state = "done"; // hela basen är redan introducerad
       this.render();
       return;
     }
@@ -228,8 +214,7 @@ export class PassView {
 
   private onAction(act: string): void {
     // start-/navigeringsknappar funkar utan aktiv session (vilo- och klart-lägena)
-    if (act === "startFull" || act === "gologin") { this.onStartRequest(true); return; }
-    if (act === "startRep") { this.onStartRequest(false); return; }
+    if (act === "start" || act === "gologin") { this.onStartRequest(); return; }
     if (act === "restart") { this.onDone(); return; }
     const s = this.session;
     if (!s) return;
@@ -408,32 +393,30 @@ export class PassView {
           </div></div>`;
       }
       const st = this.store.stats();
-      const total = st.due + st.newAvailable;
+      const total = st.due + st.nextNew;
       const busy = this.syncBusy();
       return `<div class="tomt">
-        <div class="stor">Inget pass igång</div>
-        <p>${st.due + st.newAvailable * 2} kort väntar — ${st.due} repetitioner + ${st.newAvailable} nya ord.</p>
-        <div class="btnrow" style="max-width:280px">
-          <button class="btn" data-act="startFull" ${total === 0 || busy ? "disabled" : ""}>${busy ? "Synkar …" : "Starta pass"}</button>
-          <button class="btn ghost" data-act="startRep" ${st.due === 0 || busy ? "disabled" : ""}>Bara rep.</button>
+        <div class="stor">Ingen övning igång</div>
+        <p>${st.due + st.nextNew * 2} kort väntar — ${st.due} repetitioner + ${st.nextNew} nya ord.</p>
+        <div class="btnrow" style="max-width:250px">
+          <button class="btn" data-act="start" ${total === 0 || busy ? "disabled" : ""}>${busy ? "Synkar …" : st.firstToday ? "Starta dagens övning" : "Öva mer"}</button>
         </div></div>`;
     }
     if (this.state === "done") {
       const c = s.counts;
       const answered = c.good + c.hard + c.again;
-      if (s.turbo) {
-        return `<p class="verdict v-good">${IC_OK}${answered ? "Bra plockat!" : "Hela basen är redan igång"}</p>
-          <h2 class="head">${s.turboPicked} enheter</h2>
-          <p class="also">rätt direkt <b>${c.good}</b> · med hjälp <b>${c.hard}</b> · att lära <b>${c.again}</b></p>
-          <p class="fine">~${s.forecastAdded()} repetitioner läggs på kommande vecka.</p>
-          <div class="btnrow" style="max-width:230px">
-            <button type="button" class="btn" data-act="restart">Till startsidan</button></div>`;
-      }
-      return `<p class="verdict v-good">${IC_OK}Passet klart</p>
+      const st = this.store.stats();
+      const more = st.due + st.nextNew > 0;
+      const forecast = s.forecastAdded();
+      return `<p class="verdict v-good">${IC_OK}Övningen klar</p>
         <h2 class="head">${c.good + c.hard} av ${answered}</h2>
         <p class="also">rätt <b>${c.good}</b> · med hjälp <b>${c.hard}</b> · fel <b>${c.again}</b></p>
-        <div class="btnrow" style="max-width:230px">
-          <button type="button" class="btn" data-act="restart">Till startsidan</button></div>`;
+        ${forecast > 0 ? `<p class="fine">~${forecast} repetitioner läggs på kommande vecka.</p>` : ""}
+        <div class="btnrow" style="max-width:250px">
+          ${more ? `<button type="button" class="btn" data-act="start">Öva mer</button>
+          <button type="button" class="btn ghost" data-act="restart">Till startsidan</button>`
+          : `<button type="button" class="btn" data-act="restart">Till startsidan</button>`}
+        </div>`;
     }
     const p = s.pending;
     if (this.state === "question") {
@@ -446,7 +429,7 @@ export class PassView {
       const posLabel = form ? "verb · presens" : (POS_LABEL[w.pos] ?? w.pos);
       // ledtråden särskiljer svenska dubbletter — visas bara åt sv→es-hållet
       const hint = card.dir === "sv2es" ? this.hintLine(w) : "";
-      const brake = s.turboBrake
+      const brake = s.brake
         ? `<p class="brakenote">Många nya på raken — vanlig takt imorgon är också fint.</p>` : "";
       return `<p class="pos">${esc(posLabel)}</p><h2 class="head">${esc(prompt)}</h2>${hint}${brake}`;
     }
@@ -517,9 +500,7 @@ export class PassView {
       this.bar.style.width = pr.total ? `${(pr.done / pr.total) * 100}%` : "100%";
       this.count.textContent = this.state === "done"
         ? "klart"
-        : s.turbo
-          ? `${s.turboPicked} plockade · ~${s.forecastAdded()} rep/vecka`
-          : `${s.queue.length} kort kvar`;
+        : `${s.queue.length} kort kvar`;
       const cur = s.pending?.card ?? s.current;
       if (cur) {
         this.chip.textContent = cur.dir === "es2sv" ? "spanska → svenska" : "svenska → spanska";

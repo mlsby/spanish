@@ -25,43 +25,76 @@ function makeStore(): Store {
   return store;
 }
 
-describe("introduktion av nya ord", () => {
-  it("skapar två kort per ord i frekvensordning, respekterar dagstakten, idempotent", () => {
+describe("övningsmodellen: dagens övning + öva mer", () => {
+  it("dagens första övning fyller till newFirst — frekvensordning, es→sv först", () => {
     const store = makeStore();
-    store.data.settings.newPerDay = 2;
-    const fresh = store.introduceToday();
+    store.data.settings.newFirst = 2;
+    const fresh = store.introduceForSession();
     expect(fresh).toHaveLength(4); // 2 ord × 2 riktningar
     // es→sv-korten först, sedan sv→es — samma ord förhörs inte rygg i rygg
     expect(fresh.map((c) => `${c.wordId}:${c.dir}`)).toEqual([
       "empezar|v:es2sv", "ciudad|n:es2sv", "empezar|v:sv2es", "ciudad|n:sv2es",
     ]);
-    expect(store.introduceToday()).toHaveLength(0); // samma dag → inget mer
+    // omstart utan att ha övat: de osedda ärvs — inget staplas ovanpå
+    expect(store.introduceForSession()).toHaveLength(0);
   });
 
-  it("bonusord går utanför dagstakten och stjäl inte morgondagens kvot", () => {
+  it("efter dagens första övning ger varje 'öva mer' newMore nya", () => {
     const store = makeStore();
-    store.data.settings.newPerDay = 1;
-    expect(store.introduceToday()).toHaveLength(2); // dagens enda ord
-    const bonus = store.introduceBonus(2);
-    expect(bonus).toHaveLength(4); // 2 bonusord × 2 riktningar, trots full budget
-    // imorgon räknas bara morgondagens introduktioner — full kvot igen
-    const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
-    expect(store.introducedToday(tomorrow)).toBe(0);
-    expect(store.stats(tomorrow).newAvailable).toBe(0); // bara 3 ord i testbasen, alla tagna
+    store.data.settings.newFirst = 1;
+    store.data.settings.newMore = 1;
+    expect(store.introduceForSession()).toHaveLength(2); // empezar
+    // markera att första övningen skett: kortet besvarat + review loggad
+    store.logReview({
+      ts: new Date().toISOString(), wordId: "empezar|v", dir: "es2sv",
+      raw: "börja", grade: "good", step: "exact",
+    });
+    for (const dir of ["es2sv", "sv2es"] as const) {
+      const c = store.card("empezar|v", dir)!;
+      store.putCard({ ...c, fsrs: { ...c.fsrs, reps: 1 } });
+    }
+    const more = store.introduceForSession();
+    expect(more).toHaveLength(2); // +1 nytt ord
+    expect(more[0].wordId).toBe("ciudad|n");
   });
 
-  it("dagsbudgeten delas mellan enheter — härleds ur korten, inte en lokal räknare", () => {
+  it("avbruten övning: osedda ord räknas av mot nästa övnings mål", () => {
     const store = makeStore();
-    store.data.settings.newPerDay = 2;
-    // simulera moln-pull: två ord introducerades idag på en annan enhet
+    store.data.settings.newFirst = 2;
+    store.data.settings.newMore = 1;
+    store.introduceForSession(); // empezar + ciudad
+    // öva bara ett kort (stavfel — ingen fast-track), hoppa av
+    const s = new Session(store, store.dueCards());
+    s.answer("börjaa");
+    s.commit();
+    // ciudad är fortfarande osedd (1) ≥ målet (1) → inget nytt introduceras
+    expect(store.introduceForSession()).toHaveLength(0);
+    expect(store.card("feliz|adj", "es2sv")).toBeUndefined();
+  });
+
+  it("osedda ord från en annan enhet räknas av — härlett ur korten", () => {
+    const store = makeStore();
+    store.data.settings.newFirst = 2;
     const now = new Date();
     for (const id of ["empezar|v", "ciudad|n"]) {
       store.data.cards[`${id}:es2sv`] = newCardRec(id, "es2sv", now);
       store.data.cards[`${id}:sv2es`] = newCardRec(id, "sv2es", now);
     }
-    expect(store.introducedToday()).toBe(2);
-    expect(store.introduceToday()).toHaveLength(0); // budgeten redan full idag
-    expect(store.stats().newAvailable).toBe(0);
+    expect(store.introduceForSession()).toHaveLength(0); // målet redan täckt
+  });
+
+  it("stats beskriver nästa övning: firstToday, nextNew och bara sedda i due", () => {
+    const store = makeStore();
+    store.data.settings.newFirst = 2;
+    store.data.settings.newMore = 1;
+    let st = store.stats();
+    expect(st.firstToday).toBe(true);
+    expect(st.nextNew).toBe(2);
+    expect(st.due).toBe(0);
+    store.introduceForSession();
+    st = store.stats();
+    expect(st.nextNew).toBe(2); // ärvda osedda — samma övning, inte fler
+    expect(st.due).toBe(0);     // osedda räknas som nya, inte repetitioner
   });
 });
 

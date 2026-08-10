@@ -132,8 +132,15 @@ export class Store {
     this.dirty("userWord", wordId);
   }
 
-  setPace(v: number): void {
-    this.data.settings.newPerDay = v;
+  setNewFirst(v: number): void {
+    this.data.settings.newFirst = v;
+    this.data.settings.updatedAt = new Date().toISOString();
+    this.save();
+    this.dirty("settings");
+  }
+
+  setNewMore(v: number): void {
+    this.data.settings.newMore = v;
     this.data.settings.updatedAt = new Date().toISOString();
     this.save();
     this.dirty("settings");
@@ -272,21 +279,45 @@ export class Store {
     return fresh;
   }
 
-  /** Introducerar dagens nya enheter (upp till dagstakten). Idempotent per dag. */
-  introduceToday(now: Date = new Date()): CardRec[] {
-    const room = Math.max(0, this.data.settings.newPerDay - this.introducedToday(now));
-    return this.introduceUnits(room, now);
+  /** Har någon repetition loggats idag? Styr "dagens övning" kontra "öva mer". */
+  firstToday(now: Date = new Date()): boolean {
+    return (this.data.days[dayKey(now)] ?? 0) === 0;
+  }
+
+  /** Antal kort med förfall inom `days` dagar — prognosens baslinje tas FÖRE introduktion. */
+  dueSoonCount(days = 7, now: Date = new Date()): number {
+    const cutoff = now.getTime() + days * 24 * 3600 * 1000;
+    let n = 0;
+    for (const key in this.data.cards) {
+      if (dueDate(this.data.cards[key]).getTime() <= cutoff) n++;
+    }
+    return n;
+  }
+
+  /** Introducerade men aldrig besvarade enheter som väntar i dagens kö. */
+  unseenCount(now: Date = new Date()): number {
+    const cutoff = endOfToday(now).getTime();
+    let n = 0;
+    for (const key in this.data.cards) {
+      const c = this.data.cards[key];
+      if (c.dir === "es2sv" && c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff) n++;
+    }
+    return n;
   }
 
   /**
-   * Bonus: n extra enheter utanför dagstaktens rumskoll. introducedToday()
-   * räknar per kalenderdag, så morgondagens kvot påverkas inte.
+   * En övning startar: fyll på med nya enheter upp till målet — newFirst i
+   * dagens första övning, newMore per "öva mer". Osedda enheter från en
+   * avbruten övning ärvs och räknas av, så nya aldrig staplas ovanpå.
    */
-  introduceBonus(n: number, now: Date = new Date()): CardRec[] {
-    return this.introduceUnits(n, now);
+  introduceForSession(now: Date = new Date()): CardRec[] {
+    const s = this.data.settings;
+    const target = this.firstToday(now) ? s.newFirst : s.newMore;
+    const room = Math.max(0, target - this.unseenCount(now));
+    return this.introduceUnits(room, now);
   }
 
-  /** Budgetåterbäring vid fast-track: en extra enhet, utanför dagstakten. */
+  /** Budgetåterbäring vid fast-track: en extra enhet, utanför övningsmålet. */
   introduceExtra(now: Date = new Date()): CardRec[] {
     return this.introduceUnits(1, now);
   }
@@ -370,15 +401,21 @@ export class Store {
       else if (s === "lar") lar++;
       else kan++;
     }
-    const newLeftToday = Math.max(0, this.data.settings.newPerDay - this.introducedToday(now));
-    const newAvailable = newLeftToday > 0 ? this.nextIntroUnits(newLeftToday, now).length : 0;
+    // repetitioner = förfallna kort som mötts minst en gång; osedda räknas som "nya"
+    const dueReps = this.dueCards(now).filter((c) => c.fsrs.reps > 0).length;
+    const firstToday = this.firstToday(now);
+    const target = firstToday ? this.data.settings.newFirst : this.data.settings.newMore;
+    const unseen = this.unseenCount(now);
+    const room = Math.max(0, target - unseen);
+    const fresh = room > 0 ? this.nextIntroUnits(room, now).length : 0;
     return {
       ny, lar, kan,
       started: lar + kan,
       total: this.words.length,
       goal: 5000,
-      due: this.dueCards(now).length,
-      newAvailable,
+      due: dueReps,
+      nextNew: unseen + fresh, // nya enheter nästa övning innehåller (ärvda + påfyllda)
+      firstToday,
     };
   }
 

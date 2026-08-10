@@ -1,4 +1,4 @@
-import type { AppData } from "./types";
+import type { AppData, Settings } from "./types";
 
 /**
  * Lagringsabstraktion. v1 använder localStorage; när Supabase kopplas på
@@ -12,13 +12,22 @@ export interface StorageAdapter {
 export function emptyData(): AppData {
   return {
     version: 1,
-    settings: { newPerDay: 10 },
+    settings: { newFirst: 10, newMore: 5 },
     userWords: {},
     cards: {},
     reviews: [],
     introduced: {},
     days: {},
     snapshots: {},
+  };
+}
+
+/** Äldre sparfiler har `newPerDay` — den blir första övningens takt. */
+function normSettings(s: Partial<Settings> & { newPerDay?: number } = {}): Settings {
+  return {
+    newFirst: s.newFirst ?? s.newPerDay ?? 10,
+    newMore: s.newMore ?? 5,
+    updatedAt: s.updatedAt,
   };
 }
 
@@ -31,7 +40,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       if (!raw) return null;
       const d = JSON.parse(raw) as AppData;
       if (d.version !== 1) return null;
-      return { ...emptyData(), ...d };
+      return { ...emptyData(), ...d, settings: normSettings(d.settings) };
     } catch {
       return null;
     }
@@ -59,5 +68,5 @@ export function parseImport(text: string): AppData {
   if (!d || d.version !== 1 || typeof d.cards !== "object") {
     throw new Error("Filen ser inte ut som en Glosa-backup (version 1).");
   }
-  return { ...emptyData(), ...d };
+  return { ...emptyData(), ...d, settings: normSettings(d.settings) };
 }

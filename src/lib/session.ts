@@ -26,37 +26,24 @@ export interface SessionCounts { good: number; hard: number; again: number }
 const RELEARN_WINDOW_MS = 15 * 60 * 1000;
 /** Syskonuppskov: klaras första riktningen exakt väntar andra riktningen ~2 veckor. */
 const SIBLING_DEFER_MS = 14 * 24 * 3600 * 1000;
-/** Budgetåterbäringens tak: max 3× dagstakten i totala introduktioner per dag. */
+/** Budgetåterbäringens tak: max 3× första övningens takt i introduktioner per dag. */
 const REFUND_CAP_FACTOR = 3;
-/** Turbo: fyll på kön när den krymper under så här många kort. */
-const TURBO_LOW_WATER = 4;
-
-export interface SessionOpts {
-  /** "Plocka fler"-läget: bara nya enheter, fylls på tills basen tar slut. */
-  turbo?: boolean;
-}
 
 export class Session {
   queue: CardRec[] = [];
   done = 0;
   counts: SessionCounts = { good: 0, hard: 0, again: 0 };
   pending: Pending | null = null;
-  readonly turbo: boolean;
-  /** turbo: antal plockade enheter */
-  turboPicked = 0;
-  /** turbo: utfall (exakt rätt?) för de senaste första-mötena — driver mjuka bromsen */
-  private turboOutcomes: boolean[] = [];
+  /** utfall (exakt rätt?) för passets första-möten — driver mjuka bromsen */
+  private firstOutcomes: boolean[] = [];
   /** kort med due inom 7 dagar vid sessionsstart — för prognosraden */
   private dueSoonBaseline = 0;
 
-  constructor(private store: Store, cards: CardRec[], opts?: SessionOpts) {
-    this.turbo = opts?.turbo ?? false;
+  constructor(private store: Store, cards: CardRec[], opts?: { dueSoonBaseline?: number }) {
     // syskonkort (samma ord/moderverb) hålls isär så facit aldrig står kvar på skärmen
     this.queue = spaceSiblings(cards);
-    if (this.turbo) {
-      this.dueSoonBaseline = this.dueSoonCount();
-      this.refillTurbo();
-    }
+    // baslinjen tas helst FÖRE introduktionen — annars räknas dagens nya inte in
+    this.dueSoonBaseline = opts?.dueSoonBaseline ?? this.store.dueSoonCount();
   }
 
   get current(): CardRec | null {
@@ -141,9 +128,9 @@ export class Session {
     });
     this.queue.shift();
     this.done++;
-    if (this.turbo && p.firstExposure && p.card.dir === "es2sv") {
-      this.turboOutcomes.push(p.easy);
-      if (this.turboOutcomes.length > 20) this.turboOutcomes.shift();
+    if (p.firstExposure && p.card.dir === "es2sv") {
+      this.firstOutcomes.push(p.easy);
+      if (this.firstOutcomes.length > 20) this.firstOutcomes.shift();
     }
     const nextDue = dueDate(updated).getTime() - now.getTime();
     if (p.grade === "again") {
@@ -155,7 +142,6 @@ export class Session {
       this.deferSibling(p.card, now);
       this.maybeRefund(p.card, now);
     }
-    if (this.turbo) this.refillTurbo(now);
     this.store.save();
   }
 
@@ -174,49 +160,27 @@ export class Session {
 
   /**
    * Budgetåterbäring: ett ord som sitter vid första mötet kostar ingen
-   * introduktionsplats — nästa enhet låses upp direkt (dock inte i turbo,
-   * som ändå fyller på, och aldrig över 3× dagstakten).
+   * introduktionsplats — nästa enhet låses upp direkt (aldrig över
+   * 3× första övningens takt per dag).
    */
   private maybeRefund(card: CardRec, now: Date): void {
-    if (this.turbo) return;
     const today = now.toDateString();
     if (new Date(card.introducedAt).toDateString() !== today) return;
-    const cap = this.store.data.settings.newPerDay * REFUND_CAP_FACTOR;
+    const cap = this.store.data.settings.newFirst * REFUND_CAP_FACTOR;
     if (this.store.introducedToday(now) >= cap) return;
     this.store.introduceExtra(now); // hamnar i nästa pass — inte mitt i pågående kö
   }
 
-  /** Turbo: håll kön påfylld med nya enheter tills ordbasen tar slut. */
-  private refillTurbo(now: Date = new Date()): void {
-    while (this.queue.length < TURBO_LOW_WATER) {
-      const fresh = this.store.introduceUnits(2, now);
-      if (!fresh.length) break;
-      this.turboPicked += fresh.length / 2;
-      // es→sv-korten först, sv→es efter — ger naturligt syskonavstånd
-      for (const c of fresh.filter((c) => c.dir === "es2sv")) this.queue.push(c);
-      for (const c of fresh.filter((c) => c.dir === "sv2es")) this.queue.push(c);
-    }
+  /** Mjuka bromsen: föreslå paus när exakt-träffen på nya ord sjunkit — då gissar man mer än man kan. */
+  get brake(): boolean {
+    if (this.firstOutcomes.length < 10) return false;
+    const hits = this.firstOutcomes.filter(Boolean).length;
+    return hits / this.firstOutcomes.length < 0.6;
   }
 
-  /** Turbo: föreslå paus när exakt-träffen sjunkit — då gissar man mer än man kan. */
-  get turboBrake(): boolean {
-    if (!this.turbo || this.turboOutcomes.length < 10) return false;
-    const hits = this.turboOutcomes.filter(Boolean).length;
-    return hits / this.turboOutcomes.length < 0.6;
-  }
-
-  private dueSoonCount(now: Date = new Date()): number {
-    const cutoff = now.getTime() + 7 * 24 * 3600 * 1000;
-    let n = 0;
-    for (const key in this.store.data.cards) {
-      if (dueDate(this.store.data.cards[key]).getTime() <= cutoff) n++;
-    }
-    return n;
-  }
-
-  /** Turbo: ungefär så här många repetitioner har sessionen lagt på kommande vecka. */
+  /** Ungefär så här många repetitioner har övningen lagt på kommande vecka. */
   forecastAdded(now: Date = new Date()): number {
-    return Math.max(0, this.dueSoonCount(now) - this.dueSoonBaseline);
+    return Math.max(0, this.store.dueSoonCount(7, now) - this.dueSoonBaseline);
   }
 
   progress(): { done: number; total: number } {

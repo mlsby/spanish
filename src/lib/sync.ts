@@ -61,7 +61,12 @@ export function mergeCloudIntoLocal(data: AppData, cloud: CloudRows): number {
     }
   }
   if (cloud.settings && newerThan(cloud.settings.updated_at, data.settings.updatedAt)) {
-    data.settings = { newPerDay: cloud.settings.new_per_day, updatedAt: cloud.settings.updated_at };
+    // new_per_day-kolumnen bär första övningens takt; newMore är lokal per enhet
+    data.settings = {
+      ...data.settings,
+      newFirst: cloud.settings.new_per_day,
+      updatedAt: cloud.settings.updated_at,
+    };
     adopted++;
   }
   const today = dayKey();
@@ -230,7 +235,7 @@ export class CloudSync {
   private async pushSettings(): Promise<void> {
     const s = this.store.data.settings;
     const { error } = await this.sb.from("settings").upsert({
-      user_id: this.uid(), new_per_day: s.newPerDay,
+      user_id: this.uid(), new_per_day: s.newFirst,
       updated_at: s.updatedAt ?? new Date().toISOString(),
     }, { onConflict: "user_id" });
     if (error) throw new Error(`settings: ${error.message}`);
