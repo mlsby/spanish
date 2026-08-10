@@ -100,7 +100,9 @@ export class Session {
     const p = this.pending;
     const lang = this.answerLang(p.card.dir);
     const norm = normalize(p.raw, lang);
-    if (norm) this.store.addUserSyn(p.word.id, norm);
+    // formkort: synonymen hör till just den formen (kortets id), inte moderverbet —
+    // annars läses den aldrig vid nästa rättning
+    if (norm) this.store.addUserSyn(p.form ? p.card.wordId : p.word.id, norm);
     this.pending = { ...p, grade: "hard", step: "override", forcedMnem: false };
     return this.pending;
   }

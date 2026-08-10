@@ -40,6 +40,12 @@ export const PERSON_SV: Record<VerbForm["person"], string> = {
   "1s": "jag", "2s": "du", "3s": "han/hon", "1p": "vi", "3p": "de",
 };
 
+/** Pronomen som godkänns i svaret — facit visar PERSON_SV, men alla dessa räknas rätt. */
+export const PERSON_SV_SVAR: Record<VerbForm["person"], string[]> = {
+  "1s": ["jag"], "2s": ["du"], "3s": ["han", "hon", "den", "det"],
+  "1p": ["vi"], "3p": ["de", "dom"],
+};
+
 /** Nyckeln som håller isär "syskon" i passkön — formkort delar moderverbets nyckel. */
 export const parentKey = (wordId: string): string => wordId.split("#")[0];
 

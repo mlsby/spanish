@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dl, gradeAnswer, normalize } from "../src/lib/grading";
+import { dl, gradeAnswer, normalize, slashVariants } from "../src/lib/grading";
 
 describe("normalisering (kravspec §3 steg 1)", () => {
   it("spanska: accentokänslig men ñ behålls", () => {
@@ -50,5 +50,26 @@ describe("gradeAnswer (steg 1–2)", () => {
   it("tomt eller långt ifrån → again", () => {
     expect(gradeAnswer("", ["stad"], "sv").grade).toBe("again");
     expect(gradeAnswer("häst", ["stad"], "sv").grade).toBe("again");
+  });
+});
+
+describe("snedstreck i facit = synonymer", () => {
+  it("slashVariants expanderar per ord och behåller originalet", () => {
+    expect(slashVariants("han/hon är")).toEqual(["han/hon är", "han är", "hon är"]);
+    expect(slashVariants("bli/vara kvar")).toEqual(["bli/vara kvar", "bli kvar", "vara kvar"]);
+    expect(slashVariants("är")).toEqual(["är"]);
+  });
+  it("varje variant av huvudfacit räknas som exakt rätt", () => {
+    expect(gradeAnswer("han är", ["han/hon är", "är"], "sv")).toMatchObject({ grade: "good", step: "exact" });
+    expect(gradeAnswer("hon är", ["han/hon är", "är"], "sv")).toMatchObject({ grade: "good", step: "exact" });
+    expect(gradeAnswer("han/hon är", ["han/hon är"], "sv")).toMatchObject({ grade: "good", step: "exact" });
+  });
+  it("stavfel jämförs mot närmaste variant — inte snedstreckssträngen", () => {
+    expect(gradeAnswer("han ärr", ["han/hon är"], "sv"))
+      .toMatchObject({ grade: "hard", step: "fuzzy", matched: "han är" });
+  });
+  it("snedstreck i synonymlistan expanderas också", () => {
+    expect(gradeAnswer("vara kvar", ["stanna", "bli/vara kvar"], "sv"))
+      .toMatchObject({ grade: "good", step: "syn" });
   });
 });

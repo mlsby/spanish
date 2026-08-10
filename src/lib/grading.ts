@@ -51,22 +51,49 @@ export interface GradeResult {
 }
 
 /**
+ * Ett facit med snedstreck ("han/hon är") är egentligen flera svar —
+ * varje variant godkänns för sig. Originalet behålls också (om någon
+ * faktiskt skriver snedstrecket). Kartesisk produkt per ord, med tak.
+ */
+export function slashVariants(target: string): string[] {
+  if (!target.includes("/")) return [target];
+  let combos: string[][] = [[]];
+  for (const tok of target.split(/\s+/)) {
+    const opts = tok.split("/").filter(Boolean);
+    if (!opts.length) continue;
+    const next: string[][] = [];
+    for (const c of combos) {
+      for (const o of opts) {
+        next.push([...c, o]);
+        if (next.length >= 24) break;
+      }
+      if (next.length >= 24) break;
+    }
+    combos = next;
+  }
+  return [target, ...combos.map((c) => c.join(" ")).filter((v) => v !== target)];
+}
+
+/**
  * Steg 1–2 av rättningen. `targets[0]` är huvudöversättningen, resten synonymer.
+ * Varje facit expanderas på snedstreck — varianter av huvudfacit räknas som exakta.
  * (Steg 3, AI-fallbacken, kräver server och ersätts i v1 av "Jag hade rätt"-knappen.)
  */
 export function gradeAnswer(raw: string, targets: string[], lang: AnswerLang): GradeResult {
   const n = normalize(raw, lang);
   if (!n) return { grade: "again", step: "none" };
-  const normTargets = targets.map((t) => normalize(t, lang));
-  const iExact = normTargets.indexOf(n);
-  if (iExact === 0) return { grade: "good", step: "exact" };
-  if (iExact > 0) return { grade: "good", step: "syn" };
+  const flat: { norm: string; show: string; origin: number }[] = [];
+  targets.forEach((t, i) => {
+    for (const v of slashVariants(t)) flat.push({ norm: normalize(v, lang), show: v, origin: i });
+  });
+  const iExact = flat.findIndex((t) => t.norm === n);
+  if (iExact >= 0) return { grade: "good", step: flat[iExact].origin === 0 ? "exact" : "syn" };
   let best = 99, bi = -1;
-  normTargets.forEach((t, i) => {
-    const d0 = dl(n, t);
+  flat.forEach((t, i) => {
+    const d0 = dl(n, t.norm);
     if (d0 < best) { best = d0; bi = i; }
   });
   const limit = n.length <= 5 ? 1 : 2;
-  if (best <= limit) return { grade: "hard", step: "fuzzy", matched: targets[bi] };
+  if (best <= limit) return { grade: "hard", step: "fuzzy", matched: flat[bi].show };
   return { grade: "again", step: "none" };
 }

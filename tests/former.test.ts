@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { newCardRec } from "../src/lib/scheduler";
 import { Session } from "../src/lib/session";
 import { Store } from "../src/lib/store";
 import { emptyData, type StorageAdapter } from "../src/lib/storage";
@@ -100,6 +101,26 @@ describe("böjningsformer: rättning & rendering-data", () => {
     expect(s.answer("jag kan").grade).toBe("good");
     const s2 = new Session(store, [store.card("poder|v#pres.1s", "es2sv")!]);
     expect(s2.answer("kan").grade).toBe("good");
+  });
+
+  it("es→sv 3s: 'han …', 'hon …', 'den/det …' räknas alla som rätt — aldrig snedstreck i facit", () => {
+    store.putCard(newCardRec("poder|v#pres.3s", "es2sv", new Date()));
+    for (const svar of ["han kan", "hon kan", "den kan", "det kan", "kan"]) {
+      const s = new Session(store, [store.card("poder|v#pres.3s", "es2sv")!]);
+      expect(s.answer(svar).grade, `"${svar}" ska ge rätt`).toBe("good");
+    }
+  });
+
+  it("'jag hade rätt' på formkort: synonymen sparas på formen — och rättas nästa gång", () => {
+    const card = store.card("poder|v#pres.1s", "sv2es")!;
+    const s = new Session(store, [card]);
+    expect(s.answer("puedoo").grade).not.toBe("good");
+    s.override();
+    s.commit();
+    expect(store.userWord("poder|v#pres.1s").syn).toContain("puedoo");
+    expect(store.userWord("poder|v").syn).toHaveLength(0); // moderverbet förorenas inte
+    const s2 = new Session(store, [store.card("poder|v#pres.1s", "sv2es")!]);
+    expect(s2.answer("puedoo").grade).toBe("good");
   });
 
   it("sv→es: formen krävs — grundverbet räknas inte", () => {

@@ -1,5 +1,5 @@
 import type { AppData, CardRec, Dir, DirtyKind, ReviewRec, UserWord, VerbForm, Word } from "./types";
-import { cardKey, PERSON_SV } from "./types";
+import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
 import { dueDate, isKnown, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
 import { dayKey, endOfToday } from "./time";
@@ -150,9 +150,17 @@ export class Store {
   targetsFor(card: CardRec): string[] {
     const form = this.formById.get(card.wordId);
     if (form) {
-      // es→sv: "jag kan" är huvudfacit, blotta verbet accepteras också
-      if (card.dir === "es2sv") return [`${PERSON_SV[form.person]} ${form.svPres}`, form.svPres];
-      return [form.es, ...(form.accept ?? [])];
+      // egna synonymer ("jag hade rätt") bor på FORMENS id — inte moderverbets
+      const uw = this.userWord(card.wordId);
+      // es→sv: alla pronomenvarianter är facit ("han är" OCH "hon är"), blotta verbet också
+      if (card.dir === "es2sv") {
+        return [
+          ...PERSON_SV_SVAR[form.person].map((p) => `${p} ${form.svPres}`),
+          form.svPres,
+          ...uw.syn,
+        ];
+      }
+      return [form.es, ...(form.accept ?? []), ...uw.syn];
     }
     return this.targets(this.wordFor(card), card.dir);
   }
