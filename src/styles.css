@@ -294,6 +294,20 @@ html.kbd .vetinte button{padding:3px 14px}
             font-size:12.5px;border-radius:9px;padding:7px 14px}
 .visafler{align-self:center;margin:4px 0 10px}
 
+/* ---------- snabbmarkering: ✓ i raden + ångra-remsa ---------- */
+.rowline{display:flex;align-items:center}
+.rowline .rowbtn{flex:1;min-width:0}
+.qmark{flex:none;width:32px;height:32px;margin-right:10px;border-radius:9px;
+       border:1px solid var(--line);background:var(--card);color:var(--muted);
+       font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+.qmark.done{background:var(--good-bg);border-color:var(--good-line);color:var(--good)}
+.qmark:active{transform:scale(.92)}
+.qstrip{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;
+        background:var(--accent-soft);border-top:1px solid var(--line);
+        padding:6px 10px;font-size:11.5px;color:var(--accent)}
+.qstrip button{border:0;background:none;color:var(--accent);font-weight:700;
+               text-decoration:underline;font-size:11.5px;padding:0 2px}
+
 /* ---------- nivåstegen (ordlistan) ---------- */
 /* radens miniatyr: fyra prickar ifyllda till nuvarande nivå */
 .lpath{display:inline-flex;align-items:center;gap:4px}

@@ -21,6 +21,12 @@ Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
   - Bekräftelserad under stegen efter flytt ("Kan det — kollas om 30
     dagar" osv). Budget: nyskapade kort räknas som dagens introduktioner
     (samma semantik som Plocka fler); imorgon är kvoten fri.
+- **Snabbmarkering (design A, Lucas val):** ✓-knapp längst ut i varje
+  ordlisterad — ett tryck = Kan det (30 d, båda korten), fylld grön när
+  ordet redan är där. Ångra-remsa under raden i ~6 s som återställer en
+  exakt ögonblicksbild av korten (orört ord → korten tas bort helt).
+  Sveppasset (B) och flervalsläget (C) valdes bort; B kan bli komplement
+  senare om massgenomgången ändå känns seg.
 - **Rättningsfixar:** snedstreck i facit expanderas till riktiga synonymer
   vid rättning ("han/hon är" ⇒ "han är" + "hon är" exakta; stavfel diffas
   mot närmaste variant). Formkort accepterar alla rimliga pronomen

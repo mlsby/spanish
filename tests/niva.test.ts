@@ -121,3 +121,34 @@ describe("nivåstegen: flytta för hand", () => {
     s.commit();
   });
 });
+
+describe("snabbmarkering: ✓ + ångra", () => {
+  let store: Store;
+  beforeEach(() => { store = makeStore(); });
+
+  it("ångra på ett orört ord tar bort korten helt — tillbaka till Ny", () => {
+    const snap = store.cardSnapshot("hola|interj");
+    expect(snap).toEqual([null, null]);
+    store.setLevel("hola|interj", "kan");
+    expect(store.wordStatus(WORDS[0]).level).toBe("kan");
+    store.restoreCards("hola|interj", snap);
+    expect(store.card("hola|interj", "es2sv")).toBeUndefined();
+    expect(store.card("hola|interj", "sv2es")).toBeUndefined();
+    expect(store.wordStatus(WORDS[0]).level).toBe("ny");
+  });
+
+  it("ångra på ett påbörjat ord återställer exakt föregående FSRS-läge", () => {
+    store.setLevel("hola|interj", "ovar");
+    const s = new Session(store, [store.card("hola|interj", "es2sv")!]);
+    s.answer("hej"); s.commit(); // lite riktig historik
+    const before = store.card("hola|interj", "es2sv")!;
+    const snap = store.cardSnapshot("hola|interj");
+    store.setLevel("hola|interj", "kan");
+    expect(store.card("hola|interj", "es2sv")!.fsrs.stability).toBe(30);
+    store.restoreCards("hola|interj", snap);
+    const after = store.card("hola|interj", "es2sv")!;
+    expect(after.fsrs.stability).toBe(before.fsrs.stability);
+    expect(after.fsrs.due).toBe(before.fsrs.due);
+    expect(after.fsrs.reps).toBe(before.fsrs.reps);
+  });
+});

@@ -311,6 +311,26 @@ export class Store {
     return { word, cards, status, minStability, level };
   }
 
+  /** Ögonblicksbild av ordets båda kort (null = kortet finns inte) — för ångra. */
+  cardSnapshot(wordId: string): (CardRec | null)[] {
+    return (["es2sv", "sv2es"] as Dir[]).map((d) => {
+      const c = this.card(wordId, d);
+      return c ? { ...c, fsrs: { ...c.fsrs } } : null;
+    });
+  }
+
+  /** Återställ korten till en ögonblicksbild (snabbmarkeringens ångra). */
+  restoreCards(wordId: string, snap: (CardRec | null)[]): void {
+    (["es2sv", "sv2es"] as Dir[]).forEach((d, i) => {
+      const s = snap[i];
+      if (s) this.putCard({ ...s, fsrs: { ...s.fsrs } });
+      // fanns inget kort före: ta bort igen (osynkat lokalt är det helt rent;
+      // hann det synkas återuppstår ett orört kort — som ändå visas som Ny)
+      else delete this.data.cards[cardKey(wordId, d)];
+    });
+    this.save();
+  }
+
   /**
    * Nivåstegen: flytta ett ord för hand. Markeringen är ärlig mot FSRS —
    * "på gång"/"kan det" sätter stabilitet (14/30 d) och kollas när kortet

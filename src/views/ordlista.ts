@@ -1,6 +1,6 @@
 import type { Social } from "../lib/social";
 import type { Store, WordStatus } from "../lib/store";
-import type { Level } from "../lib/types";
+import type { CardRec, Level } from "../lib/types";
 import { LEVEL_SV, POS_LABEL } from "../lib/types";
 
 const esc = (s: string) =>
@@ -23,6 +23,13 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
   let shown = PAGE;
   let openId: string | null = null;
   let moved: { id: string; text: string } | null = null;
+  /** senaste snabbmarkeringen — bär ögonblicksbilden som ångra återställer */
+  let undo: { id: string; snap: (CardRec | null)[]; timer: number } | null = null;
+
+  function dropUndo(): void {
+    if (undo) window.clearTimeout(undo.timer);
+    undo = null;
+  }
 
   el.innerHTML = `
     <div class="lista">
@@ -94,15 +101,23 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const ownSyns = uw.syn
       .map((s) => `<button class="syn egen" data-delsyn="${esc(s)}" title="Ta bort">${esc(s)} ×</button>`)
       .join("");
+    const known = ws.level === "kan";
     return `
       <div class="row${open ? " open" : ""}" data-id="${esc(word.id)}">
-        <button type="button" class="rowbtn" aria-expanded="${open}">
-          <span class="es">${esc(es)}</span><span class="sv">${esc(word.sv)}</span>
-          <span class="meta">
-            ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
-            ${pathHtml(ws)}
-          </span>
-        </button>
+        <div class="rowline">
+          <button type="button" class="rowbtn" aria-expanded="${open}">
+            <span class="es">${esc(es)}</span><span class="sv">${esc(word.sv)}</span>
+            <span class="meta">
+              ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
+              ${pathHtml(ws)}
+            </span>
+          </button>
+          <button type="button" class="qmark${known ? " done" : ""}" data-qmark
+            aria-pressed="${known}" aria-label="${known ? "Markerad: kan det" : "Markera: kan det"}">✓</button>
+        </div>
+        ${undo?.id === word.id
+          ? `<div class="qstrip">Kan det — kollas om 30 dagar ·
+              <button type="button" data-qundo>ångra</button></div>` : ""}
         <div class="rowx">
           ${stegeHtml(ws)}
           <div><div class="xl">${esc(POS_LABEL[word.pos] ?? word.pos)}</div>
@@ -144,6 +159,32 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const row = t.closest<HTMLElement>(".row");
     if (!row) return;
     const id = row.dataset.id!;
+    const qm = t.closest<HTMLElement>("[data-qmark]");
+    if (qm) {
+      const w = store.byId.get(id);
+      if (!w || store.wordStatus(w).level === "kan") return; // redan där
+      dropUndo();
+      const snap = store.cardSnapshot(id);
+      store.setLevel(id, "kan");
+      const timer = window.setTimeout(() => {
+        if (undo?.id !== id) return;
+        undo = null;
+        // rita inte om mitt i skrivande — remsan får ligga kvar tills nästa rendering
+        const a = document.activeElement;
+        if (a && rowsEl.contains(a) && a.matches("input,textarea")) return;
+        renderRows();
+      }, 6000);
+      undo = { id, snap, timer };
+      moved = null;
+      renderRows();
+      return;
+    }
+    if (t.closest("[data-qundo]") && undo) {
+      store.restoreCards(undo.id, undo.snap);
+      dropUndo();
+      renderRows();
+      return;
+    }
     const steg = t.closest<HTMLElement>("[data-setlvl]");
     if (steg) {
       const lvl = steg.dataset.setlvl as Level;
