@@ -108,6 +108,17 @@ Tänkt upplägg:
   saktar ner nya ord — värt att känna på.
 - Kollisionsmaskineriet (hints/disambig) återanvänds när former krockar
   ("kan" utan pronomen, är/es-klassikern osv.).
+- **Introduktionsmodell (skiss 2026-08-10):** en enda intro-kö sorterad på
+  verklig korpusfrekvens — lemman med sin aggregerade siffra, böjningar med
+  sin egen (tengo 954k slår de flesta substantiv). Ovanpå kön tre spärrar:
+  (1) en form låses upp först när moderverbets grundform besvarats rätt en
+  gång, (2) max 1–2 nya former per verb och dag — forskningens interleaving,
+  (3) syskonregeln utökas till "delar moderverb" så puedo/poder/puede hålls
+  isär i passkön. Dagsbudgeten delas (8 ord + 6 böjningar = 14), heron visar
+  uppdelningen. Vid lansering på befintligt konto: redan introducerade verbs
+  toppformer låses upp direkt och dominerar kön några veckor (lätta poäng,
+  throttlat av budgeten). Preteritum/imperfekt behöver parentesledtrådar
+  eftersom svenskan inte skiljer dem ("ville" = quería/quise) — fas 2.
 
 ## Övrigt öppet (sedan tidigare)
 
