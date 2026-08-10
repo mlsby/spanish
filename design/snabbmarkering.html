@@ -1,0 +1,274 @@
+<title>Glosa · Snabbmarkering — bocka av det du kan</title>
+<style>
+  :root{
+    --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:clamp(30px,4.6vw,42px);margin:0;line-height:1.08;text-wrap:balance}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.55;max-width:70ch;margin:12px 0 0}
+  .sub b{color:var(--ink)}
+  section{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+  section h2{font-family:ui-serif,Georgia,serif;font-size:25px;margin:0 0 4px}
+  .blurb{color:var(--muted);font-size:14.5px;line-height:1.6;max-width:74ch;margin:4px 0 16px}
+  .blurb b{color:var(--ink)}
+  .minirow{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+  .minicol{flex:0 0 262px;display:flex;flex-direction:column}
+  .mini{width:262px;min-height:440px;scroll-snap-align:start;
+        background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
+        border-radius:22px;padding:14px 12px 12px;display:flex;flex-direction:column;gap:7px;
+        box-shadow:0 10px 26px rgba(30,24,16,.12)}
+  .mini,.mini *{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .mlabel{text-align:center;font-family:ui-monospace,Menlo,monospace !important;
+          font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+
+  .mini{
+    --m-app:#F7F3EB; --m-card:#FFFDF8; --m-ink:#2B241E; --m-muted:#79695A; --m-line:#E6DCCB; --m-rule:#F0EADD;
+    --m-accent:#59452F; --m-on:#FFF9EF; --m-soft:#EFE6D6;
+    --m-good:#54683A; --m-goodbg:#EEF1E1; --m-goodline:#D8DFC2;
+    --m-warn:#96660F; --m-warnbg:#F8EFD9;
+    --m-brons:#9A7F5B; --m-bronsbg:#EFE4D2;
+  }
+  .m-serif{font-family:ui-serif,"Iowan Old Style",Georgia,serif !important}
+  .m-search{background:var(--m-card);border:1px solid var(--m-line);border-radius:9px;padding:6px 9px;
+            font-size:9px;color:var(--m-muted)}
+  .m-row{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;overflow:hidden}
+  .m-rowtop{display:flex;align-items:center;gap:6px;padding:7px 9px}
+  .m-rowtop .es{font-weight:600;font-size:10.5px;flex:none}
+  .m-rowtop .sv{color:var(--m-muted);font-size:8.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* dagens rad: prickstegen */
+  .m-path{display:flex;align-items:center;gap:3px;flex:none}
+  .m-path i{width:5px;height:5px;border-radius:50%;background:var(--m-rule);border:1px solid var(--m-line)}
+  .m-path i.fill-ovar{background:var(--m-warn);border-color:var(--m-warn)}
+  .m-path i.fill-pagang{background:var(--m-brons);border-color:var(--m-brons)}
+  .m-path i.fill-kan{background:var(--m-good);border-color:var(--m-good)}
+
+  /* A: ✓ i raden */
+  .m-quick{display:flex;gap:4px;flex:none}
+  .m-quick .qb{width:20px;height:20px;border-radius:6px;border:1px solid var(--m-line);
+      background:var(--m-card);color:var(--m-muted);font-size:9px;display:flex;align-items:center;justify-content:center}
+  .m-quick .qb.done{background:var(--m-goodbg);border-color:var(--m-goodline);color:var(--m-good)}
+  .m-strip{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--m-soft);
+           border-top:1px solid var(--m-line);padding:4px 8px;font-size:7.5px;color:var(--m-accent)}
+  .m-strip u{cursor:pointer}
+
+  /* B: sveppasset */
+  .m-top{display:flex;align-items:center;gap:6px;font-size:8px;color:var(--m-muted)}
+  .m-top .x{width:16px;height:16px;border-radius:6px;border:1px solid var(--m-line);display:flex;
+            align-items:center;justify-content:center;font-size:8px}
+  .m-top .cnt{margin-left:auto;font-family:ui-monospace,Menlo,monospace !important;font-size:7.5px}
+  .m-pbar{height:3px;border-radius:99px;background:var(--m-rule);overflow:hidden}
+  .m-pbar i{display:block;height:100%;width:38%;background:var(--m-accent)}
+  .m-sweep{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+           background:var(--m-card);border:1px solid var(--m-line);border-radius:14px;padding:14px 10px;text-align:center}
+  .m-sweep .pos{font-size:6.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--m-muted)}
+  .m-sweep .big{font-size:24px;font-weight:700;line-height:1.05}
+  .m-sweep .svv{font-size:11px;color:var(--m-muted)}
+  .m-sweep .osaker{font-size:7.5px;color:var(--m-muted);text-decoration:underline;margin-top:6px}
+  .m-bigbtns{display:flex;gap:7px}
+  .m-bigbtn{flex:1;border-radius:12px;padding:12px 6px;text-align:center;font-size:10px;font-weight:700}
+  .m-bigbtn.nej{background:none;border:1.5px solid var(--m-line);color:var(--m-muted)}
+  .m-bigbtn.ja{background:var(--m-good);color:#FFFDF8;border:1.5px solid var(--m-good)}
+  .m-undo{text-align:center;font-size:7.5px;color:var(--m-muted)}
+  .m-undo u{cursor:pointer}
+  .m-done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
+  .m-done .stor{font-family:ui-serif,Georgia,serif !important;font-size:19px;font-weight:700}
+  .m-done .rad{font-size:9px;color:var(--m-muted)}
+  .m-done .rad b{color:var(--m-ink)}
+  .m-btn{background:var(--m-accent);color:var(--m-on);border-radius:9px;padding:8px 14px;font-size:9px;font-weight:600;text-align:center}
+  .m-btn.ghost{background:none;border:1px solid var(--m-line);color:var(--m-accent);font-weight:500}
+  .m-entry{display:flex;align-items:center;gap:6px;background:var(--m-soft);border:1px solid var(--m-line);
+           border-radius:10px;padding:7px 9px;font-size:8.5px;font-weight:600;color:var(--m-accent)}
+  .m-entry span{font-weight:400;color:var(--m-muted);font-size:7.5px}
+
+  /* C: flervalsläge */
+  .m-selbar{display:flex;align-items:center;gap:6px;font-size:8px}
+  .m-selbar .tgl{margin-left:auto;border:1px solid var(--m-line);border-radius:99px;padding:3px 8px;
+                 font-size:7.5px;color:var(--m-accent);background:var(--m-soft);font-weight:600}
+  .m-chk{width:15px;height:15px;border-radius:5px;border:1.5px solid var(--m-line);flex:none;
+         display:flex;align-items:center;justify-content:center;font-size:8px;color:#FFFDF8}
+  .m-chk.on{background:var(--m-good);border-color:var(--m-good)}
+  .m-actionbar{position:sticky;bottom:0;background:var(--m-accent);color:var(--m-on);border-radius:11px;
+               padding:9px 10px;font-size:9px;font-weight:700;text-align:center;margin-top:auto}
+
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:14.5px;line-height:1.65;max-width:74ch}
+  footer b{color:var(--ink)}
+</style>
+
+<div class="page" lang="sv">
+  <p class="eyebrow">Sand · snabbmarkering · inget byggt än</p>
+  <h1>Bocka av det du kan — snabbt</h1>
+  <p class="sub">Nivåstegen är byggd, men för att markera <b>hundratals</b> ord är den för långsam:
+  öppna raden + trycka på steget = två–tre tryck per ord. Här är tre sätt att göra det till
+  ett löpande band. Alla använder samma ärliga semantik som stegen: "kan det" = ~30 dagars
+  stabilitet, kollas vid nästa repetition.</p>
+
+  <!-- ============ A ============ -->
+  <section>
+    <h2>A · ✓ direkt i varje rad</h2>
+    <div class="blurb">Förra rundans C, tillbaka — för den löser exakt det här. En liten
+    <b>✓-knapp längst ut i raden</b>: ett tryck = Kan det, utan att öppna något. En smal
+    ångra-remsa dyker upp under raden i några sekunder. Bäst när du <b>söker och bockar</b>
+    ("alla veckodagar", "alla siffror"). Ärlig nackdel: du scrollar och siktar fortfarande —
+    i en lång genomgång blir det pilligt, och raden blir lite tätare.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">poder</span><span class="sv">kunna</span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span>
+            <span class="m-quick"><span class="qb done">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">entender</span><span class="sv">förstå</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la orilla</span><span class="sv">strand</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+        </div>
+        <div class="mlabel">A · listan — ✓ i varje rad</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 lunes</div>
+          <div class="m-row">
+            <div class="m-rowtop"><span class="es">el lunes</span><span class="sv">måndag</span>
+              <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span>
+              <span class="m-quick"><span class="qb done">✓</span></span></div>
+            <div class="m-strip">Kan det — kollas om 30 dagar · <u>ångra</u></div>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el martes</span><span class="sv">tisdag</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el miércoles</span><span class="sv">onsdag</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span>
+            <span class="m-quick"><span class="qb">✓</span></span></div></div>
+        </div>
+        <div class="mlabel">A · efter tryck — ångra-remsa</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section>
+    <h2>B · Sveppasset — "Beta av"</h2>
+    <div class="blurb">Ett eget löpande band, startat från en knapp överst i ordlistan (och på
+    startsidan): <b>ett ord i taget, båda språken synliga</b> (det här är markering, inte förhör),
+    två <b>stora tumknappar</b> — Kan det / Kan inte. Orden kommer i frekvensordning bland dina
+    orörda ord. "Kan inte" lämnar ordet som Ny (det kommer via dagsbudgeten som vanligt),
+    länken "osäker" lägger det i Övar. Ångra-pil för senaste beslutet, avsluta när du vill —
+    nästa svep fortsätter där du slutade. Det här är <b>snabbast per ord</b>: ett beslut,
+    en tumme, ingen scroll, inget sikte. Swipe höger/vänster kan läggas ovanpå som bonus.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-top"><span class="x">✕</span> Beta av <span class="cnt">34 ✓ · ord 51 av basen</span></div>
+          <div class="m-pbar"><i></i></div>
+          <div class="m-sweep">
+            <span class="pos">substantiv</span>
+            <span class="big m-serif">la ventana</span>
+            <span class="svv">fönster</span>
+            <span class="osaker">osäker? → lägg i Övar</span>
+          </div>
+          <div class="m-bigbtns">
+            <div class="m-bigbtn nej">Kan inte</div>
+            <div class="m-bigbtn ja">Kan det ✓</div>
+          </div>
+          <div class="m-undo">↩ <u>ångra</u> — el pueblo blev Kan det</div>
+        </div>
+        <div class="mlabel">B · svepet — ett ord, två tumknappar</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-top"><span class="x">✕</span> Beta av <span class="cnt">klart för idag</span></div>
+          <div class="m-done">
+            <span class="stor">143 ord avbockade</span>
+            <span class="rad"><b>128</b> Kan det · <b>11</b> Övar · <b>4</b> hoppade</span>
+            <span class="rad">Kan det-orden kollas ärligt om ~30 dagar —<br>failar du då tar vanlig inlärning över.</span>
+            <div class="m-btn">Fortsätt beta av</div>
+            <div class="m-btn ghost">Till startsidan</div>
+          </div>
+        </div>
+        <div class="mlabel">B · paus/klart — summering</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-entry">⚡ Beta av basen <span>— bocka av det du redan kan, ord för ord</span></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">poder</span><span class="sv">kunna</span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">entender</span><span class="sv">förstå</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la sombra</span><span class="sv">skugga</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">B · ingången — knapp överst i ordlistan</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ C ============ -->
+  <section>
+    <h2>C · Flervalsläge — kryssa och bekräfta</h2>
+    <div class="blurb">En <b>"Välj"-knapp</b> i ordlistan slår på kryssrutor (som att markera
+    foton). Kryssa så många du vill, tryck på samlingsknappen längst ner: <b>"Markera 12 som
+    Kan det"</b>. Bra när du vill batcha ett exakt urval och se helheten innan du bekräftar.
+    Ärlig nackdel: flest tryck totalt (läge på + N kryss + bekräfta) och klumpigast med en
+    hand — kryssrutor är små, och man växlar mellan scroll och sikte hela tiden.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-selbar"><span class="m-search" style="flex:1">🔍 Sök …</span><span class="tgl">Väljer · avbryt</span></div>
+          <div class="m-row"><div class="m-rowtop"><span class="m-chk on">✓</span><span class="es">poder</span><span class="sv">kunna</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="m-chk on">✓</span><span class="es">entender</span><span class="sv">förstå</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="m-chk"></span><span class="es">la sombra</span><span class="sv">skugga</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="m-chk on">✓</span><span class="es">el desarrollo</span><span class="sv">utveckling</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="m-chk"></span><span class="es">quedar</span><span class="sv">bli kvar</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-actionbar">Markera 3 som Kan det</div>
+        </div>
+        <div class="mlabel">C · välj-läge + samlingsknapp</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Min rekommendation: B — sveppasset.</b> För att beta av hundratals ord är ett beslut i
+    taget med två stora tumknappar oslagbart: ingen scroll, inget sikte, en tumme, ångra i
+    botten. A är ett fint komplement <i>senare</i> (bocka av enstaka ord medan man ändå är i
+    listan), och de utesluter inte varandra — men börja med B. C ger flest tryck för samma
+    resultat. Detaljer att ta ställning till: <b>(1)</b> räcker "Kan det / Kan inte" + en
+    osäker-länk, eller vill du ha tre lika stora knappar (Kan inte · Övar · Kan det)?
+    <b>(2)</b> swipe-gester ovanpå knapparna — ja eller onödigt? <b>(3)</b> namnet på läget:
+    "Beta av", "Svep", "Genomgång" — döp fritt. Säg A, B, C (eller B + A) så bygger jag.
+  </footer>
+</div>
