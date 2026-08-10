@@ -152,8 +152,19 @@ Viktiga egenskaper:
   väntar — Lucas har fler AI-idéer och vill ta dem i ett svep senare.
   (Upplägget står fast: Supabase Edge Function, Claude-nyckeln som
   Supabase-secret, aldrig i klienten.)
-- **Batch 2** av ordbasen (rank 1001–2000): `node seed/build-seed.mjs` enligt
-  README, granska kollisioner på samma sätt som batch 1.
+- ~~Batch 2~~ **KLART 2026-08-10: hela basen utbyggd till 5 000 ord** (se Klart).
+
+## Klart (byggt 2026-08-10, släpp "5 000 ord")
+
+- **Ordbasen 1 000 → 5 000** i fyra nya batchar, samma granskningsdisciplin som
+  batch 1: ~450 svenska dubbletter särskiljda (omdöpning till ordets egentliga
+  huvudbetydelse, ledtrådar på båda, eller kors-alt för äkta synonympar där
+  båda svaren räknas), ~650 luckor handöversatta, ~40 skräplemman skippade,
+  ~50 felöversättningar från Lexin-inversionen rättade (moto=motorcykel,
+  lámpara=lampa, cueva=grotta, raíz=rot …), 554 nya femininformer som fullt
+  godkända svar, dialektpar kors-accepterade (zumo/jugo, billete/boleto,
+  computadora/ordenador, aparcar/estacionar), 0 svarsläckor i ledtrådar
+  verifierat maskinellt över hela basen. Progression: "5 000 i basen" = målet.
 
 ## Klart (byggt 2026-08-10, släpp "startsida A + småfixar")
 

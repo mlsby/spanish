@@ -56,8 +56,9 @@ Source: GitHub Actions* i repot.)
 
 ## Ordbasen & seed-pipelinen
 
-`public/data/batch-001.json` innehåller de 1 000 vanligaste orden med svensk
-huvudöversättning, synonymer, ordklass, frekvensrank och artikel. Byggd av
+`public/data/batch-001.json` … `batch-005.json` innehåller de 5 000 vanligaste
+orden med svensk huvudöversättning, synonymer, ordklass, frekvensrank och
+artikel. Byggda av
 `seed/build-seed.mjs` från öppna källor:
 
 | Källa | Ger | Licens |
@@ -70,6 +71,10 @@ huvudöversättning, synonymer, ordklass, frekvensrank och artikel. Byggd av
 Manuella korrigeringar (~170 granskade huvudöversättningar + handöversatta
 luckor + skräplemman) ligger i `seed/overrides.json` och appliceras sist.
 Granskningsrapport per batch: `seed/report-NNN.md`.
+
+**Viktigt vid ombygge:** en batch får bara byggas om när alla SENARE batchar
+är raderade — skriptet räknar allt annat utgivet som upptaget, så att bygga om
+batch 2 medan batch 5 finns tömmer batch 2. Bygg alltid 2→3→4→5 i ordning.
 
 ### Utöka med nästa batch (utan att röra inlärningsdata)
 

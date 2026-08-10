@@ -299,12 +299,14 @@
     ],
     "alt": [
       "reconocer"
-    ]
+    ],
+    "hint": "även: tillåta, släppa in"
   },
   "reconocer|v": {
     "alt": [
       "admitir"
-    ]
+    ],
+    "hint": "även: känna igen"
   },
   "durante|prep": {
     "sv": "under",
@@ -376,7 +378,8 @@
   "fin|n": {
     "alt": [
       "final"
-    ]
+    ],
+    "hint": "även: syftet, ändamålet"
   },
   "final|n": {
     "sv": "slut",
@@ -386,7 +389,8 @@
     ],
     "alt": [
       "fin"
-    ]
+    ],
+    "hint": "sista delen — finalen"
   },
   "permitir|v": {
     "sv": "låta",
@@ -468,7 +472,8 @@
     ],
     "alt": [
       "tirar"
-    ]
+    ],
+    "hint": "slänga i, hälla — kasta ut"
   },
   "tirar|v": {
     "sv": "kasta",
@@ -479,7 +484,8 @@
     ],
     "alt": [
       "echar"
-    ]
+    ],
+    "hint": "kasta bort; även dra i"
   },
   "difícil|adj": {
     "hint": "motsats till lätt"
@@ -604,7 +610,8 @@
     ],
     "alt": [
       "mostrar"
-    ]
+    ],
+    "hint": "peka ut — visa"
   },
   "plan|n": {
     "hint": "det man tänker göra"
@@ -863,7 +870,8 @@
   "golpear|v": {
     "alt": [
       "pegar"
-    ]
+    ],
+    "hint": "utdela slag — banka"
   },
   "pegar|v": {
     "sv": "slå",
@@ -921,7 +929,8 @@
     ],
     "alt": [
       "gusto"
-    ]
+    ],
+    "hint": "njutningen"
   },
   "especie|n": {
     "sv": "art",
@@ -932,7 +941,7 @@
     ]
   },
   "golpe|n": {
-    "hint": "smäll, stöt"
+    "hint": "smällen — slaget man utdelar"
   },
   "luchar|v": {
     "alt": [
@@ -959,6 +968,9 @@
       "val",
       "option",
       "tillval"
+    ],
+    "alt": [
+      "alternativa"
     ]
   },
   "totalmente|adv": {
@@ -1042,6 +1054,9 @@
       "gå",
       "gå till fots",
       "vandra"
+    ],
+    "alt": [
+      "pasear"
     ]
   },
   "marchar|v": {
@@ -1138,7 +1153,8 @@
       "sak",
       "fråga",
       "angelägenhet"
-    ]
+    ],
+    "hint": "saken — angelägenheten"
   },
   "objeto|n": {
     "sv": "föremål",
@@ -1221,7 +1237,8 @@
       "plats",
       "stånd",
       "befattning"
-    ]
+    ],
+    "hint": "tjänsten man har; ståndet på torget"
   },
   "acabar|v": {
     "alt": [
@@ -1238,7 +1255,8 @@
     ],
     "alt": [
       "acabar"
-    ]
+    ],
+    "hint": "göra klart — få något färdigt"
   },
   "parar|v": {
     "sv": "stanna",
@@ -1377,7 +1395,8 @@
       "påstå",
       "förklara",
       "bekräfta"
-    ]
+    ],
+    "hint": "hävda bestämt — påstå"
   },
   "oportunidad|n": {
     "hint": "tillfälle"
@@ -1594,7 +1613,8 @@
   },
   "vivo|adj": {
     "alt": [
-      "viva"
+      "viva",
+      "viviente"
     ]
   },
   "justo|adj": {
@@ -1634,13 +1654,16 @@
   },
   "hermoso|adj": {
     "alt": [
-      "hermosa"
+      "hermosa",
+      "bello",
+      "bella"
     ]
   },
   "bonito|adj": {
     "alt": [
       "bonita"
-    ]
+    ],
+    "hint": "söt — fin att se på"
   },
   "necesario|adj": {
     "alt": [
@@ -1764,7 +1787,8 @@
   },
   "contrario|adj": {
     "alt": [
-      "contraria"
+      "contraria",
+      "opuesto"
     ]
   },
   "entendido|adj": {
@@ -1775,7 +1799,8 @@
   "americano|adj": {
     "alt": [
       "americana"
-    ]
+    ],
+    "hint": "hela Amerika — även Latinamerika"
   },
   "preocupado|adj": {
     "alt": [
@@ -1830,11 +1855,8268 @@
   "limpio|adj": {
     "alt": [
       "limpia"
-    ]
+    ],
+    "hint": "rengjord — städad"
   },
   "europeo|adj": {
     "alt": [
       "europea"
     ]
+  },
+  "durar|v": {
+    "sv": "pågå",
+    "addSyn": [
+      "vara",
+      "räcka"
+    ]
+  },
+  "poseer|v": {
+    "sv": "äga",
+    "addSyn": [
+      "besitta",
+      "inneha"
+    ]
+  },
+  "advertir|v": {
+    "sv": "varna",
+    "addSyn": [
+      "märka",
+      "uppmärksamma"
+    ]
+  },
+  "curso|n": {
+    "sv": "kurs",
+    "addSyn": [
+      "lopp",
+      "förlopp",
+      "läsår"
+    ]
+  },
+  "girar|v": {
+    "sv": "snurra",
+    "addSyn": [
+      "svänga",
+      "rotera",
+      "vrida"
+    ]
+  },
+  "grandioso|adj": {
+    "sv": "storslagen",
+    "addSyn": [
+      "grandios"
+    ],
+    "alt": [
+      "grandiosa"
+    ]
+  },
+  "componer|v": {
+    "sv": "komponera",
+    "addSyn": [
+      "sätta ihop",
+      "laga"
+    ]
+  },
+  "aprobar|v": {
+    "sv": "godkänna",
+    "addSyn": [
+      "gilla"
+    ]
+  },
+  "empleo|n": {
+    "sv": "anställning",
+    "addSyn": [
+      "jobb",
+      "sysselsättning",
+      "användning"
+    ]
+  },
+  "concierto|n": {
+    "sv": "konsert",
+    "addSyn": [
+      "överenskommelse"
+    ]
+  },
+  "instante|n": {
+    "alt": [
+      "momento"
+    ]
+  },
+  "asistir|v": {
+    "sv": "närvara",
+    "addSyn": [
+      "bistå",
+      "hjälpa"
+    ]
+  },
+  "concluir|v": {
+    "sv": "avsluta",
+    "addSyn": [
+      "dra slutsatsen",
+      "sluta"
+    ]
+  },
+  "caída|n": {
+    "sv": "fall",
+    "hint": "fallet nedåt — att ramla"
+  },
+  "rogar|v": {
+    "sv": "bönfalla",
+    "addSyn": [
+      "be enträget"
+    ]
+  },
+  "rezar|v": {
+    "sv": "be",
+    "hint": "bönen — be till Gud"
+  },
+  "breve|adj": {
+    "sv": "kortvarig",
+    "addSyn": [
+      "kortfattad",
+      "kort"
+    ]
+  },
+  "adoptar|v": {
+    "sv": "adoptera",
+    "addSyn": [
+      "anta",
+      "ta till sig"
+    ]
+  },
+  "determinado|adj": {
+    "sv": "bestämd",
+    "addSyn": [
+      "fastställd",
+      "beslutsam",
+      "viss"
+    ],
+    "alt": [
+      "determinada"
+    ]
+  },
+  "cuento|n": {
+    "sv": "saga",
+    "addSyn": [
+      "berättelse",
+      "novell"
+    ]
+  },
+  "página|n": {
+    "sv": "sida",
+    "hint": "boksidan"
+  },
+  "término|n": {
+    "sv": "term",
+    "addSyn": [
+      "slut",
+      "gräns",
+      "uttryck"
+    ]
+  },
+  "conclusión|n": {
+    "sv": "slutsats",
+    "addSyn": [
+      "avslutning"
+    ]
+  },
+  "carretera|n": {
+    "sv": "landsväg",
+    "addSyn": [
+      "bilväg"
+    ]
+  },
+  "grado|n": {
+    "sv": "grad",
+    "addSyn": [
+      "nivå",
+      "examen"
+    ]
+  },
+  "mudar|v": {
+    "sv": "flytta",
+    "hint": "byta bostad; även ömsa"
+  },
+  "trasladar|v": {
+    "sv": "förflytta",
+    "addSyn": [
+      "omplacera",
+      "flytta"
+    ]
+  },
+  "lanzar|v": {
+    "sv": "slunga",
+    "addSyn": [
+      "kasta",
+      "lansera",
+      "skjuta upp"
+    ]
+  },
+  "arrojar|v": {
+    "sv": "kasta",
+    "hint": "häftigt — slänga ifrån sig"
+  },
+  "turno|n": {
+    "sv": "tur",
+    "hint": "turen i kön — arbetspasset"
+  },
+  "paseo|n": {
+    "sv": "promenad",
+    "addSyn": [
+      "tur",
+      "åktur"
+    ]
+  },
+  "examen|n": {
+    "sv": "tentamen",
+    "addSyn": [
+      "prov",
+      "examen",
+      "undersökning"
+    ]
+  },
+  "intención|n": {
+    "sv": "avsikt",
+    "addSyn": [
+      "mening",
+      "uppsåt"
+    ]
+  },
+  "período|n": {
+    "sv": "period",
+    "addSyn": [
+      "tidsperiod",
+      "mening"
+    ]
+  },
+  "propósito|n": {
+    "sv": "syfte",
+    "addSyn": [
+      "avsikt",
+      "föresats"
+    ]
+  },
+  "pedido|n": {
+    "sv": "beställning",
+    "addSyn": [
+      "order"
+    ]
+  },
+  "revelar|v": {
+    "sv": "avslöja",
+    "addSyn": [
+      "uppenbara",
+      "framkalla"
+    ]
+  },
+  "cobrar|v": {
+    "sv": "ta betalt",
+    "addSyn": [
+      "inkassera",
+      "lyfta lön"
+    ]
+  },
+  "garantizar|v": {
+    "sv": "garantera",
+    "addSyn": [
+      "säkra"
+    ]
+  },
+  "plano|n": {
+    "sv": "ritning",
+    "addSyn": [
+      "plan",
+      "karta",
+      "bildutsnitt"
+    ]
+  },
+  "ilegal|adj": {
+    "sv": "olaglig",
+    "addSyn": [
+      "illegal",
+      "svart"
+    ]
+  },
+  "empujar|v": {
+    "sv": "knuffa",
+    "addSyn": [
+      "skjuta på",
+      "putta"
+    ]
+  },
+  "adecuado|adj": {
+    "sv": "lämplig",
+    "addSyn": [
+      "passande",
+      "adekvat"
+    ],
+    "alt": [
+      "apropiado",
+      "adecuada"
+    ]
+  },
+  "preciso|adj": {
+    "sv": "exakt",
+    "addSyn": [
+      "precis",
+      "nödvändig"
+    ],
+    "alt": [
+      "precisa"
+    ]
+  },
+  "auténtico|adj": {
+    "sv": "äkta",
+    "addSyn": [
+      "autentisk"
+    ],
+    "alt": [
+      "auténtica"
+    ]
+  },
+  "asiento|n": {
+    "sv": "säte",
+    "addSyn": [
+      "sits",
+      "plats"
+    ]
+  },
+  "correo|n": {
+    "sv": "post",
+    "hint": "brev och paket — mejlen"
+  },
+  "partida|n": {
+    "sv": "parti",
+    "addSyn": [
+      "omgång",
+      "avfärd"
+    ]
+  },
+  "fábrica|n": {
+    "sv": "fabrik",
+    "addSyn": [
+      "verk"
+    ]
+  },
+  "suave|adj": {
+    "sv": "mjuk",
+    "addSyn": [
+      "len",
+      "mild",
+      "lätt"
+    ],
+    "alt": [
+      "blando"
+    ]
+  },
+  "aventura|n": {
+    "sv": "äventyr",
+    "addSyn": [
+      "kärleksaffär"
+    ]
+  },
+  "voto|n": {
+    "sv": "röst",
+    "hint": "rösten i valet"
+  },
+  "fotografía|n": {
+    "sv": "fotografi",
+    "addSyn": [
+      "foto",
+      "fotografering"
+    ]
+  },
+  "debajo|adv": {
+    "sv": "nedanför",
+    "addSyn": [
+      "under",
+      "undertill"
+    ]
+  },
+  "deuda|n": {
+    "sv": "skuld",
+    "hint": "pengarna man är skyldig"
+  },
+  "escoger|v": {
+    "alt": [
+      "elegir",
+      "optar"
+    ]
+  },
+  "bello|adj": {
+    "alt": [
+      "hermoso",
+      "hermosa",
+      "bella"
+    ]
+  },
+  "interrumpir|v": {
+    "sv": "avbryta",
+    "addSyn": [
+      "störa"
+    ]
+  },
+  "violar|v": {
+    "sv": "kränka",
+    "addSyn": [
+      "våldta",
+      "bryta mot"
+    ]
+  },
+  "excelente|adj": {
+    "sv": "utmärkt",
+    "addSyn": [
+      "utomordentlig",
+      "fin"
+    ]
+  },
+  "ruta|n": {
+    "sv": "rutt",
+    "addSyn": [
+      "färdväg",
+      "linje"
+    ]
+  },
+  "representante|n": {
+    "sv": "representant",
+    "addSyn": [
+      "ombud",
+      "agent"
+    ]
+  },
+  "comienzo|n": {
+    "alt": [
+      "principio",
+      "inicio"
+    ]
+  },
+  "tarea|n": {
+    "sv": "uppgift",
+    "addSyn": [
+      "läxa",
+      "syssla"
+    ],
+    "hint": "sysslan — läxan"
+  },
+  "rendir|v": {
+    "sv": "prestera",
+    "addSyn": [
+      "avkasta",
+      "ge sig"
+    ]
+  },
+  "extender|v": {
+    "sv": "sträcka ut",
+    "addSyn": [
+      "utvidga",
+      "räcka fram",
+      "breda ut"
+    ]
+  },
+  "comunicación|n": {
+    "sv": "kommunikation",
+    "addSyn": [
+      "meddelande",
+      "förbindelse"
+    ]
+  },
+  "pleno|adj": {
+    "sv": "full",
+    "hint": "mitt i något: mitt på ljusa dagen",
+    "alt": [
+      "plena"
+    ]
+  },
+  "confesar|v": {
+    "sv": "bekänna",
+    "addSyn": [
+      "erkänna",
+      "bikta"
+    ]
+  },
+  "región|n": {
+    "sv": "region",
+    "addSyn": [
+      "område",
+      "trakt"
+    ]
+  },
+  "rostro|n": {
+    "sv": "ansikte",
+    "addSyn": [
+      "anlete",
+      "nuna"
+    ],
+    "alt": [
+      "cara"
+    ]
+  },
+  "espectáculo|n": {
+    "sv": "föreställning",
+    "addSyn": [
+      "skådespel",
+      "uppträde"
+    ]
+  },
+  "visión|n": {
+    "sv": "vision",
+    "addSyn": [
+      "syn",
+      "synförmåga"
+    ]
+  },
+  "dividir|v": {
+    "sv": "dela",
+    "hint": "dela upp — splittra i delar"
+  },
+  "famoso|adj": {
+    "sv": "berömd",
+    "addSyn": [
+      "känd",
+      "ryktbar"
+    ],
+    "alt": [
+      "famosa"
+    ]
+  },
+  "sincero|adj": {
+    "sv": "uppriktig",
+    "addSyn": [
+      "ärlig",
+      "öppenhjärtig"
+    ],
+    "alt": [
+      "sincera"
+    ]
+  },
+  "vencer|v": {
+    "sv": "besegra",
+    "addSyn": [
+      "övervinna",
+      "förfalla"
+    ],
+    "alt": [
+      "derrotar"
+    ]
+  },
+  "junta|n": {
+    "sv": "styrelse",
+    "addSyn": [
+      "möte",
+      "junta",
+      "fog"
+    ]
+  },
+  "lástima|n": {
+    "sv": "synd",
+    "hint": "medlidandet: så synd, vad tråkigt"
+  },
+  "generar|v": {
+    "sv": "generera",
+    "addSyn": [
+      "skapa",
+      "alstra"
+    ]
+  },
+  "emoción|n": {
+    "sv": "känsla",
+    "hint": "starka känslor — upprymdheten"
+  },
+  "sensación|n": {
+    "sv": "förnimmelse",
+    "addSyn": [
+      "känsla",
+      "sensation"
+    ]
+  },
+  "pintura|n": {
+    "sv": "målning",
+    "addSyn": [
+      "färg",
+      "måleri"
+    ]
+  },
+  "pieza|n": {
+    "sv": "pjäs",
+    "addSyn": [
+      "bit",
+      "stycke",
+      "del",
+      "reservdel"
+    ]
+  },
+  "enamorado|adj": {
+    "sv": "förälskad",
+    "addSyn": [
+      "kär"
+    ],
+    "alt": [
+      "enamorada"
+    ]
+  },
+  "meta|n": {
+    "sv": "mål",
+    "hint": "målet man siktar mot — mållinjen"
+  },
+  "premio|n": {
+    "sv": "pris",
+    "hint": "priset man vinner — belöningen"
+  },
+  "cabello|n": {
+    "alt": [
+      "pelo"
+    ]
+  },
+  "liberar|v": {
+    "sv": "befria",
+    "addSyn": [
+      "frige",
+      "frigöra",
+      "lösa"
+    ]
+  },
+  "conservar|v": {
+    "sv": "bevara",
+    "addSyn": [
+      "konservera",
+      "behålla"
+    ],
+    "alt": [
+      "preservar"
+    ]
+  },
+  "desgracia|n": {
+    "sv": "olycka",
+    "hint": "oturen, det tragiska — inte kraschen"
+  },
+  "bote|n": {
+    "sv": "båt",
+    "hint": "den lilla — roddbåten; även burken"
+  },
+  "ocultar|v": {
+    "sv": "dölja",
+    "addSyn": [
+      "gömma",
+      "hemlighålla"
+    ]
+  },
+  "carácter|n": {
+    "sv": "karaktär",
+    "addSyn": [
+      "tecken",
+      "lynne",
+      "prägel"
+    ]
+  },
+  "signo|n": {
+    "sv": "tecken",
+    "hint": "symbolen — stjärntecknet"
+  },
+  "escenario|n": {
+    "sv": "scen",
+    "hint": "scenen man står på; scenariot"
+  },
+  "excusa|n": {
+    "sv": "ursäkt",
+    "hint": "bortförklaringen"
+  },
+  "sencillo|adj": {
+    "alt": [
+      "simple",
+      "sencilla"
+    ]
+  },
+  "delito|n": {
+    "sv": "brott",
+    "hint": "lagbrottet — juridiskt"
+  },
+  "planta|n": {
+    "sv": "växt",
+    "addSyn": [
+      "planta",
+      "våningsplan",
+      "fotsula"
+    ]
+  },
+  "batalla|n": {
+    "sv": "slag",
+    "hint": "slaget i krig — batalj"
+  },
+  "prisión|n": {
+    "alt": [
+      "cárcel"
+    ]
+  },
+  "apartamento|n": {
+    "alt": [
+      "piso"
+    ]
+  },
+  "norma|n": {
+    "sv": "norm",
+    "addSyn": [
+      "regel",
+      "standard"
+    ]
+  },
+  "estadounidense|adj": {
+    "sv": "amerikansk",
+    "hint": "från just USA"
+  },
+  "montar|v": {
+    "sv": "rida",
+    "addSyn": [
+      "montera",
+      "sätta ihop",
+      "åka"
+    ],
+    "alt": [
+      "cabalgar"
+    ]
+  },
+  "trasero|n": {
+    "sv": "bak",
+    "addSyn": [
+      "rumpa",
+      "ända",
+      "stjärt"
+    ]
+  },
+  "extremo|n": {
+    "sv": "ytterlighet",
+    "addSyn": [
+      "ände",
+      "ytterkant"
+    ]
+  },
+  "punta|n": {
+    "sv": "spets",
+    "addSyn": [
+      "udd",
+      "topp",
+      "ände"
+    ]
+  },
+  "importancia|n": {
+    "sv": "betydelse",
+    "addSyn": [
+      "vikt",
+      "vikten av"
+    ]
+  },
+  "alternativa|n": {
+    "alt": [
+      "opción"
+    ]
+  },
+  "superficie|n": {
+    "sv": "yta",
+    "hint": "ovansidan — ytskiktet"
+  },
+  "ordenar|v": {
+    "sv": "beordra",
+    "addSyn": [
+      "ordna",
+      "städa",
+      "sortera"
+    ]
+  },
+  "culpable|adj": {
+    "sv": "skyldig",
+    "hint": "skyldig till brottet"
+  },
+  "obligado|adj": {
+    "sv": "tvungen",
+    "addSyn": [
+      "skyldig",
+      "förpliktad"
+    ],
+    "alt": [
+      "obligada"
+    ]
+  },
+  "introducir|v": {
+    "sv": "införa",
+    "addSyn": [
+      "introducera",
+      "stoppa in"
+    ]
+  },
+  "sostener|v": {
+    "sv": "vidhålla",
+    "addSyn": [
+      "hålla uppe",
+      "försörja",
+      "stödja"
+    ]
+  },
+  "largar|v": {
+    "sv": "dra iväg",
+    "addSyn": [
+      "släppa",
+      "sticka",
+      "vräka ur sig"
+    ]
+  },
+  "patrón|n": {
+    "sv": "mönster",
+    "addSyn": [
+      "förlaga",
+      "husbonde",
+      "beskyddare"
+    ]
+  },
+  "diseño|n": {
+    "sv": "design",
+    "addSyn": [
+      "formgivning",
+      "mönster",
+      "utformning"
+    ]
+  },
+  "gloria|n": {
+    "sv": "ära",
+    "hint": "glansen — berömmelsen"
+  },
+  "puro|adj": {
+    "sv": "ren",
+    "hint": "oblandad — pur",
+    "alt": [
+      "pura"
+    ]
+  },
+  "huella|n": {
+    "sv": "spår",
+    "hint": "avtrycket — fotspåret"
+  },
+  "cinta|n": {
+    "sv": "band",
+    "hint": "bandet av tyg — tejpen, kassetten"
+  },
+  "aprovechar|v": {
+    "sv": "utnyttja",
+    "addSyn": [
+      "ta vara på",
+      "dra nytta av"
+    ]
+  },
+  "capturar|v": {
+    "sv": "fånga",
+    "addSyn": [
+      "gripa",
+      "tillfångata"
+    ],
+    "alt": [
+      "atrapar"
+    ]
+  },
+  "promesa|n": {
+    "sv": "löfte",
+    "addSyn": [
+      "lov"
+    ]
+  },
+  "absoluto|adj": {
+    "sv": "absolut",
+    "addSyn": [
+      "fullkomlig",
+      "total"
+    ],
+    "alt": [
+      "absoluta"
+    ]
+  },
+  "seguido|adj": {
+    "sv": "oavbruten",
+    "addSyn": [
+      "i följd",
+      "rak"
+    ],
+    "alt": [
+      "seguida"
+    ]
+  },
+  "conductor|n": {
+    "sv": "förare",
+    "addSyn": [
+      "chaufför",
+      "ledare"
+    ],
+    "alt": [
+      "chofer"
+    ]
+  },
+  "dirigente|n": {
+    "alt": [
+      "líder"
+    ]
+  },
+  "personaje|n": {
+    "sv": "rollfigur",
+    "addSyn": [
+      "personlighet",
+      "gestalt",
+      "figur"
+    ]
+  },
+  "recurso|n": {
+    "sv": "resurs",
+    "addSyn": [
+      "tillgång",
+      "utväg"
+    ]
+  },
+  "oferta|n": {
+    "sv": "erbjudande",
+    "addSyn": [
+      "utbud",
+      "anbud"
+    ]
+  },
+  "acceso|n": {
+    "sv": "tillträde",
+    "addSyn": [
+      "åtkomst",
+      "tillgång",
+      "anfall"
+    ]
+  },
+  "copa|n": {
+    "sv": "glas",
+    "hint": "vinglaset på fot — pokalen"
+  },
+  "vaso|n": {
+    "sv": "glas",
+    "hint": "dricksglaset"
+  },
+  "sugerir|v": {
+    "alt": [
+      "proponer"
+    ]
+  },
+  "presión|n": {
+    "sv": "tryck",
+    "addSyn": [
+      "press",
+      "påtryckning"
+    ]
+  },
+  "impresión|n": {
+    "sv": "intryck",
+    "addSyn": [
+      "tryck",
+      "avtryck"
+    ]
+  },
+  "atravesar|v": {
+    "sv": "genomkorsa",
+    "addSyn": [
+      "korsa",
+      "gå igenom",
+      "genomlida"
+    ]
+  },
+  "expresar|v": {
+    "sv": "uttrycka",
+    "addSyn": [
+      "ge uttryck för"
+    ]
+  },
+  "vigilar|v": {
+    "sv": "vakta",
+    "addSyn": [
+      "bevaka",
+      "hålla vakt",
+      "passa"
+    ]
+  },
+  "atender|v": {
+    "sv": "betjäna",
+    "addSyn": [
+      "sköta",
+      "ta hand om",
+      "passa upp"
+    ]
+  },
+  "escritor|n": {
+    "alt": [
+      "autor"
+    ]
+  },
+  "declaración|n": {
+    "sv": "uttalande",
+    "addSyn": [
+      "deklaration",
+      "förklaring",
+      "vittnesmål"
+    ]
+  },
+  "esfuerzo|n": {
+    "sv": "ansträngning",
+    "addSyn": [
+      "insats",
+      "möda"
+    ]
+  },
+  "puesta|n": {
+    "sv": "insats",
+    "hint": "det man satsar; solens nedgång"
+  },
+  "elemento|n": {
+    "sv": "element",
+    "addSyn": [
+      "beståndsdel",
+      "inslag"
+    ]
+  },
+  "vía|n": {
+    "sv": "bana",
+    "addSyn": [
+      "väg",
+      "spår",
+      "led"
+    ],
+    "hint": "spåret — järnvägen"
+  },
+  "etapa|n": {
+    "sv": "etapp",
+    "addSyn": [
+      "skede",
+      "fas"
+    ]
+  },
+  "fase|n": {
+    "sv": "fas",
+    "addSyn": [
+      "skede",
+      "stadium"
+    ]
+  },
+  "fila|n": {
+    "sv": "rad",
+    "addSyn": [
+      "kö",
+      "led",
+      "fil"
+    ]
+  },
+  "marcar|v": {
+    "sv": "markera",
+    "addSyn": [
+      "märka ut",
+      "göra mål",
+      "slå ett nummer"
+    ]
+  },
+  "fortuna|n": {
+    "sv": "förmögenhet",
+    "addSyn": [
+      "lycka",
+      "tur",
+      "öde"
+    ]
+  },
+  "tribunal|n": {
+    "sv": "domstol",
+    "addSyn": [
+      "rätt",
+      "tribunal"
+    ]
+  },
+  "plato|n": {
+    "sv": "tallrik",
+    "addSyn": [
+      "rätt",
+      "maträtt"
+    ]
+  },
+  "teoría|n": {
+    "sv": "teori",
+    "addSyn": [
+      "lära"
+    ]
+  },
+  "lección|n": {
+    "sv": "lektion",
+    "addSyn": [
+      "läxa",
+      "lärdom"
+    ]
+  },
+  "práctica|n": {
+    "sv": "praktik",
+    "addSyn": [
+      "övning",
+      "träning",
+      "praxis"
+    ]
+  },
+  "pelota|n": {
+    "sv": "boll",
+    "addSyn": [
+      "kula"
+    ],
+    "hint": "bollen man spelar med"
+  },
+  "crédito|n": {
+    "sv": "kredit",
+    "addSyn": [
+      "förtroende",
+      "tilltro",
+      "lån"
+    ]
+  },
+  "clave|n": {
+    "sv": "lösenord",
+    "addSyn": [
+      "nyckel",
+      "kod",
+      "klav"
+    ],
+    "alt": [
+      "contraseña"
+    ]
+  },
+  "cifra|n": {
+    "sv": "siffra",
+    "addSyn": [
+      "chiffer",
+      "kod",
+      "summa"
+    ]
+  },
+  "letra|n": {
+    "sv": "bokstav",
+    "addSyn": [
+      "sångtext",
+      "handstil",
+      "text"
+    ]
+  },
+  "frontera|n": {
+    "sv": "gräns",
+    "hint": "landsgränsen"
+  },
+  "límite|n": {
+    "sv": "gräns",
+    "hint": "begränsningen — det yttersta"
+  },
+  "ambiente|n": {
+    "sv": "miljö",
+    "addSyn": [
+      "stämning",
+      "atmosfär",
+      "omgivning"
+    ]
+  },
+  "demanda|n": {
+    "sv": "stämning",
+    "hint": "juridiken: stämningen i domstol; efterfrågan"
+  },
+  "unión|n": {
+    "sv": "union",
+    "addSyn": [
+      "förening",
+      "sammanslutning",
+      "enighet"
+    ]
+  },
+  "conjunto|n": {
+    "sv": "helhet",
+    "addSyn": [
+      "samling",
+      "ensemble",
+      "uppsättning"
+    ]
+  },
+  "disparo|n": {
+    "alt": [
+      "tiro"
+    ]
+  },
+  "corresponder|v": {
+    "sv": "motsvara",
+    "addSyn": [
+      "besvara",
+      "tillkomma"
+    ]
+  },
+  "coincidir|v": {
+    "sv": "sammanfalla",
+    "addSyn": [
+      "stämma överens",
+      "råka mötas"
+    ]
+  },
+  "fresco|adj": {
+    "sv": "sval",
+    "addSyn": [
+      "färsk",
+      "fräsch",
+      "frisk"
+    ],
+    "alt": [
+      "fresca"
+    ]
+  },
+  "organizar|v": {
+    "sv": "organisera",
+    "addSyn": [
+      "ordna",
+      "arrangera"
+    ]
+  },
+  "disponer|v": {
+    "sv": "förfoga",
+    "addSyn": [
+      "ordna",
+      "disponera",
+      "bestämma"
+    ]
+  },
+  "arrancar|v": {
+    "sv": "rycka",
+    "addSyn": [
+      "starta",
+      "slita loss",
+      "dra igång"
+    ]
+  },
+  "atraer|v": {
+    "sv": "locka",
+    "addSyn": [
+      "attrahera",
+      "dra till sig"
+    ]
+  },
+  "beneficio|n": {
+    "sv": "vinst",
+    "addSyn": [
+      "förmån",
+      "nytta",
+      "fördel"
+    ]
+  },
+  "ventaja|n": {
+    "sv": "fördel",
+    "addSyn": [
+      "försprång",
+      "nytta"
+    ]
+  },
+  "impuesto|n": {
+    "sv": "skatt",
+    "hint": "skatten till staten"
+  },
+  "tesoro|n": {
+    "sv": "skatt",
+    "hint": "skattkistan; älskling"
+  },
+  "pez|n": {
+    "sv": "fisk",
+    "hint": "fisken som simmar"
+  },
+  "pescado|n": {
+    "sv": "fisk",
+    "hint": "fisken på tallriken"
+  },
+  "entrega|n": {
+    "sv": "leverans",
+    "addSyn": [
+      "överlämnande",
+      "avsnitt"
+    ]
+  },
+  "despacho|n": {
+    "sv": "arbetsrum",
+    "addSyn": [
+      "kontor",
+      "expediering"
+    ]
+  },
+  "ensayo|n": {
+    "sv": "repetition",
+    "addSyn": [
+      "övning",
+      "essä",
+      "försök"
+    ]
+  },
+  "caso|n": {
+    "hint": "fallet — ärendet"
+  },
+  "pedir|v": {
+    "hint": "be om något — begära"
+  },
+  "lado|n": {
+    "hint": "sidan, hållet — riktningen"
+  },
+  "mover|v": {
+    "hint": "flytta på saker — röra"
+  },
+  "suerte|n": {
+    "hint": "lyckan — turen man har"
+  },
+  "voz|n": {
+    "hint": "rösten man talar med"
+  },
+  "culpa|n": {
+    "hint": "skulden — felet"
+  },
+  "elegir|v": {
+    "alt": [
+      "escoger",
+      "optar"
+    ]
+  },
+  "principio|n": {
+    "alt": [
+      "comienzo",
+      "inicio"
+    ]
+  },
+  "sentimiento|n": {
+    "hint": "känslan man bär i hjärtat"
+  },
+  "objetivo|n": {
+    "hint": "syftet — det man siktar på"
+  },
+  "precio|n": {
+    "hint": "priset man betalar"
+  },
+  "pelo|n": {
+    "alt": [
+      "cabello"
+    ]
+  },
+  "accidente|n": {
+    "hint": "kraschen — olyckshändelsen"
+  },
+  "barco|n": {
+    "hint": "vanliga ordet — även stora fartyg"
+  },
+  "señal|n": {
+    "hint": "signalen — vägmärket"
+  },
+  "escena|n": {
+    "hint": "scenen i filmen — uppträdet"
+  },
+  "disculpa|n": {
+    "hint": "ursäkten man ber om — förlåtelsen"
+  },
+  "crimen|n": {
+    "hint": "grova brottet — mordet"
+  },
+  "piso|n": {
+    "alt": [
+      "apartamento"
+    ]
+  },
+  "cabo|n": {
+    "hint": "änden av något; udden; korpral"
+  },
+  "área|n": {
+    "hint": "arean — området"
+  },
+  "responsable|adj": {
+    "sv": "ansvarig",
+    "addSyn": [
+      "skyldig"
+    ],
+    "hint": "den som bär ansvaret"
+  },
+  "honor|n": {
+    "hint": "hedern"
+  },
+  "pista|n": {
+    "hint": "spåret man följer; banan"
+  },
+  "banda|n": {
+    "hint": "gänget; musikbandet"
+  },
+  "simple|adj": {
+    "alt": [
+      "sencillo"
+    ]
+  },
+  "cárcel|n": {
+    "alt": [
+      "prisión"
+    ]
+  },
+  "momento|n": {
+    "alt": [
+      "instante"
+    ]
+  },
+  "tú|pron": {
+    "hint": "det vanliga duet"
+  },
+  "papá|n": {
+    "hint": "det vanliga ordet för pappa"
+  },
+  "escuela|n": {
+    "hint": "skolan i allmänhet"
+  },
+  "líder|n": {
+    "alt": [
+      "dirigente"
+    ]
+  },
+  "proponer|v": {
+    "alt": [
+      "sugerir"
+    ]
+  },
+  "autor|n": {
+    "alt": [
+      "escritor"
+    ]
+  },
+  "tiro|n": {
+    "alt": [
+      "disparo"
+    ]
+  },
+  "bala|n": {
+    "hint": "gevärskulan"
+  },
+  "precisamente|adv": {
+    "alt": [
+      "exactamente"
+    ]
+  },
+  "hueso|n": {
+    "sv": "ben",
+    "hint": "skelettbenet — knotan"
+  },
+  "pata|n": {
+    "sv": "tass",
+    "addSyn": [
+      "djurben",
+      "ben"
+    ]
+  },
+  "función|n": {
+    "sv": "funktion",
+    "addSyn": [
+      "föreställning",
+      "tillställning"
+    ]
+  },
+  "crecimiento|n": {
+    "sv": "tillväxt",
+    "addSyn": [
+      "växande",
+      "ökning"
+    ]
+  },
+  "cien|num": {
+    "hint": "kortformen — precis hundra"
+  },
+  "victoria|n": {
+    "sv": "seger",
+    "addSyn": [
+      "vinst",
+      "triumf"
+    ]
+  },
+  "transporte|n": {
+    "sv": "transport",
+    "addSyn": [
+      "kommunikationer",
+      "trafik"
+    ]
+  },
+  "personalidad|n": {
+    "sv": "personlighet",
+    "addSyn": [
+      "karaktär",
+      "kändis"
+    ]
+  },
+  "reserva|n": {
+    "sv": "bokning",
+    "addSyn": [
+      "reservation",
+      "reserv",
+      "beställning"
+    ]
+  },
+  "asociación|n": {
+    "sv": "förening",
+    "addSyn": [
+      "organisation",
+      "association"
+    ]
+  },
+  "bola|n": {
+    "sv": "boll",
+    "hint": "klotet, kulan — även lögnen"
+  },
+  "pecado|n": {
+    "sv": "synd",
+    "hint": "synden mot Gud — försyndelsen"
+  },
+  "cara|n": {
+    "alt": [
+      "rostro"
+    ]
+  },
+  "exactamente|adv": {
+    "alt": [
+      "precisamente"
+    ]
+  },
+  "pierna|n": {
+    "hint": "benet man går på"
+  },
+  "dato|n": {
+    "hint": "faktauppgiften — datan"
+  },
+  "atrapar|v": {
+    "alt": [
+      "capturar"
+    ]
+  },
+  "serie|n": {
+    "sv": "serie",
+    "addSyn": [
+      "rad",
+      "följd",
+      "svit"
+    ]
+  },
+  "división|n": {
+    "sv": "division",
+    "addSyn": [
+      "indelning",
+      "serie",
+      "delning"
+    ]
+  },
+  "hecho|adj": {
+    "sv": "gjord",
+    "syn": [
+      "färdig",
+      "tillagad"
+    ],
+    "alt": [
+      "hecha"
+    ]
+  },
+  "dicho|adj": {
+    "sv": "nämnd",
+    "syn": [
+      "sagd",
+      "omtalad"
+    ],
+    "alt": [
+      "dicha"
+    ]
+  },
+  "mexicano|adj": {
+    "sv": "mexikansk",
+    "alt": [
+      "mexicana"
+    ]
+  },
+  "financiero|adj": {
+    "sv": "finansiell",
+    "syn": [
+      "ekonomisk"
+    ],
+    "alt": [
+      "financiera"
+    ]
+  },
+  "mentiroso|adj": {
+    "sv": "lögnaktig",
+    "syn": [
+      "falsk"
+    ],
+    "alt": [
+      "mentirosa"
+    ]
+  },
+  "usado|adj": {
+    "sv": "begagnad",
+    "syn": [
+      "använd",
+      "sliten"
+    ],
+    "alt": [
+      "usada"
+    ]
+  },
+  "efectivo|adj": {
+    "sv": "effektiv",
+    "syn": [
+      "verklig",
+      "kontant"
+    ],
+    "alt": [
+      "eficiente",
+      "efectiva"
+    ]
+  },
+  "profundo|adj": {
+    "sv": "djup",
+    "syn": [
+      "djupsinnig",
+      "ingående"
+    ],
+    "alt": [
+      "hondo",
+      "profunda"
+    ]
+  },
+  "cómodo|adj": {
+    "sv": "bekväm",
+    "syn": [
+      "skön",
+      "behaglig"
+    ],
+    "alt": [
+      "cómoda"
+    ]
+  },
+  "harto|adj": {
+    "sv": "utled",
+    "syn": [
+      "trött på",
+      "mätt"
+    ],
+    "alt": [
+      "harta"
+    ]
+  },
+  "extraordinario|adj": {
+    "sv": "enastående",
+    "syn": [
+      "utomordentlig",
+      "suverän",
+      "extraordinär"
+    ],
+    "alt": [
+      "extraordinaria"
+    ]
+  },
+  "máximo|adj": {
+    "sv": "maximal",
+    "syn": [
+      "störst",
+      "högst"
+    ],
+    "alt": [
+      "máxima"
+    ]
+  },
+  "precioso|adj": {
+    "alt": [
+      "preciosa"
+    ]
+  },
+  "guapo|adj": {
+    "alt": [
+      "guapa"
+    ]
+  },
+  "orgulloso|adj": {
+    "alt": [
+      "orgullosa"
+    ]
+  },
+  "ocupado|adj": {
+    "alt": [
+      "ocupada"
+    ]
+  },
+  "inmediato|adj": {
+    "alt": [
+      "inmediata"
+    ]
+  },
+  "roto|adj": {
+    "alt": [
+      "rota"
+    ]
+  },
+  "técnico|adj": {
+    "alt": [
+      "técnica"
+    ]
+  },
+  "exacto|adj": {
+    "alt": [
+      "exacta"
+    ]
+  },
+  "encantado|adj": {
+    "alt": [
+      "encantada"
+    ]
+  },
+  "fantástico|adj": {
+    "alt": [
+      "fantástica"
+    ]
+  },
+  "favorito|adj": {
+    "alt": [
+      "favorita"
+    ]
+  },
+  "armado|adj": {
+    "alt": [
+      "armada"
+    ]
+  },
+  "interno|adj": {
+    "alt": [
+      "interna"
+    ]
+  },
+  "sospechoso|adj": {
+    "alt": [
+      "sospechosa"
+    ]
+  },
+  "sucio|adj": {
+    "alt": [
+      "sucia"
+    ]
+  },
+  "estupendo|adj": {
+    "alt": [
+      "estupenda"
+    ]
+  },
+  "asustado|adj": {
+    "alt": [
+      "asustada"
+    ]
+  },
+  "ridículo|adj": {
+    "alt": [
+      "ridícula"
+    ]
+  },
+  "ruso|adj": {
+    "alt": [
+      "rusa"
+    ]
+  },
+  "mínimo|adj": {
+    "alt": [
+      "mínima"
+    ]
+  },
+  "diverso|adj": {
+    "alt": [
+      "diversa"
+    ]
+  },
+  "interesado|adj": {
+    "alt": [
+      "interesada"
+    ]
+  },
+  "poderoso|adj": {
+    "alt": [
+      "poderosa"
+    ]
+  },
+  "dormido|adj": {
+    "alt": [
+      "dormida"
+    ]
+  },
+  "cercano|adj": {
+    "alt": [
+      "cercana"
+    ]
+  },
+  "parecido|adj": {
+    "alt": [
+      "parecida"
+    ]
+  },
+  "histórico|adj": {
+    "alt": [
+      "histórica"
+    ]
+  },
+  "moderno|adj": {
+    "alt": [
+      "moderna"
+    ]
+  },
+  "quieto|adj": {
+    "alt": [
+      "quieta"
+    ]
+  },
+  "desnudo|adj": {
+    "alt": [
+      "desnuda"
+    ]
+  },
+  "italiano|adj": {
+    "alt": [
+      "italiana"
+    ]
+  },
+  "positivo|adj": {
+    "alt": [
+      "positiva"
+    ]
+  },
+  "norteamericano|adj": {
+    "alt": [
+      "norteamericana"
+    ]
+  },
+  "atrapado|adj": {
+    "alt": [
+      "atrapada"
+    ]
+  },
+  "complicado|adj": {
+    "alt": [
+      "complicada"
+    ]
+  },
+  "jodido|adj": {
+    "alt": [
+      "jodida"
+    ]
+  },
+  "contento|adj": {
+    "alt": [
+      "contenta"
+    ]
+  },
+  "ciego|adj": {
+    "alt": [
+      "ciega"
+    ]
+  },
+  "seco|adj": {
+    "alt": [
+      "seca"
+    ]
+  },
+  "secundario|adj": {
+    "alt": [
+      "secundaria"
+    ]
+  },
+  "desconocido|adj": {
+    "alt": [
+      "desconocida"
+    ]
+  },
+  "británico|adj": {
+    "alt": [
+      "británica"
+    ]
+  },
+  "acusado|adj": {
+    "alt": [
+      "acusada"
+    ]
+  },
+  "clásico|adj": {
+    "alt": [
+      "clásica"
+    ]
+  },
+  "feo|adj": {
+    "alt": [
+      "fea"
+    ]
+  },
+  "aburrido|adj": {
+    "alt": [
+      "aburrida"
+    ]
+  },
+  "honesto|adj": {
+    "alt": [
+      "honrado",
+      "honesta"
+    ]
+  },
+  "activo|adj": {
+    "alt": [
+      "activa"
+    ]
+  },
+  "relacionado|adj": {
+    "alt": [
+      "relacionada"
+    ]
+  },
+  "helado|adj": {
+    "alt": [
+      "helada"
+    ]
+  },
+  "lento|adj": {
+    "alt": [
+      "lenta"
+    ]
+  },
+  "pesado|adj": {
+    "alt": [
+      "pesada"
+    ]
+  },
+  "enojado|adj": {
+    "alt": [
+      "enojada"
+    ]
+  },
+  "químico|adj": {
+    "alt": [
+      "química"
+    ]
+  },
+  "eléctrico|adj": {
+    "alt": [
+      "eléctrica"
+    ]
+  },
+  "suelto|adj": {
+    "alt": [
+      "suelta"
+    ]
+  },
+  "básico|adj": {
+    "alt": [
+      "básica"
+    ]
+  },
+  "religioso|adj": {
+    "alt": [
+      "religiosa"
+    ]
+  },
+  "amplio|adj": {
+    "alt": [
+      "amplia"
+    ]
+  },
+  "nacido|adj": {
+    "alt": [
+      "nacida"
+    ]
+  },
+  "atractivo|adj": {
+    "alt": [
+      "atractiva"
+    ]
+  },
+  "enfadado|adj": {
+    "alt": [
+      "enfadada"
+    ]
+  },
+  "cristiano|adj": {
+    "alt": [
+      "cristiana"
+    ]
+  },
+  "escondido|adj": {
+    "alt": [
+      "escondida"
+    ]
+  },
+  "chino|adj": {
+    "alt": [
+      "china"
+    ]
+  },
+  "curioso|adj": {
+    "alt": [
+      "curiosa"
+    ]
+  },
+  "amarillo|adj": {
+    "alt": [
+      "amarilla"
+    ]
+  },
+  "específico|adj": {
+    "alt": [
+      "específica"
+    ]
+  },
+  "dirigido|adj": {
+    "alt": [
+      "dirigida"
+    ]
+  },
+  "femenino|adj": {
+    "alt": [
+      "femenina"
+    ]
+  },
+  "separado|adj": {
+    "alt": [
+      "separada"
+    ]
+  },
+  "democrático|adj": {
+    "alt": [
+      "democrática"
+    ]
+  },
+  "definitivo|adj": {
+    "alt": [
+      "definitiva"
+    ]
+  },
+  "sano|adj": {
+    "alt": [
+      "sana"
+    ]
+  },
+  "previsto|adj": {
+    "alt": [
+      "prevista"
+    ]
+  },
+  "presentado|adj": {
+    "alt": [
+      "presentada"
+    ]
+  },
+  "obvio|adj": {
+    "alt": [
+      "obvia"
+    ]
+  },
+  "basado|adj": {
+    "alt": [
+      "basada"
+    ]
+  },
+  "aéreo|adj": {
+    "alt": [
+      "aérea"
+    ]
+  },
+  "condenado|adj": {
+    "alt": [
+      "condenada"
+    ]
+  },
+  "barato|adj": {
+    "alt": [
+      "barata"
+    ]
+  },
+  "romántico|adj": {
+    "alt": [
+      "romántica"
+    ]
+  },
+  "amado|adj": {
+    "alt": [
+      "amada"
+    ]
+  },
+  "violento|adj": {
+    "alt": [
+      "violenta"
+    ]
+  },
+  "mágico|adj": {
+    "alt": [
+      "mágica"
+    ]
+  },
+  "telefónico|adj": {
+    "alt": [
+      "telefónica"
+    ]
+  },
+  "perdido|adj": {
+    "alt": [
+      "perdida"
+    ]
+  },
+  "solitario|adj": {
+    "alt": [
+      "solitaria"
+    ]
+  },
+  "sagrado|adj": {
+    "alt": [
+      "sagrada"
+    ]
+  },
+  "magnífico|adj": {
+    "alt": [
+      "magnífica"
+    ]
+  },
+  "fiscal|adj": {
+    "sv": "åklagare",
+    "pos": "n",
+    "art": "el",
+    "syn": [
+      "skattemässig"
+    ]
+  },
+  "contratar|v": {
+    "sv": "anställa",
+    "syn": [
+      "anlita",
+      "kontraktera",
+      "rekrytera"
+    ]
+  },
+  "educación|n": {
+    "addSyn": [
+      "utbildning",
+      "bildning"
+    ]
+  },
+  "funcionamiento|n": {
+    "sv": "drift",
+    "addSyn": [
+      "funktion",
+      "gång"
+    ],
+    "hint": "maskinens drift — gången"
+  },
+  "únicamente|adv": {
+    "sv": "enbart",
+    "addSyn": [
+      "endast",
+      "bara"
+    ]
+  },
+  "aguardar|v": {
+    "alt": [
+      "esperar"
+    ]
+  },
+  "igualmente|adv": {
+    "sv": "likaså",
+    "addSyn": [
+      "också",
+      "detsamma"
+    ]
+  },
+  "convocar|v": {
+    "sv": "sammankalla",
+    "addSyn": [
+      "kalla",
+      "utlysa"
+    ]
+  },
+  "plantar|v": {
+    "sv": "plantera",
+    "addSyn": [
+      "sätta",
+      "så",
+      "lämna vid altaret"
+    ]
+  },
+  "labor|n": {
+    "sv": "arbete",
+    "addSyn": [
+      "möda",
+      "syssla"
+    ]
+  },
+  "cesar|v": {
+    "sv": "upphöra",
+    "addSyn": [
+      "sluta",
+      "avgå"
+    ]
+  },
+  "modificar|v": {
+    "sv": "modifiera",
+    "addSyn": [
+      "ändra"
+    ]
+  },
+  "alterar|v": {
+    "sv": "förändra",
+    "addSyn": [
+      "ändra",
+      "uppröra"
+    ]
+  },
+  "verdaderamente|adv": {
+    "sv": "sannerligen",
+    "addSyn": [
+      "verkligen"
+    ]
+  },
+  "elevado|adj": {
+    "sv": "upphöjd",
+    "addSyn": [
+      "hög",
+      "förhöjd"
+    ],
+    "alt": [
+      "elevada"
+    ]
+  },
+  "recorrido|n": {
+    "sv": "sträcka",
+    "addSyn": [
+      "rutt",
+      "väg",
+      "tur"
+    ]
+  },
+  "socorro|n": {
+    "sv": "hjälp",
+    "hint": "nödropet — undsättningen"
+  },
+  "asistencia|n": {
+    "sv": "assistans",
+    "addSyn": [
+      "närvaro",
+      "hjälp"
+    ]
+  },
+  "batir|v": {
+    "sv": "vispa",
+    "addSyn": [
+      "slå",
+      "bulta",
+      "slå rekord"
+    ]
+  },
+  "ejecución|n": {
+    "sv": "avrättning",
+    "addSyn": [
+      "utförande",
+      "verkställande"
+    ]
+  },
+  "ánimo|n": {
+    "sv": "mod",
+    "addSyn": [
+      "humör",
+      "sinnesstämning",
+      "livslust"
+    ],
+    "hint": "uppmuntran — livsandarna"
+  },
+  "significado|n": {
+    "sv": "innebörd",
+    "addSyn": [
+      "betydelse",
+      "mening"
+    ]
+  },
+  "ronda|n": {
+    "sv": "rond",
+    "addSyn": [
+      "runda",
+      "omgång"
+    ]
+  },
+  "automóvil|n": {
+    "alt": [
+      "coche"
+    ]
+  },
+  "rescatar|v": {
+    "sv": "undsätta",
+    "addSyn": [
+      "rädda",
+      "frita"
+    ]
+  },
+  "elevar|v": {
+    "sv": "höja",
+    "alt": [
+      "alzar"
+    ],
+    "addSyn": [
+      "lyfta",
+      "upphöja"
+    ]
+  },
+  "garantía|n": {
+    "sv": "garanti",
+    "addSyn": [
+      "säkerhet",
+      "pant"
+    ]
+  },
+  "mecanismo|n": {
+    "sv": "mekanism",
+    "addSyn": [
+      "mekanik",
+      "verk"
+    ]
+  },
+  "ligero|adj": {
+    "sv": "lätt",
+    "hint": "väger lite — snabb och lättfotad",
+    "alt": [
+      "ligera"
+    ]
+  },
+  "escándalo|n": {
+    "sv": "skandal",
+    "addSyn": [
+      "uppståndelse",
+      "oväsen"
+    ]
+  },
+  "acontecimiento|n": {
+    "sv": "händelse",
+    "addSyn": [
+      "tilldragelse",
+      "evenemang"
+    ],
+    "hint": "tilldragelsen — den stora händelsen"
+  },
+  "anteriormente|adv": {
+    "sv": "tidigare",
+    "addSyn": [
+      "förut",
+      "dessförinnan"
+    ]
+  },
+  "novedad|n": {
+    "sv": "nyhet",
+    "hint": "det nya — nymodigheten"
+  },
+  "fino|adj": {
+    "sv": "fin",
+    "hint": "tunn och elegant — finkornig",
+    "alt": [
+      "fina"
+    ]
+  },
+  "delicado|adj": {
+    "sv": "ömtålig",
+    "addSyn": [
+      "fin",
+      "känslig",
+      "delikat"
+    ],
+    "alt": [
+      "delicada"
+    ]
+  },
+  "inicio|n": {
+    "alt": [
+      "principio",
+      "comienzo"
+    ]
+  },
+  "sustancia|n": {
+    "sv": "substans",
+    "addSyn": [
+      "ämne"
+    ]
+  },
+  "disciplina|n": {
+    "sv": "disciplin",
+    "addSyn": [
+      "ämne",
+      "gren"
+    ]
+  },
+  "furioso|adj": {
+    "sv": "rasande",
+    "addSyn": [
+      "ursinnig"
+    ],
+    "alt": [
+      "furiosa"
+    ]
+  },
+  "acostumbrar|v": {
+    "sv": "vänja",
+    "addSyn": [
+      "bruka"
+    ]
+  },
+  "margen|n": {
+    "sv": "marginal",
+    "addSyn": [
+      "utrymme",
+      "kant"
+    ]
+  },
+  "derrotar|v": {
+    "alt": [
+      "vencer"
+    ],
+    "sv": "besegra"
+  },
+  "guía|n": {
+    "sv": "guide",
+    "addSyn": [
+      "vägledning",
+      "råd",
+      "handbok"
+    ]
+  },
+  "pasear|v": {
+    "alt": [
+      "caminar"
+    ]
+  },
+  "fundar|v": {
+    "sv": "grunda",
+    "addSyn": [
+      "stifta",
+      "skapa"
+    ]
+  },
+  "gobernar|v": {
+    "sv": "regera",
+    "addSyn": [
+      "styra",
+      "leda"
+    ]
+  },
+  "guiar|v": {
+    "sv": "vägleda",
+    "addSyn": [
+      "leda",
+      "guida",
+      "lotsa"
+    ]
+  },
+  "conquistar|v": {
+    "sv": "erövra",
+    "addSyn": [
+      "inta",
+      "vinna"
+    ]
+  },
+  "juntar|v": {
+    "alt": [
+      "reunir"
+    ]
+  },
+  "sacrificio|n": {
+    "sv": "uppoffring",
+    "addSyn": [
+      "offer",
+      "offrande"
+    ]
+  },
+  "diversión|n": {
+    "sv": "nöje",
+    "hint": "underhållningen — det roliga"
+  },
+  "gol|n": {
+    "sv": "mål",
+    "hint": "målet i fotboll"
+  },
+  "dimensión|n": {
+    "sv": "dimension",
+    "addSyn": [
+      "mått",
+      "omfattning"
+    ]
+  },
+  "solucionar|v": {
+    "alt": [
+      "resolver"
+    ]
+  },
+  "feria|n": {
+    "sv": "marknad",
+    "hint": "mässan — tivolit"
+  },
+  "océano|n": {
+    "sv": "ocean",
+    "addSyn": [
+      "hav",
+      "världshav"
+    ]
+  },
+  "símbolo|n": {
+    "sv": "symbol",
+    "addSyn": [
+      "tecken",
+      "sinnebild"
+    ]
+  },
+  "ceder|v": {
+    "sv": "ge efter",
+    "addSyn": [
+      "avstå",
+      "släppa",
+      "överlåta"
+    ]
+  },
+  "mediodía|n": {
+    "sv": "middagstid",
+    "addSyn": [
+      "mitt på dagen"
+    ]
+  },
+  "vigilancia|n": {
+    "sv": "övervakning",
+    "addSyn": [
+      "bevakning",
+      "vakt"
+    ]
+  },
+  "invertir|v": {
+    "sv": "investera",
+    "addSyn": [
+      "satsa",
+      "vända om"
+    ]
+  },
+  "violación|n": {
+    "sv": "våldtäkt",
+    "addSyn": [
+      "kränkning",
+      "överträdelse"
+    ]
+  },
+  "manipular|v": {
+    "sv": "manipulera",
+    "addSyn": [
+      "hantera",
+      "fiffla med"
+    ]
+  },
+  "opuesto|adj": {
+    "alt": [
+      "contrario",
+      "opuesta"
+    ]
+  },
+  "chiste|n": {
+    "sv": "vits",
+    "addSyn": [
+      "skämt",
+      "rolig historia"
+    ]
+  },
+  "experimento|n": {
+    "sv": "experiment",
+    "addSyn": [
+      "försök"
+    ]
+  },
+  "tranquilizar|v": {
+    "alt": [
+      "calmar"
+    ]
+  },
+  "salto|n": {
+    "sv": "hopp",
+    "hint": "hoppet man gör — språnget"
+  },
+  "armar|v": {
+    "sv": "beväpna",
+    "addSyn": [
+      "montera",
+      "ställa till"
+    ]
+  },
+  "entidad|n": {
+    "sv": "instans",
+    "addSyn": [
+      "enhet",
+      "organisation",
+      "väsen"
+    ]
+  },
+  "muro|n": {
+    "sv": "mur",
+    "addSyn": [
+      "vägg",
+      "vall"
+    ]
+  },
+  "licencia|n": {
+    "sv": "licens",
+    "addSyn": [
+      "tillstånd",
+      "körkort",
+      "permission"
+    ]
+  },
+  "residencia|n": {
+    "sv": "residens",
+    "addSyn": [
+      "bostad",
+      "hem",
+      "uppehälle"
+    ]
+  },
+  "charla|n": {
+    "sv": "prat",
+    "addSyn": [
+      "samtal",
+      "föredrag",
+      "snack"
+    ]
+  },
+  "cultivo|n": {
+    "sv": "odling",
+    "addSyn": [
+      "gröda",
+      "kultur"
+    ]
+  },
+  "rastro|n": {
+    "sv": "spår",
+    "hint": "spåret efter någon — lämningen"
+  },
+  "encargo|n": {
+    "sv": "ärende",
+    "addSyn": [
+      "uppdrag",
+      "beställning"
+    ],
+    "hint": "det man blivit ombedd att göra"
+  },
+  "justificar|v": {
+    "sv": "rättfärdiga",
+    "addSyn": [
+      "motivera",
+      "styrka"
+    ]
+  },
+  "triunfo|n": {
+    "sv": "triumf",
+    "addSyn": [
+      "seger"
+    ]
+  },
+  "anotar|v": {
+    "sv": "anteckna",
+    "addSyn": [
+      "notera",
+      "skriva upp"
+    ]
+  },
+  "brillar|v": {
+    "sv": "glänsa",
+    "addSyn": [
+      "lysa",
+      "skina",
+      "stråla"
+    ]
+  },
+  "distinguir|v": {
+    "sv": "urskilja",
+    "addSyn": [
+      "skilja",
+      "särskilja",
+      "utmärka"
+    ],
+    "alt": [
+      "diferenciar"
+    ]
+  },
+  "emplear|v": {
+    "sv": "sysselsätta",
+    "addSyn": [
+      "använda",
+      "anställa"
+    ]
+  },
+  "comprometido|adj": {
+    "sv": "engagerad",
+    "addSyn": [
+      "förlovad",
+      "komprometterad",
+      "skyldig"
+    ],
+    "alt": [
+      "comprometida"
+    ]
+  },
+  "propietario|n": {
+    "alt": [
+      "dueño"
+    ]
+  },
+  "rumbo|n": {
+    "sv": "färdriktning",
+    "addSyn": [
+      "kurs",
+      "riktning"
+    ]
+  },
+  "apropiado|adj": {
+    "alt": [
+      "adecuado",
+      "apropiada"
+    ]
+  },
+  "medicamento|n": {
+    "sv": "läkemedel",
+    "addSyn": [
+      "medicin",
+      "preparat"
+    ]
+  },
+  "derrota|n": {
+    "sv": "nederlag",
+    "addSyn": [
+      "förlust"
+    ]
+  },
+  "concepción|n": {
+    "sv": "uppfattning",
+    "addSyn": [
+      "befruktning",
+      "koncept"
+    ]
+  },
+  "leyenda|n": {
+    "sv": "legend",
+    "addSyn": [
+      "saga",
+      "sägen",
+      "bildtext"
+    ]
+  },
+  "entorno|n": {
+    "sv": "omgivning",
+    "addSyn": [
+      "miljö"
+    ]
+  },
+  "botón|n": {
+    "sv": "knapp",
+    "addSyn": [
+      "knopp",
+      "skott"
+    ]
+  },
+  "gestión|n": {
+    "sv": "förvaltning",
+    "addSyn": [
+      "ledning",
+      "hantering"
+    ]
+  },
+  "facultad|n": {
+    "sv": "fakultet",
+    "addSyn": [
+      "förmåga",
+      "befogenhet"
+    ]
+  },
+  "entrenar|v": {
+    "alt": [
+      "practicar"
+    ]
+  },
+  "refugio|n": {
+    "sv": "tillflykt",
+    "addSyn": [
+      "skydd",
+      "härbärge"
+    ]
+  },
+  "ganancia|n": {
+    "sv": "förtjänst",
+    "addSyn": [
+      "vinst",
+      "avkastning"
+    ]
+  },
+  "aportar|v": {
+    "sv": "bidra med",
+    "addSyn": [
+      "tillföra"
+    ]
+  },
+  "pronunciar|v": {
+    "sv": "uttala",
+    "addSyn": [
+      "hålla tal",
+      "meddela"
+    ]
+  },
+  "sujetar|v": {
+    "sv": "hålla fast",
+    "addSyn": [
+      "fästa",
+      "hålla"
+    ]
+  },
+  "disposición|n": {
+    "sv": "förfogande",
+    "addSyn": [
+      "läggning",
+      "humör",
+      "anordning"
+    ]
+  },
+  "ave|n": {
+    "alt": [
+      "pájaro"
+    ]
+  },
+  "dominio|n": {
+    "sv": "herravälde",
+    "addSyn": [
+      "domän",
+      "behärskning"
+    ]
+  },
+  "costo|n": {
+    "alt": [
+      "gasto"
+    ]
+  },
+  "permanente|adj": {
+    "sv": "permanent",
+    "addSyn": [
+      "fast",
+      "bestående"
+    ]
+  },
+  "fijo|adj": {
+    "sv": "fast",
+    "hint": "fastsatt — orörlig",
+    "alt": [
+      "fija"
+    ]
+  },
+  "urgencia|n": {
+    "sv": "nödläge",
+    "addSyn": [
+      "brådska",
+      "akutmottagning"
+    ]
+  },
+  "mago|n": {
+    "sv": "magiker",
+    "addSyn": [
+      "trollkarl"
+    ]
+  },
+  "incremento|n": {
+    "alt": [
+      "aumento"
+    ]
+  },
+  "pasta|n": {
+    "sv": "pasta",
+    "addSyn": [
+      "deg",
+      "massa",
+      "stålar"
+    ]
+  },
+  "idioma|n": {
+    "alt": [
+      "lenguaje"
+    ]
+  },
+  "esencial|adj": {
+    "sv": "väsentlig",
+    "addSyn": [
+      "grundläggande",
+      "nödvändig"
+    ]
+  },
+  "rincón|n": {
+    "sv": "hörn",
+    "hint": "hörnet inuti — vrån"
+  },
+  "insultar|v": {
+    "sv": "förolämpa",
+    "alt": [
+      "ofender"
+    ],
+    "addSyn": [
+      "kränka",
+      "skymfa"
+    ]
+  },
+  "tonelada|n": {
+    "sv": "ton",
+    "hint": "viktenheten — tusen kilo"
+  },
+  "generalmente|adv": {
+    "sv": "i allmänhet",
+    "addSyn": [
+      "vanligtvis",
+      "normalt"
+    ]
+  },
+  "petróleo|n": {
+    "sv": "olja",
+    "hint": "råoljan ur marken"
+  },
+  "hábito|n": {
+    "alt": [
+      "costumbre"
+    ]
+  },
+  "ordenador|n": {
+    "sv": "dator",
+    "hint": "ordet i Spanien"
+  },
+  "alzar|v": {
+    "sv": "höja",
+    "alt": [
+      "elevar"
+    ]
+  },
+  "bienes|n": {
+    "sv": "tillgångar",
+    "addSyn": [
+      "ägodelar",
+      "gods"
+    ]
+  },
+  "dibujo|n": {
+    "sv": "teckning",
+    "addSyn": [
+      "ritning",
+      "mönster"
+    ]
+  },
+  "tribu|n": {
+    "sv": "stam",
+    "addSyn": [
+      "folkstam"
+    ],
+    "hint": "folkstammen"
+  },
+  "reputación|n": {
+    "sv": "rykte",
+    "hint": "anseendet — vad folk tycker"
+  },
+  "fama|n": {
+    "sv": "berömmelse",
+    "addSyn": [
+      "rykte",
+      "ryktbarhet"
+    ]
+  },
+  "transferir|v": {
+    "sv": "överföra",
+    "addSyn": [
+      "flytta över"
+    ]
+  },
+  "bolso|n": {
+    "sv": "handväska",
+    "addSyn": [
+      "väska"
+    ]
+  },
+  "celda|n": {
+    "sv": "cell",
+    "hint": "fängelsecellen"
+  },
+  "desafío|n": {
+    "sv": "utmaning",
+    "addSyn": [
+      "trots"
+    ],
+    "alt": [
+      "reto"
+    ]
+  },
+  "atar|v": {
+    "sv": "binda",
+    "addSyn": [
+      "knyta",
+      "koppla"
+    ]
+  },
+  "captar|v": {
+    "sv": "uppfatta",
+    "addSyn": [
+      "fånga upp",
+      "koppla"
+    ]
+  },
+  "billete|n": {
+    "sv": "biljett",
+    "hint": "ordet i Spanien; även sedeln",
+    "alt": [
+      "boleto"
+    ]
+  },
+  "boleto|n": {
+    "sv": "biljett",
+    "hint": "ordet i Latinamerika",
+    "alt": [
+      "billete"
+    ]
+  },
+  "acceder|v": {
+    "sv": "gå med på",
+    "addSyn": [
+      "få tillgång",
+      "samtycka"
+    ]
+  },
+  "convenir|v": {
+    "sv": "komma överens",
+    "addSyn": [
+      "passa",
+      "gå med på"
+    ]
+  },
+  "patio|n": {
+    "sv": "innergård",
+    "addSyn": [
+      "gård",
+      "skolgård"
+    ]
+  },
+  "granja|n": {
+    "sv": "bondgård",
+    "addSyn": [
+      "gård",
+      "farm"
+    ]
+  },
+  "placa|n": {
+    "sv": "skylt",
+    "addSyn": [
+      "platta",
+      "polisbricka",
+      "nummerplåt"
+    ]
+  },
+  "cartel|n": {
+    "sv": "affisch",
+    "addSyn": [
+      "skylt",
+      "plakat",
+      "kartell"
+    ]
+  },
+  "castigo|n": {
+    "sv": "straff",
+    "addSyn": [
+      "bestraffning"
+    ]
+  },
+  "sentencia|n": {
+    "sv": "dom",
+    "addSyn": [
+      "straff",
+      "utslag"
+    ]
+  },
+  "fruta|n": {
+    "sv": "frukt",
+    "hint": "frukten man äter"
+  },
+  "fruto|n": {
+    "sv": "frukt",
+    "hint": "frukten av arbetet; botanikens frukt"
+  },
+  "ofender|v": {
+    "sv": "förolämpa",
+    "alt": [
+      "insultar"
+    ]
+  },
+  "chocar|v": {
+    "sv": "krocka",
+    "addSyn": [
+      "kollidera",
+      "stöta",
+      "chockera"
+    ]
+  },
+  "depósito|n": {
+    "sv": "depå",
+    "addSyn": [
+      "lager",
+      "förråd",
+      "insättning",
+      "tank"
+    ]
+  },
+  "almacén|n": {
+    "sv": "lager",
+    "addSyn": [
+      "magasin",
+      "varuhus"
+    ]
+  },
+  "confesión|n": {
+    "sv": "bekännelse",
+    "addSyn": [
+      "erkännande",
+      "bikt"
+    ]
+  },
+  "situar|v": {
+    "sv": "placera",
+    "addSyn": [
+      "belägen",
+      "förlägga"
+    ],
+    "alt": [
+      "ubicar"
+    ]
+  },
+  "incrementar|v": {
+    "alt": [
+      "aumentar"
+    ]
+  },
+  "aumentar|v": {
+    "alt": [
+      "incrementar"
+    ]
+  },
+  "monte|n": {
+    "sv": "berg",
+    "hint": "mindre berget — skogshöjden"
+  },
+  "colina|n": {
+    "sv": "kulle",
+    "addSyn": [
+      "höjd",
+      "backe"
+    ]
+  },
+  "garganta|n": {
+    "sv": "strupe",
+    "addSyn": [
+      "hals",
+      "svalg",
+      "bergspass"
+    ]
+  },
+  "ciclo|n": {
+    "sv": "cykel",
+    "hint": "kretsloppet — cykeln i tiden"
+  },
+  "bicicleta|n": {
+    "sv": "cykel",
+    "hint": "tvåhjulingen"
+  },
+  "salario|n": {
+    "alt": [
+      "sueldo"
+    ]
+  },
+  "sueldo|n": {
+    "alt": [
+      "salario"
+    ]
+  },
+  "temblar|v": {
+    "sv": "darra",
+    "addSyn": [
+      "skaka",
+      "skälva"
+    ]
+  },
+  "ascender|v": {
+    "sv": "stiga",
+    "addSyn": [
+      "befordra",
+      "klättra",
+      "avancera"
+    ]
+  },
+  "promover|v": {
+    "sv": "främja",
+    "addSyn": [
+      "befordra",
+      "driva på"
+    ],
+    "alt": [
+      "fomentar"
+    ]
+  },
+  "moto|n": {
+    "sv": "motorcykel",
+    "addSyn": [
+      "hoj"
+    ],
+    "art": "la"
+  },
+  "favorecer|v": {
+    "sv": "gynna",
+    "alt": [
+      "beneficiar"
+    ]
+  },
+  "beneficiar|v": {
+    "sv": "gynna",
+    "alt": [
+      "favorecer"
+    ]
+  },
+  "profesión|n": {
+    "sv": "yrke",
+    "hint": "yrket man utbildat sig till"
+  },
+  "oficio|n": {
+    "sv": "yrke",
+    "hint": "hantverket — sysslan"
+  },
+  "dueño|n": {
+    "alt": [
+      "propietario"
+    ]
+  },
+  "practicar|v": {
+    "alt": [
+      "entrenar"
+    ]
+  },
+  "pájaro|n": {
+    "alt": [
+      "ave"
+    ]
+  },
+  "gasto|n": {
+    "alt": [
+      "costo"
+    ]
+  },
+  "firme|adj": {
+    "hint": "stadig — bestämd"
+  },
+  "aumento|n": {
+    "alt": [
+      "incremento"
+    ]
+  },
+  "costumbre|n": {
+    "alt": [
+      "hábito"
+    ]
+  },
+  "esquina|n": {
+    "hint": "gathörnet — utsidan"
+  },
+  "tono|n": {
+    "hint": "tonen i rösten — nyansen"
+  },
+  "aceite|n": {
+    "hint": "matoljan — smörjoljan"
+  },
+  "rumor|n": {
+    "hint": "ryktet som sprids — skvallret"
+  },
+  "célula|n": {
+    "hint": "kroppens cell — biologin"
+  },
+  "maleta|n": {
+    "sv": "resväska",
+    "addSyn": [
+      "väska",
+      "koffert"
+    ]
+  },
+  "agregar|v": {
+    "sv": "tillägga",
+    "addSyn": [
+      "lägga till",
+      "tillsätta"
+    ],
+    "alt": [
+      "añadir"
+    ]
+  },
+  "organismo|n": {
+    "sv": "organism",
+    "addSyn": [
+      "organ",
+      "myndighet"
+    ]
+  },
+  "marco|n": {
+    "sv": "ram",
+    "addSyn": [
+      "inramning",
+      "mark"
+    ]
+  },
+  "raíz|n": {
+    "sv": "rot",
+    "addSyn": [
+      "ursprung",
+      "stam"
+    ]
+  },
+  "transmitir|v": {
+    "sv": "sända",
+    "addSyn": [
+      "överföra",
+      "fortplanta"
+    ]
+  },
+  "cancelar|v": {
+    "sv": "ställa in",
+    "addSyn": [
+      "avboka",
+      "annullera",
+      "häva"
+    ]
+  },
+  "esperar|v": {
+    "alt": [
+      "aguardar"
+    ]
+  },
+  "coche|n": {
+    "alt": [
+      "automóvil"
+    ]
+  },
+  "fácil|adj": {
+    "hint": "lätt att göra — enkelt"
+  },
+  "reunir|v": {
+    "alt": [
+      "juntar"
+    ]
+  },
+  "resolver|v": {
+    "alt": [
+      "solucionar"
+    ]
+  },
+  "mercado|n": {
+    "hint": "marknaden man handlar på"
+  },
+  "calmar|v": {
+    "alt": [
+      "tranquilizar"
+    ]
+  },
+  "esperanza|n": {
+    "hint": "hoppet man känner"
+  },
+  "noticia|n": {
+    "hint": "nyheten i medierna"
+  },
+  "montaña|n": {
+    "hint": "berget — bergskedjan"
+  },
+  "añadir|v": {
+    "alt": [
+      "agregar"
+    ]
+  },
+  "lenguaje|n": {
+    "alt": [
+      "idioma"
+    ]
+  },
+  "emitir|v": {
+    "sv": "avge",
+    "addSyn": [
+      "sända ut",
+      "utfärda"
+    ]
+  },
+  "asimismo|adv": {
+    "sv": "likaledes",
+    "addSyn": [
+      "likaså",
+      "även"
+    ]
+  },
+  "ligar|v": {
+    "sv": "ragga",
+    "addSyn": [
+      "binda",
+      "koppla ihop"
+    ]
+  },
+  "sede|n": {
+    "sv": "huvudkontor",
+    "addSyn": [
+      "säte",
+      "residens"
+    ]
+  },
+  "extrañar|v": {
+    "hint": "sakna någon — längta efter"
+  },
+  "ayuda|n": {
+    "hint": "vanliga ordet — hjälpen"
+  },
+  "valor|n": {
+    "hint": "modet; även värdet"
+  },
+  "película|n": {
+    "alt": [
+      "filme"
+    ]
+  },
+  "cómo|adv": {
+    "hint": "vanliga frågeordet"
+  },
+  "camarada|n": {
+    "hint": "politiska kamraten — kompanjonen i strid"
+  },
+  "mamá|n": {
+    "hint": "det vanliga ordet för mamma"
+  },
+  "baile|n": {
+    "alt": [
+      "danza"
+    ]
+  },
+  "rápidamente|adv": {
+    "alt": [
+      "deprisa"
+    ]
+  },
+  "deprisa|adv": {
+    "alt": [
+      "rápidamente"
+    ]
+  },
+  "preparación|n": {
+    "sv": "förberedelse",
+    "addSyn": [
+      "beredskap",
+      "preparat"
+    ]
+  },
+  "completar|v": {
+    "alt": [
+      "finalizar",
+      "ultimar"
+    ]
+  },
+  "finalizar|v": {
+    "alt": [
+      "completar",
+      "ultimar"
+    ]
+  },
+  "sustituir|v": {
+    "alt": [
+      "reemplazar"
+    ]
+  },
+  "reemplazar|v": {
+    "alt": [
+      "sustituir"
+    ]
+  },
+  "inmenso|adj": {
+    "sv": "ofantlig",
+    "addSyn": [
+      "enorm",
+      "väldig"
+    ],
+    "alt": [
+      "inmensa"
+    ]
+  },
+  "vomitar|v": {
+    "sv": "kräkas",
+    "syn": [
+      "spy"
+    ]
+  },
+  "compañero|n": {
+    "hint": "kompisen — kollegan"
+  },
+  "informar|v": {
+    "sv": "informera",
+    "addSyn": [
+      "rapportera",
+      "upplysa",
+      "meddela"
+    ]
+  },
+  "afectado|adj": {
+    "sv": "drabbad",
+    "syn": [
+      "påverkad",
+      "tillgjord"
+    ],
+    "alt": [
+      "afectada"
+    ]
+  },
+  "molesto|adj": {
+    "sv": "irriterad",
+    "syn": [
+      "besvärad",
+      "störande"
+    ],
+    "alt": [
+      "molesta"
+    ]
+  },
+  "escaso|adj": {
+    "sv": "knapp",
+    "syn": [
+      "sparsam",
+      "fåtalig"
+    ],
+    "alt": [
+      "escasa"
+    ]
+  },
+  "absurdo|adj": {
+    "sv": "absurd",
+    "syn": [
+      "orimlig",
+      "meningslös"
+    ],
+    "alt": [
+      "absurda"
+    ]
+  },
+  "cortado|adj": {
+    "sv": "avskuren",
+    "syn": [
+      "förlägen",
+      "blyg"
+    ],
+    "alt": [
+      "cortada"
+    ]
+  },
+  "encendido|adj": {
+    "sv": "tänd",
+    "syn": [
+      "påslagen",
+      "glödande"
+    ],
+    "alt": [
+      "encendida"
+    ]
+  },
+  "protegido|adj": {
+    "sv": "skyddad",
+    "syn": [
+      "skyddsling"
+    ],
+    "alt": [
+      "protegida"
+    ]
+  },
+  "parlamentario|adj": {
+    "sv": "parlamentarisk",
+    "syn": [
+      "riksdagsman"
+    ],
+    "alt": [
+      "parlamentaria"
+    ]
+  },
+  "doloroso|adj": {
+    "sv": "smärtsam",
+    "syn": [
+      "plågsam"
+    ],
+    "alt": [
+      "dolorosa"
+    ]
+  },
+  "vencido|adj": {
+    "sv": "besegrad",
+    "syn": [
+      "förfallen",
+      "utgången"
+    ],
+    "alt": [
+      "vencida"
+    ]
+  },
+  "grabado|adj": {
+    "sv": "inspelad",
+    "syn": [
+      "ingraverad",
+      "gravyr"
+    ],
+    "alt": [
+      "grabada"
+    ]
+  },
+  "atado|adj": {
+    "sv": "bunden",
+    "syn": [
+      "fastknuten"
+    ],
+    "alt": [
+      "atada"
+    ]
+  },
+  "cuadrado|adj": {
+    "sv": "fyrkantig",
+    "syn": [
+      "kvadratisk",
+      "kvadrat"
+    ],
+    "alt": [
+      "cuadrada"
+    ]
+  },
+  "reservado|adj": {
+    "sv": "reserverad",
+    "syn": [
+      "förbehållsam",
+      "hemlig"
+    ],
+    "alt": [
+      "reservada"
+    ]
+  },
+  "limitado|adj": {
+    "sv": "begränsad",
+    "syn": [
+      "inskränkt"
+    ],
+    "alt": [
+      "limitada"
+    ]
+  },
+  "confundido|adj": {
+    "sv": "förvirrad",
+    "alt": [
+      "confuso",
+      "confundida"
+    ],
+    "syn": [
+      "omtumlad",
+      "förväxlad"
+    ]
+  },
+  "confuso|adj": {
+    "alt": [
+      "confundido",
+      "confusa"
+    ]
+  },
+  "rico|adj": {
+    "addSyn": [
+      "god",
+      "läcker"
+    ],
+    "alt": [
+      "rica"
+    ]
+  },
+  "encargado|adj": {
+    "alt": [
+      "encargada"
+    ]
+  },
+  "involucrado|adj": {
+    "alt": [
+      "involucrada"
+    ]
+  },
+  "asqueroso|adj": {
+    "alt": [
+      "asquerosa"
+    ]
+  },
+  "afortunado|adj": {
+    "alt": [
+      "afortunada"
+    ]
+  },
+  "destinado|adj": {
+    "alt": [
+      "destinada"
+    ]
+  },
+  "deportivo|adj": {
+    "alt": [
+      "deportiva"
+    ]
+  },
+  "numeroso|adj": {
+    "alt": [
+      "numerosa"
+    ]
+  },
+  "delicioso|adj": {
+    "alt": [
+      "deliciosa"
+    ]
+  },
+  "intenso|adj": {
+    "alt": [
+      "intensa"
+    ]
+  },
+  "celoso|adj": {
+    "alt": [
+      "celosa"
+    ]
+  },
+  "convencido|adj": {
+    "alt": [
+      "convencida"
+    ]
+  },
+  "sorprendido|adj": {
+    "alt": [
+      "sorprendida"
+    ]
+  },
+  "judío|adj": {
+    "alt": [
+      "judía"
+    ]
+  },
+  "dedicado|adj": {
+    "alt": [
+      "dedicada"
+    ]
+  },
+  "universitario|adj": {
+    "alt": [
+      "académico",
+      "universitaria"
+    ]
+  },
+  "colectivo|adj": {
+    "alt": [
+      "colectiva"
+    ]
+  },
+  "encerrado|adj": {
+    "alt": [
+      "encerrada"
+    ]
+  },
+  "desesperado|adj": {
+    "alt": [
+      "desesperada"
+    ]
+  },
+  "cubano|adj": {
+    "alt": [
+      "cubana"
+    ]
+  },
+  "previo|adj": {
+    "alt": [
+      "previa"
+    ]
+  },
+  "romano|adj": {
+    "alt": [
+      "romana"
+    ]
+  },
+  "pagado|adj": {
+    "alt": [
+      "pagada"
+    ]
+  },
+  "desgraciado|adj": {
+    "alt": [
+      "infeliz",
+      "desafortunado",
+      "desgraciada"
+    ]
+  },
+  "continuo|adj": {
+    "alt": [
+      "sostenido",
+      "continua"
+    ]
+  },
+  "establecido|adj": {
+    "alt": [
+      "establecida"
+    ]
+  },
+  "poquito|adj": {
+    "alt": [
+      "poquita"
+    ]
+  },
+  "organizado|adj": {
+    "alt": [
+      "organizada"
+    ]
+  },
+  "asombroso|adj": {
+    "alt": [
+      "asombrosa"
+    ]
+  },
+  "prohibido|adj": {
+    "alt": [
+      "prohibida"
+    ]
+  },
+  "digno|adj": {
+    "alt": [
+      "digna"
+    ]
+  },
+  "típico|adj": {
+    "alt": [
+      "típica"
+    ]
+  },
+  "urbano|adj": {
+    "alt": [
+      "urbana"
+    ]
+  },
+  "electrónico|adj": {
+    "alt": [
+      "electrónica"
+    ]
+  },
+  "acostumbrado|adj": {
+    "alt": [
+      "acostumbrada"
+    ]
+  },
+  "artístico|adj": {
+    "alt": [
+      "artística"
+    ]
+  },
+  "nocturno|adj": {
+    "alt": [
+      "nocturna"
+    ]
+  },
+  "eterno|adj": {
+    "alt": [
+      "eterna"
+    ]
+  },
+  "agradecido|adj": {
+    "alt": [
+      "agradecida"
+    ]
+  },
+  "externo|adj": {
+    "alt": [
+      "externa"
+    ]
+  },
+  "soviético|adj": {
+    "alt": [
+      "soviética"
+    ]
+  },
+  "voluntario|adj": {
+    "alt": [
+      "voluntaria"
+    ]
+  },
+  "misterioso|adj": {
+    "alt": [
+      "misteriosa"
+    ]
+  },
+  "alejado|adj": {
+    "alt": [
+      "alejada"
+    ]
+  },
+  "emocionado|adj": {
+    "alt": [
+      "emocionada"
+    ]
+  },
+  "despierto|adj": {
+    "alt": [
+      "despierta"
+    ]
+  },
+  "dorado|adj": {
+    "alt": [
+      "dorada"
+    ]
+  },
+  "avanzado|adj": {
+    "alt": [
+      "avanzada"
+    ]
+  },
+  "construido|adj": {
+    "alt": [
+      "construida"
+    ]
+  },
+  "revolucionario|adj": {
+    "alt": [
+      "revolucionaria"
+    ]
+  },
+  "valioso|adj": {
+    "alt": [
+      "valiosa"
+    ]
+  },
+  "sabio|adj": {
+    "alt": [
+      "sabia"
+    ]
+  },
+  "tirado|adj": {
+    "alt": [
+      "tirada"
+    ]
+  },
+  "incómodo|adj": {
+    "alt": [
+      "incómoda"
+    ]
+  },
+  "mecánico|adj": {
+    "alt": [
+      "mecánica"
+    ]
+  },
+  "firmado|adj": {
+    "alt": [
+      "firmada"
+    ]
+  },
+  "jurídico|adj": {
+    "alt": [
+      "jurídica"
+    ]
+  },
+  "satisfecho|adj": {
+    "alt": [
+      "satisfecha"
+    ]
+  },
+  "marcado|adj": {
+    "alt": [
+      "marcada"
+    ]
+  },
+  "malvado|adj": {
+    "alt": [
+      "malvada"
+    ]
+  },
+  "cargado|adj": {
+    "alt": [
+      "cargada"
+    ]
+  },
+  "informado|adj": {
+    "alt": [
+      "informada"
+    ]
+  },
+  "sólido|adj": {
+    "alt": [
+      "sólida"
+    ]
+  },
+  "citado|adj": {
+    "alt": [
+      "citada"
+    ]
+  },
+  "lejano|adj": {
+    "alt": [
+      "lejana"
+    ]
+  },
+  "situado|adj": {
+    "alt": [
+      "ubicado",
+      "situada"
+    ]
+  },
+  "significativo|adj": {
+    "alt": [
+      "significativa"
+    ]
+  },
+  "generoso|adj": {
+    "alt": [
+      "generosa"
+    ]
+  },
+  "primario|adj": {
+    "alt": [
+      "primaria"
+    ]
+  },
+  "esperado|adj": {
+    "alt": [
+      "esperada"
+    ]
+  },
+  "conectado|adj": {
+    "alt": [
+      "conectada"
+    ]
+  },
+  "asociado|adj": {
+    "alt": [
+      "asociada"
+    ]
+  },
+  "divino|adj": {
+    "alt": [
+      "divina"
+    ]
+  },
+  "genético|adj": {
+    "alt": [
+      "genética"
+    ]
+  },
+  "enterrado|adj": {
+    "alt": [
+      "enterrada"
+    ]
+  },
+  "frito|adj": {
+    "alt": [
+      "frita"
+    ]
+  },
+  "argentino|adj": {
+    "alt": [
+      "argentina"
+    ]
+  },
+  "rubio|adj": {
+    "alt": [
+      "rubia"
+    ]
+  },
+  "callado|adj": {
+    "alt": [
+      "callada"
+    ]
+  },
+  "quemado|adj": {
+    "alt": [
+      "quemada"
+    ]
+  },
+  "masculino|adj": {
+    "alt": [
+      "masculina"
+    ]
+  },
+  "ajeno|adj": {
+    "alt": [
+      "ajena"
+    ]
+  },
+  "reducido|adj": {
+    "alt": [
+      "reducida"
+    ]
+  },
+  "biológico|adj": {
+    "alt": [
+      "biológica"
+    ]
+  },
+  "relativo|adj": {
+    "alt": [
+      "relativa"
+    ]
+  },
+  "administrativo|adj": {
+    "alt": [
+      "administrativa"
+    ]
+  },
+  "íntimo|adj": {
+    "alt": [
+      "íntima"
+    ]
+  },
+  "fabuloso|adj": {
+    "alt": [
+      "fabulosa"
+    ]
+  },
+  "despejado|adj": {
+    "alt": [
+      "despejada"
+    ]
+  },
+  "expuesto|adj": {
+    "alt": [
+      "expuesta"
+    ]
+  },
+  "patético|adj": {
+    "alt": [
+      "patética"
+    ]
+  },
+  "literario|adj": {
+    "alt": [
+      "literaria"
+    ]
+  },
+  "educativo|adj": {
+    "alt": [
+      "educativa"
+    ]
+  },
+  "psicológico|adj": {
+    "alt": [
+      "psicológica"
+    ]
+  },
+  "pegado|adj": {
+    "alt": [
+      "pegada"
+    ]
+  },
+  "diplomático|adj": {
+    "alt": [
+      "diplomática"
+    ]
+  },
+  "masivo|adj": {
+    "alt": [
+      "masiva"
+    ]
+  },
+  "orgánico|adj": {
+    "alt": [
+      "orgánica"
+    ]
+  },
+  "exclusivo|adj": {
+    "alt": [
+      "exclusiva"
+    ]
+  },
+  "tremendo|adj": {
+    "alt": [
+      "tremenda"
+    ]
+  },
+  "aislado|adj": {
+    "alt": [
+      "aislada"
+    ]
+  },
+  "dramático|adj": {
+    "alt": [
+      "dramática"
+    ]
+  },
+  "republicano|adj": {
+    "alt": [
+      "republicana"
+    ]
+  },
+  "planeado|adj": {
+    "alt": [
+      "planeada"
+    ]
+  },
+  "cardíaco|adj": {
+    "alt": [
+      "cardíaca"
+    ]
+  },
+  "designar|v": {
+    "sv": "utse",
+    "addSyn": [
+      "utnämna",
+      "beteckna"
+    ],
+    "alt": [
+      "nombrar"
+    ]
+  },
+  "denominar|v": {
+    "sv": "benämna",
+    "addSyn": [
+      "kalla",
+      "döpa"
+    ]
+  },
+  "chaval|n": {
+    "sv": "grabb",
+    "addSyn": [
+      "kille",
+      "unge"
+    ]
+  },
+  "suspender|v": {
+    "sv": "underkänna",
+    "addSyn": [
+      "ställa in",
+      "avstänga",
+      "hänga upp"
+    ]
+  },
+  "proveer|v": {
+    "sv": "förse",
+    "addSyn": [
+      "försörja",
+      "tillhandahålla"
+    ]
+  },
+  "inaugurar|v": {
+    "sv": "inviga",
+    "addSyn": [
+      "öppna"
+    ]
+  },
+  "auxilio|n": {
+    "sv": "undsättning",
+    "addSyn": [
+      "hjälp",
+      "bistånd"
+    ]
+  },
+  "desplazar|v": {
+    "sv": "förskjuta",
+    "addSyn": [
+      "förflytta",
+      "tränga undan"
+    ]
+  },
+  "talla|n": {
+    "sv": "storlek",
+    "addSyn": [
+      "klädstorlek",
+      "växt"
+    ],
+    "hint": "klädstorleken — konfektionsnumret"
+  },
+  "bondad|n": {
+    "sv": "godhet",
+    "addSyn": [
+      "snällhet",
+      "vänlighet"
+    ]
+  },
+  "rellenar|v": {
+    "sv": "fylla i",
+    "addSyn": [
+      "stoppa",
+      "fylla"
+    ]
+  },
+  "transformación|n": {
+    "sv": "omvandling",
+    "addSyn": [
+      "förvandling"
+    ]
+  },
+  "despegar|v": {
+    "sv": "lyfta",
+    "hint": "flygplanet lyfter — lossa"
+  },
+  "severo|adj": {
+    "sv": "sträng",
+    "addSyn": [
+      "hård",
+      "allvarlig"
+    ],
+    "alt": [
+      "estricto",
+      "severa"
+    ]
+  },
+  "leve|adj": {
+    "sv": "lindrig",
+    "addSyn": [
+      "lätt",
+      "obetydlig"
+    ]
+  },
+  "remitir|v": {
+    "sv": "översända",
+    "addSyn": [
+      "hänvisa",
+      "avta"
+    ]
+  },
+  "orientación|n": {
+    "sv": "orientering",
+    "addSyn": [
+      "inriktning",
+      "vägledning"
+    ]
+  },
+  "documentación|n": {
+    "sv": "dokumentation",
+    "addSyn": [
+      "papper",
+      "handlingar"
+    ]
+  },
+  "estirar|v": {
+    "sv": "sträcka",
+    "addSyn": [
+      "tänja",
+      "sträcka på sig"
+    ]
+  },
+  "defecto|n": {
+    "sv": "defekt",
+    "addSyn": [
+      "fel",
+      "brist"
+    ],
+    "hint": "felet — bristen"
+  },
+  "complacer|v": {
+    "sv": "tillmötesgå",
+    "addSyn": [
+      "glädja",
+      "behaga"
+    ]
+  },
+  "encuesta|n": {
+    "sv": "enkät",
+    "addSyn": [
+      "undersökning",
+      "opinionsmätning"
+    ]
+  },
+  "coraje|n": {
+    "sv": "kurage",
+    "addSyn": [
+      "mod",
+      "ilska"
+    ]
+  },
+  "localidad|n": {
+    "sv": "ort",
+    "addSyn": [
+      "plats",
+      "samhälle"
+    ]
+  },
+  "presidir|v": {
+    "sv": "presidera",
+    "addSyn": [
+      "leda",
+      "sitta ordförande"
+    ]
+  },
+  "orientar|v": {
+    "sv": "orientera",
+    "addSyn": [
+      "rikta",
+      "vägleda"
+    ]
+  },
+  "cómico|adj": {
+    "sv": "komisk",
+    "addSyn": [
+      "rolig",
+      "lustig"
+    ],
+    "alt": [
+      "cómica"
+    ]
+  },
+  "duelo|n": {
+    "sv": "duell",
+    "addSyn": [
+      "sorg",
+      "sorgetid"
+    ]
+  },
+  "estimado|adj": {
+    "sv": "aktad",
+    "addSyn": [
+      "uppskattad",
+      "ärade"
+    ],
+    "alt": [
+      "estimada"
+    ]
+  },
+  "ballena|n": {
+    "sv": "val",
+    "hint": "djuret i havet — blåvalen"
+  },
+  "ordinario|adj": {
+    "sv": "ordinär",
+    "addSyn": [
+      "vanlig",
+      "simpel"
+    ],
+    "alt": [
+      "ordinaria"
+    ]
+  },
+  "gozar|v": {
+    "alt": [
+      "disfrutar"
+    ]
+  },
+  "ruptura|n": {
+    "sv": "brytning",
+    "addSyn": [
+      "brott",
+      "bristning"
+    ]
+  },
+  "pila|n": {
+    "sv": "trave",
+    "addSyn": [
+      "hög",
+      "batteri",
+      "stapel"
+    ]
+  },
+  "desfile|n": {
+    "sv": "parad",
+    "addSyn": [
+      "tåg",
+      "modevisning"
+    ]
+  },
+  "promedio|n": {
+    "sv": "genomsnitt",
+    "addSyn": [
+      "snitt",
+      "medelvärde"
+    ]
+  },
+  "reservar|v": {
+    "sv": "boka",
+    "addSyn": [
+      "reservera",
+      "beställa"
+    ]
+  },
+  "delatar|v": {
+    "sv": "ange",
+    "hint": "skvallra på någon — förråda"
+  },
+  "atento|adj": {
+    "sv": "uppmärksam",
+    "addSyn": [
+      "artig",
+      "snäll"
+    ],
+    "alt": [
+      "atenta"
+    ]
+  },
+  "cálido|adj": {
+    "sv": "varm",
+    "hint": "värmen i klimat och känslor",
+    "alt": [
+      "cálida"
+    ]
+  },
+  "entretener|v": {
+    "sv": "underhålla",
+    "addSyn": [
+      "roa",
+      "uppehålla"
+    ]
+  },
+  "escritura|n": {
+    "sv": "handstil",
+    "addSyn": [
+      "skrift",
+      "lagfart"
+    ]
+  },
+  "editorial|n": {
+    "sv": "förlag",
+    "addSyn": [
+      "ledarartikel"
+    ]
+  },
+  "vidrio|n": {
+    "sv": "glas",
+    "hint": "materialet glas — glasrutan"
+  },
+  "acento|n": {
+    "sv": "accent",
+    "addSyn": [
+      "betoning",
+      "brytning"
+    ]
+  },
+  "maldición|n": {
+    "sv": "förbannelse",
+    "syn": [
+      "svordom",
+      "ed"
+    ]
+  },
+  "juramento|n": {
+    "sv": "ed",
+    "addSyn": [
+      "svordom"
+    ]
+  },
+  "publicación|n": {
+    "sv": "publikation",
+    "addSyn": [
+      "utgivning",
+      "skrift"
+    ]
+  },
+  "ordenado|adj": {
+    "sv": "ordningsam",
+    "addSyn": [
+      "prydlig",
+      "städad"
+    ],
+    "alt": [
+      "ordenada"
+    ]
+  },
+  "proclamar|v": {
+    "sv": "utropa",
+    "addSyn": [
+      "proklamera",
+      "kungöra"
+    ]
+  },
+  "tecnológico|adj": {
+    "sv": "teknologisk",
+    "alt": [
+      "tecnológica"
+    ]
+  },
+  "prevenir|v": {
+    "sv": "förebygga",
+    "addSyn": [
+      "hindra",
+      "varna"
+    ]
+  },
+  "conveniente|adj": {
+    "sv": "fördelaktig",
+    "addSyn": [
+      "lämplig",
+      "passande"
+    ]
+  },
+  "oportuno|adj": {
+    "sv": "läglig",
+    "addSyn": [
+      "lämplig",
+      "träffande"
+    ],
+    "alt": [
+      "oportuna"
+    ]
+  },
+  "ahorro|n": {
+    "sv": "besparing",
+    "addSyn": [
+      "sparande"
+    ]
+  },
+  "mito|n": {
+    "sv": "myt",
+    "addSyn": [
+      "saga",
+      "legend"
+    ]
+  },
+  "entrevista|n": {
+    "sv": "intervju",
+    "syn": [
+      "anställningsintervju",
+      "möte"
+    ]
+  },
+  "interrogatorio|n": {
+    "sv": "förhör",
+    "addSyn": [
+      "utfrågning"
+    ]
+  },
+  "totalidad|n": {
+    "sv": "totalitet",
+    "addSyn": [
+      "helhet",
+      "det hela"
+    ]
+  },
+  "descargar|v": {
+    "sv": "ladda ner",
+    "addSyn": [
+      "lasta av",
+      "urladda"
+    ]
+  },
+  "industria|n": {
+    "sv": "industri",
+    "syn": [
+      "näringsliv",
+      "bruk"
+    ]
+  },
+  "utilización|n": {
+    "sv": "utnyttjande",
+    "addSyn": [
+      "användning"
+    ]
+  },
+  "tratado|n": {
+    "sv": "fördrag",
+    "syn": [
+      "traktat",
+      "avhandling"
+    ]
+  },
+  "tesis|n": {
+    "sv": "tes",
+    "addSyn": [
+      "avhandling",
+      "uppsats"
+    ]
+  },
+  "evidentemente|adv": {
+    "alt": [
+      "obviamente"
+    ]
+  },
+  "obviamente|adv": {
+    "alt": [
+      "evidentemente"
+    ]
+  },
+  "favorable|adj": {
+    "sv": "gynnsam",
+    "addSyn": [
+      "positiv",
+      "välvillig"
+    ]
+  },
+  "rendimiento|n": {
+    "sv": "prestanda",
+    "addSyn": [
+      "avkastning",
+      "prestation"
+    ]
+  },
+  "hueco|n": {
+    "sv": "hålighet",
+    "addSyn": [
+      "hål",
+      "lucka"
+    ]
+  },
+  "hoyo|n": {
+    "sv": "grop",
+    "addSyn": [
+      "hål",
+      "golfhål"
+    ]
+  },
+  "gimnasio|n": {
+    "sv": "gym",
+    "addSyn": [
+      "gymnastiksal"
+    ]
+  },
+  "proporción|n": {
+    "sv": "proportion",
+    "addSyn": [
+      "andel",
+      "halt"
+    ]
+  },
+  "honrado|adj": {
+    "alt": [
+      "honesto",
+      "honrada"
+    ]
+  },
+  "característica|n": {
+    "sv": "egenskap",
+    "syn": [
+      "kännetecken",
+      "drag"
+    ],
+    "alt": [
+      "cualidad"
+    ]
+  },
+  "rasgo|n": {
+    "sv": "drag",
+    "hint": "ansiktsdraget — karaktärsdraget"
+  },
+  "jugada|n": {
+    "sv": "drag",
+    "hint": "draget i spelet — fult spel"
+  },
+  "eje|n": {
+    "sv": "axel",
+    "hint": "hjulaxeln — jordaxeln"
+  },
+  "hombro|n": {
+    "hint": "kroppens axel — skuldran"
+  },
+  "pobreza|n": {
+    "sv": "fattigdom",
+    "addSyn": [
+      "armod"
+    ]
+  },
+  "miseria|n": {
+    "sv": "misär",
+    "addSyn": [
+      "elände",
+      "fattigdom"
+    ]
+  },
+  "preso|n": {
+    "alt": [
+      "prisionero"
+    ]
+  },
+  "prisionero|n": {
+    "alt": [
+      "preso"
+    ]
+  },
+  "piedad|n": {
+    "sv": "barmhärtighet",
+    "addSyn": [
+      "nåd",
+      "fromhet"
+    ]
+  },
+  "compasión|n": {
+    "sv": "medkänsla",
+    "addSyn": [
+      "medlidande",
+      "förbarmande"
+    ]
+  },
+  "hondo|adj": {
+    "alt": [
+      "profundo",
+      "honda"
+    ]
+  },
+  "decepcionar|v": {
+    "sv": "göra besviken",
+    "addSyn": [
+      "svika"
+    ],
+    "alt": [
+      "defraudar"
+    ]
+  },
+  "excepcional|adj": {
+    "sv": "exceptionell",
+    "addSyn": [
+      "enastående"
+    ]
+  },
+  "graduar|v": {
+    "sv": "gradera",
+    "addSyn": [
+      "justera",
+      "ta examen"
+    ]
+  },
+  "psíquico|adj": {
+    "sv": "psykisk",
+    "addSyn": [
+      "själslig"
+    ],
+    "alt": [
+      "psíquica"
+    ]
+  },
+  "chofer|n": {
+    "sv": "chaufför",
+    "alt": [
+      "conductor"
+    ]
+  },
+  "donar|v": {
+    "sv": "donera",
+    "addSyn": [
+      "skänka",
+      "ge"
+    ]
+  },
+  "interferir|v": {
+    "sv": "lägga sig i",
+    "addSyn": [
+      "störa",
+      "interferera"
+    ]
+  },
+  "portero|n": {
+    "sv": "portvakt",
+    "addSyn": [
+      "målvakt",
+      "dörrvakt"
+    ]
+  },
+  "competición|n": {
+    "alt": [
+      "concurso"
+    ]
+  },
+  "concurso|n": {
+    "alt": [
+      "competición"
+    ]
+  },
+  "ayuntamiento|n": {
+    "sv": "stadshus",
+    "syn": [
+      "kommunfullmäktige",
+      "kommun"
+    ]
+  },
+  "municipio|n": {
+    "sv": "kommun",
+    "addSyn": [
+      "municipalitet"
+    ]
+  },
+  "imprimir|v": {
+    "sv": "trycka",
+    "hint": "trycka på papper — skriva ut"
+  },
+  "apretar|v": {
+    "hint": "trycka på knappen — klämma åt"
+  },
+  "furgoneta|n": {
+    "alt": [
+      "camioneta"
+    ]
+  },
+  "camioneta|n": {
+    "alt": [
+      "furgoneta"
+    ]
+  },
+  "infeliz|adj": {
+    "alt": [
+      "desgraciado",
+      "desafortunado"
+    ]
+  },
+  "borde|n": {
+    "sv": "kant",
+    "syn": [
+      "rand",
+      "ren",
+      "brädd"
+    ]
+  },
+  "orilla|n": {
+    "sv": "strand",
+    "addSyn": [
+      "kant",
+      "brädd"
+    ],
+    "hint": "vattenbrynet — flodkanten"
+  },
+  "tronco|n": {
+    "sv": "stam",
+    "hint": "trädstammen — bålen"
+  },
+  "percibir|v": {
+    "sv": "varsebli",
+    "syn": [
+      "uppfatta",
+      "uppbära"
+    ]
+  },
+  "inscribir|v": {
+    "sv": "skriva in",
+    "addSyn": [
+      "registrera",
+      "anmäla"
+    ]
+  },
+  "separación|n": {
+    "sv": "separation",
+    "addSyn": [
+      "åtskillnad",
+      "skilsmässa"
+    ]
+  },
+  "leal|adj": {
+    "alt": [
+      "fiel"
+    ]
+  },
+  "fiel|adj": {
+    "alt": [
+      "leal"
+    ]
+  },
+  "diseñar|v": {
+    "sv": "formge",
+    "addSyn": [
+      "designa",
+      "rita",
+      "konstruera"
+    ]
+  },
+  "partícula|n": {
+    "sv": "partikel",
+    "addSyn": [
+      "korn"
+    ]
+  },
+  "azar|n": {
+    "alt": [
+      "casualidad"
+    ]
+  },
+  "casualidad|n": {
+    "alt": [
+      "azar"
+    ]
+  },
+  "género|n": {
+    "sv": "genre",
+    "syn": [
+      "kön",
+      "genus",
+      "vara",
+      "tyg"
+    ]
+  },
+  "mercancía|n": {
+    "sv": "vara",
+    "addSyn": [
+      "gods",
+      "handelsvara"
+    ]
+  },
+  "esfera|n": {
+    "sv": "klot",
+    "addSyn": [
+      "sfär",
+      "glob",
+      "urtavla"
+    ]
+  },
+  "suceso|n": {
+    "sv": "händelse",
+    "hint": "det som hände — nyhetshändelsen"
+  },
+  "concentración|n": {
+    "sv": "koncentration",
+    "syn": [
+      "samling",
+      "styrka",
+      "fokusering"
+    ]
+  },
+  "intensidad|n": {
+    "sv": "intensitet",
+    "addSyn": [
+      "styrka"
+    ]
+  },
+  "gusano|n": {
+    "sv": "mask",
+    "hint": "krypet — larven"
+  },
+  "máscara|n": {
+    "hint": "ansiktsmasken — förklädnaden"
+  },
+  "esquema|n": {
+    "sv": "schema",
+    "hint": "skissen — översikten"
+  },
+  "horario|n": {
+    "hint": "tidsschemat — öppettiderna"
+  },
+  "excluir|v": {
+    "alt": [
+      "descartar"
+    ]
+  },
+  "descartar|v": {
+    "alt": [
+      "excluir"
+    ]
+  },
+  "condenar|v": {
+    "sv": "döma",
+    "addSyn": [
+      "fördöma",
+      "fälla"
+    ],
+    "hint": "fällande — till straff"
+  },
+  "derribar|v": {
+    "sv": "riva ner",
+    "syn": [
+      "fälla",
+      "störta",
+      "skjuta ner"
+    ]
+  },
+  "lámpara|n": {
+    "sv": "lampa",
+    "syn": [
+      "lykta"
+    ]
+  },
+  "cometa|n": {
+    "sv": "komet",
+    "addSyn": [
+      "pappersdrake"
+    ],
+    "art": "el"
+  },
+  "autonomía|n": {
+    "sv": "självstyre",
+    "addSyn": [
+      "autonomi",
+      "räckvidd"
+    ]
+  },
+  "autónomo|n": {
+    "sv": "egenföretagare",
+    "addSyn": [
+      "frilansare"
+    ]
+  },
+  "curva|n": {
+    "sv": "kurva",
+    "addSyn": [
+      "båge",
+      "sväng"
+    ]
+  },
+  "aplastar|v": {
+    "sv": "mosa",
+    "addSyn": [
+      "krossa",
+      "platta till"
+    ]
+  },
+  "silencioso|adj": {
+    "sv": "ljudlös",
+    "addSyn": [
+      "tyst",
+      "stillsam"
+    ],
+    "alt": [
+      "silenciosa"
+    ]
+  },
+  "explotación|n": {
+    "sv": "exploatering",
+    "addSyn": [
+      "utvinning",
+      "drift"
+    ]
+  },
+  "horror|n": {
+    "alt": [
+      "terror"
+    ]
+  },
+  "terror|n": {
+    "alt": [
+      "horror"
+    ]
+  },
+  "vulnerable|adj": {
+    "sv": "sårbar",
+    "addSyn": [
+      "utsatt"
+    ]
+  },
+  "agitar|v": {
+    "sv": "vifta",
+    "addSyn": [
+      "skaka",
+      "röra om",
+      "uppvigla"
+    ]
+  },
+  "explorar|v": {
+    "sv": "utforska",
+    "addSyn": [
+      "undersöka",
+      "söka av"
+    ],
+    "hint": "upptäcktsresan — söka av terrängen"
+  },
+  "cooperación|n": {
+    "alt": [
+      "colaboración"
+    ]
+  },
+  "colaboración|n": {
+    "alt": [
+      "cooperación"
+    ]
+  },
+  "timbre|n": {
+    "sv": "ringklocka",
+    "addSyn": [
+      "dörrklocka",
+      "klang",
+      "frimärke"
+    ]
+  },
+  "mérito|n": {
+    "sv": "merit",
+    "addSyn": [
+      "förtjänst",
+      "värde"
+    ]
+  },
+  "creencia|n": {
+    "sv": "trosuppfattning",
+    "addSyn": [
+      "övertygelse",
+      "tro"
+    ]
+  },
+  "fastidiar|v": {
+    "sv": "irritera",
+    "addSyn": [
+      "tråka ut",
+      "jäklas med"
+    ]
+  },
+  "orinar|v": {
+    "sv": "urinera",
+    "addSyn": [
+      "kissa"
+    ]
+  },
+  "cooperar|v": {
+    "alt": [
+      "colaborar"
+    ]
+  },
+  "colaborar|v": {
+    "alt": [
+      "cooperar"
+    ]
+  },
+  "desorden|n": {
+    "sv": "oordning",
+    "addSyn": [
+      "röra",
+      "kaos"
+    ]
+  },
+  "confusión|n": {
+    "sv": "förvirring",
+    "syn": [
+      "röra",
+      "sammanblandning"
+    ]
+  },
+  "traición|n": {
+    "sv": "förräderi",
+    "addSyn": [
+      "svek"
+    ]
+  },
+  "engaño|n": {
+    "sv": "bedrägeri",
+    "addSyn": [
+      "svek",
+      "lurendrejeri"
+    ],
+    "alt": [
+      "fraude"
+    ]
+  },
+  "perjudicar|v": {
+    "sv": "missgynna",
+    "addSyn": [
+      "skada"
+    ]
+  },
+  "fluir|v": {
+    "sv": "flyta",
+    "hint": "vätskan strömmar — rinner"
+  },
+  "flotar|v": {
+    "sv": "flyta",
+    "hint": "hålla sig ovanpå — sväva"
+  },
+  "insecto|n": {
+    "sv": "insekt",
+    "addSyn": [
+      "kryp"
+    ]
+  },
+  "ansiedad|n": {
+    "sv": "ångest",
+    "addSyn": [
+      "oro",
+      "ängslan"
+    ]
+  },
+  "angustia|n": {
+    "sv": "vånda",
+    "addSyn": [
+      "ångest",
+      "oro"
+    ]
+  },
+  "alteración|n": {
+    "sv": "rubbning",
+    "addSyn": [
+      "ändring",
+      "upphetsning"
+    ]
+  },
+  "modesto|adj": {
+    "alt": [
+      "humilde",
+      "modesta"
+    ]
+  },
+  "humilde|adj": {
+    "alt": [
+      "modesto"
+    ]
+  },
+  "cueva|n": {
+    "sv": "grotta",
+    "syn": [
+      "håla"
+    ]
+  },
+  "patrimonio|n": {
+    "sv": "kulturarv",
+    "addSyn": [
+      "arv",
+      "tillgångar"
+    ]
+  },
+  "requisito|n": {
+    "sv": "förutsättning",
+    "addSyn": [
+      "krav",
+      "villkor"
+    ]
+  },
+  "estabilidad|n": {
+    "sv": "stabilitet",
+    "addSyn": [
+      "stadga"
+    ]
+  },
+  "reglamento|n": {
+    "sv": "reglemente",
+    "addSyn": [
+      "stadga",
+      "regelverk"
+    ]
+  },
+  "levantar|v": {
+    "hint": "lyfta upp något — resa"
+  },
+  "caliente|adj": {
+    "hint": "het — varm på riktigt"
+  },
+  "disfrutar|v": {
+    "alt": [
+      "gozar"
+    ]
+  },
+  "informe|n": {
+    "alt": [
+      "reporte"
+    ]
+  },
+  "encender|v": {
+    "alt": [
+      "prender"
+    ]
+  },
+  "guarda|n": {
+    "alt": [
+      "guardián"
+    ]
+  },
+  "juez|n": {
+    "hint": "vanliga domaren"
+  },
+  "precaución|n": {
+    "sv": "varsamhet",
+    "addSyn": [
+      "försiktighet"
+    ]
+  },
+  "concebir|v": {
+    "sv": "tänka ut",
+    "addSyn": [
+      "föreställa sig",
+      "befrukta"
+    ]
+  },
+  "tamaño|n": {
+    "hint": "allmänna storleken — formatet"
+  },
+  "juzgar|v": {
+    "hint": "bedöma — sitta till doms"
+  },
+  "renta|n": {
+    "sv": "avkastning",
+    "addSyn": [
+      "hyra",
+      "inkomst",
+      "ränta"
+    ]
+  },
+  "gubernamental|adj": {
+    "sv": "styrande",
+    "addSyn": [
+      "statlig",
+      "regeringsvänlig"
+    ]
+  },
+  "enfadar|v": {
+    "sv": "göra arg",
+    "addSyn": [
+      "reta",
+      "irritera"
+    ]
+  },
+  "nombrar|v": {
+    "alt": [
+      "designar"
+    ]
+  },
+  "investigar|v": {
+    "hint": "utredningen — polisarbetet"
+  },
+  "cuidado|n": {
+    "hint": "omsorgen — akta dig!"
+  },
+  "playa|n": {
+    "hint": "sandstranden — badstranden"
+  },
+  "cualidad|n": {
+    "alt": [
+      "característica"
+    ]
+  },
+  "pluma|n": {
+    "sv": "fjäder",
+    "syn": [
+      "penna",
+      "reservoarpenna"
+    ]
+  },
+  "estricto|adj": {
+    "alt": [
+      "severo",
+      "estricta"
+    ]
+  },
+  "cocaína|n": {
+    "hint": "narkotikan — pulvret"
+  },
+  "homosexual|adj": {
+    "sv": "homosexuell",
+    "syn": [
+      "gay",
+      "lesbisk"
+    ]
+  },
+  "espléndido|adj": {
+    "sv": "praktfull",
+    "addSyn": [
+      "lysande",
+      "strålande"
+    ],
+    "alt": [
+      "espléndida"
+    ]
+  },
+  "muelle|n": {
+    "sv": "kaj",
+    "addSyn": [
+      "fjäder",
+      "pir",
+      "brygga"
+    ]
+  },
+  "gráfico|adj": {
+    "alt": [
+      "gráfica"
+    ]
+  },
+  "anónimo|adj": {
+    "alt": [
+      "anónima"
+    ]
+  },
+  "sexto|adj": {
+    "alt": [
+      "sexta"
+    ]
+  },
+  "delantero|adj": {
+    "alt": [
+      "delantera"
+    ]
+  },
+  "bancario|adj": {
+    "alt": [
+      "bancaria"
+    ]
+  },
+  "sanitario|adj": {
+    "alt": [
+      "sanitaria"
+    ]
+  },
+  "académico|adj": {
+    "alt": [
+      "universitario",
+      "académica"
+    ]
+  },
+  "hambriento|adj": {
+    "alt": [
+      "hambrienta"
+    ]
+  },
+  "colombiano|adj": {
+    "alt": [
+      "colombiana"
+    ]
+  },
+  "maduro|adj": {
+    "alt": [
+      "madura"
+    ]
+  },
+  "sordo|adj": {
+    "alt": [
+      "sorda"
+    ]
+  },
+  "húmedo|adj": {
+    "alt": [
+      "húmeda"
+    ]
+  },
+  "simpático|adj": {
+    "alt": [
+      "simpática"
+    ]
+  },
+  "tímido|adj": {
+    "alt": [
+      "tímida"
+    ]
+  },
+  "sometido|adj": {
+    "alt": [
+      "sometida"
+    ]
+  },
+  "ansioso|adj": {
+    "alt": [
+      "ansiosa"
+    ]
+  },
+  "redondo|adj": {
+    "alt": [
+      "redonda"
+    ]
+  },
+  "remoto|adj": {
+    "alt": [
+      "remota"
+    ]
+  },
+  "tierno|adj": {
+    "alt": [
+      "cariñoso",
+      "tierna"
+    ]
+  },
+  "indicado|adj": {
+    "alt": [
+      "indicada"
+    ]
+  },
+  "supremo|adj": {
+    "alt": [
+      "suprema"
+    ]
+  },
+  "mudo|adj": {
+    "alt": [
+      "muda"
+    ]
+  },
+  "chileno|adj": {
+    "alt": [
+      "chilena"
+    ]
+  },
+  "avergonzado|adj": {
+    "alt": [
+      "avergonzada"
+    ]
+  },
+  "agresivo|adj": {
+    "alt": [
+      "agresiva"
+    ]
+  },
+  "colgado|adj": {
+    "alt": [
+      "colgada"
+    ]
+  },
+  "creativo|adj": {
+    "alt": [
+      "creativa"
+    ]
+  },
+  "injusto|adj": {
+    "alt": [
+      "injusta"
+    ]
+  },
+  "oculto|adj": {
+    "alt": [
+      "oculta"
+    ]
+  },
+  "comunitario|adj": {
+    "alt": [
+      "comunitaria"
+    ]
+  },
+  "diseñado|adj": {
+    "alt": [
+      "diseñada"
+    ]
+  },
+  "agotado|adj": {
+    "alt": [
+      "agotada"
+    ]
+  },
+  "vago|adj": {
+    "alt": [
+      "vaga"
+    ]
+  },
+  "agudo|adj": {
+    "alt": [
+      "aguda"
+    ]
+  },
+  "doméstico|adj": {
+    "alt": [
+      "doméstica"
+    ]
+  },
+  "mero|adj": {
+    "alt": [
+      "mera"
+    ]
+  },
+  "operativo|adj": {
+    "alt": [
+      "operativa"
+    ]
+  },
+  "teórico|adj": {
+    "alt": [
+      "teórica"
+    ]
+  },
+  "envuelto|adj": {
+    "alt": [
+      "envuelta"
+    ]
+  },
+  "excesivo|adj": {
+    "alt": [
+      "exagerado",
+      "excesiva"
+    ]
+  },
+  "inesperado|adj": {
+    "alt": [
+      "inesperada"
+    ]
+  },
+  "forzado|adj": {
+    "alt": [
+      "forzada"
+    ]
+  },
+  "trágico|adj": {
+    "alt": [
+      "trágica"
+    ]
+  },
+  "automático|adj": {
+    "alt": [
+      "automática"
+    ]
+  },
+  "contemporáneo|adj": {
+    "alt": [
+      "contemporánea"
+    ]
+  },
+  "autorizado|adj": {
+    "alt": [
+      "autorizada"
+    ]
+  },
+  "castigado|adj": {
+    "alt": [
+      "castigada"
+    ]
+  },
+  "impresionado|adj": {
+    "alt": [
+      "impresionada"
+    ]
+  },
+  "apagado|adj": {
+    "alt": [
+      "apagada"
+    ]
+  },
+  "congelado|adj": {
+    "alt": [
+      "congelada"
+    ]
+  },
+  "grosero|adj": {
+    "alt": [
+      "grosera"
+    ]
+  },
+  "legítimo|adj": {
+    "alt": [
+      "legítima"
+    ]
+  },
+  "tranquilo|adj": {
+    "alt": [
+      "tranquila"
+    ]
+  },
+  "mojado|adj": {
+    "alt": [
+      "mojada"
+    ]
+  },
+  "africano|adj": {
+    "alt": [
+      "africana"
+    ]
+  },
+  "crudo|adj": {
+    "alt": [
+      "cruda"
+    ]
+  },
+  "destacado|adj": {
+    "alt": [
+      "destacada"
+    ]
+  },
+  "alcohólico|adj": {
+    "alt": [
+      "alcohólica"
+    ]
+  },
+  "decepcionado|adj": {
+    "alt": [
+      "decepcionada"
+    ]
+  },
+  "amoroso|adj": {
+    "alt": [
+      "amorosa"
+    ]
+  },
+  "productivo|adj": {
+    "alt": [
+      "productiva"
+    ]
+  },
+  "destrozado|adj": {
+    "alt": [
+      "destrozada"
+    ]
+  },
+  "denominado|adj": {
+    "alt": [
+      "denominada"
+    ]
+  },
+  "educado|adj": {
+    "alt": [
+      "educada"
+    ]
+  },
+  "primitivo|adj": {
+    "alt": [
+      "primitiva"
+    ]
+  },
+  "definido|adj": {
+    "alt": [
+      "definida"
+    ]
+  },
+  "idéntico|adj": {
+    "alt": [
+      "idéntica"
+    ]
+  },
+  "cruzado|adj": {
+    "alt": [
+      "cruzada"
+    ]
+  },
+  "elaborado|adj": {
+    "alt": [
+      "elaborada"
+    ]
+  },
+  "decisivo|adj": {
+    "alt": [
+      "crucial",
+      "decisiva"
+    ]
+  },
+  "informativo|adj": {
+    "alt": [
+      "informativa"
+    ]
+  },
+  "especializado|adj": {
+    "alt": [
+      "especializada"
+    ]
+  },
+  "presunto|adj": {
+    "alt": [
+      "presunta"
+    ]
+  },
+  "bendito|adj": {
+    "alt": [
+      "bendita"
+    ]
+  },
+  "paralelo|adj": {
+    "alt": [
+      "paralela"
+    ]
+  },
+  "reverendo|adj": {
+    "alt": [
+      "reverenda"
+    ]
+  },
+  "cotidiano|adj": {
+    "alt": [
+      "cotidiana"
+    ]
+  },
+  "exitoso|adj": {
+    "alt": [
+      "exitosa"
+    ]
+  },
+  "ubicado|adj": {
+    "alt": [
+      "situado",
+      "ubicada"
+    ]
+  },
+  "cuidadoso|adj": {
+    "alt": [
+      "cuidadosa"
+    ]
+  },
+  "brasileño|adj": {
+    "alt": [
+      "brasileña"
+    ]
+  },
+  "tenso|adj": {
+    "alt": [
+      "tensa"
+    ]
+  },
+  "tomado|adj": {
+    "alt": [
+      "tomada"
+    ]
+  },
+  "desaparecido|adj": {
+    "alt": [
+      "desaparecida"
+    ]
+  },
+  "espantoso|adj": {
+    "alt": [
+      "espantosa"
+    ]
+  },
+  "celebrado|adj": {
+    "alt": [
+      "celebrada"
+    ]
+  },
+  "aprobado|adj": {
+    "alt": [
+      "aprobada"
+    ]
+  },
+  "bruto|adj": {
+    "alt": [
+      "bruta"
+    ]
+  },
+  "pálido|adj": {
+    "alt": [
+      "pálida"
+    ]
+  },
+  "olímpico|adj": {
+    "alt": [
+      "olímpica"
+    ]
+  },
+  "deseado|adj": {
+    "alt": [
+      "deseada"
+    ]
+  },
+  "turístico|adj": {
+    "alt": [
+      "turística"
+    ]
+  },
+  "discreto|adj": {
+    "alt": [
+      "discreta"
+    ]
+  },
+  "retrasado|adj": {
+    "alt": [
+      "retrasada"
+    ]
+  },
+  "lesbiano|adj": {
+    "alt": [
+      "lesbiana"
+    ]
+  },
+  "astuto|adj": {
+    "alt": [
+      "astuta"
+    ]
+  },
+  "implicado|adj": {
+    "alt": [
+      "implicada"
+    ]
+  },
+  "nombrado|adj": {
+    "alt": [
+      "nombrada"
+    ]
+  },
+  "madrileño|adj": {
+    "alt": [
+      "madrileña"
+    ]
+  },
+  "deprimido|adj": {
+    "alt": [
+      "deprimida"
+    ]
+  },
+  "respectivo|adj": {
+    "alt": [
+      "respectiva"
+    ]
+  },
+  "séptimo|adj": {
+    "alt": [
+      "séptima"
+    ]
+  },
+  "válido|adj": {
+    "alt": [
+      "válida"
+    ]
+  },
+  "obsesionado|adj": {
+    "alt": [
+      "obsesionada"
+    ]
+  },
+  "latinoamericano|adj": {
+    "alt": [
+      "latinoamericana"
+    ]
+  },
+  "venezolano|adj": {
+    "alt": [
+      "venezolana"
+    ]
+  },
+  "ideológico|adj": {
+    "alt": [
+      "ideológica"
+    ]
+  },
+  "energético|adj": {
+    "alt": [
+      "energética"
+    ]
+  },
+  "montado|adj": {
+    "alt": [
+      "montada"
+    ]
+  },
+  "alterado|adj": {
+    "alt": [
+      "alterada"
+    ]
+  },
+  "legislativo|adj": {
+    "alt": [
+      "legislativa"
+    ]
+  },
+  "directivo|adj": {
+    "alt": [
+      "directiva"
+    ]
+  },
+  "pervertido|adj": {
+    "alt": [
+      "pervertida"
+    ]
+  },
+  "monetario|adj": {
+    "alt": [
+      "monetaria"
+    ]
+  },
+  "dañado|adj": {
+    "alt": [
+      "dañada"
+    ]
+  },
+  "suspendido|adj": {
+    "alt": [
+      "suspendida"
+    ]
+  },
+  "ingenuo|adj": {
+    "alt": [
+      "ingenua"
+    ]
+  },
+  "acostado|adj": {
+    "alt": [
+      "acostada"
+    ]
+  },
+  "infectado|adj": {
+    "alt": [
+      "infectada"
+    ]
+  },
+  "amenazado|adj": {
+    "alt": [
+      "amenazada"
+    ]
+  },
+  "prometido|adj": {
+    "alt": [
+      "prometida"
+    ]
+  },
+  "encubierto|adj": {
+    "alt": [
+      "encubierta"
+    ]
+  },
+  "arriesgado|adj": {
+    "alt": [
+      "arriesgada"
+    ]
+  },
+  "fallecido|adj": {
+    "alt": [
+      "fallecida"
+    ]
+  },
+  "animado|adj": {
+    "alt": [
+      "animada"
+    ]
+  },
+  "peruano|adj": {
+    "alt": [
+      "peruana"
+    ]
+  },
+  "mutuo|adj": {
+    "alt": [
+      "mutua"
+    ]
+  },
+  "entrenado|adj": {
+    "alt": [
+      "entrenada"
+    ]
+  },
+  "amargo|adj": {
+    "alt": [
+      "amarga"
+    ]
+  },
+  "compartido|adj": {
+    "alt": [
+      "compartida"
+    ]
+  },
+  "comparado|adj": {
+    "alt": [
+      "comparada"
+    ]
+  },
+  "estratégico|adj": {
+    "alt": [
+      "estratégica"
+    ]
+  },
+  "geográfico|adj": {
+    "alt": [
+      "geográfica"
+    ]
+  },
+  "apretado|adj": {
+    "alt": [
+      "apretada"
+    ]
+  },
+  "atascado|adj": {
+    "alt": [
+      "atascada"
+    ]
+  },
+  "metálico|adj": {
+    "alt": [
+      "metálica"
+    ]
+  },
+  "sanguíneo|adj": {
+    "alt": [
+      "sanguínea"
+    ]
+  },
+  "aplicado|adj": {
+    "alt": [
+      "aplicada"
+    ]
+  },
+  "subterráneo|adj": {
+    "alt": [
+      "subterránea"
+    ],
+    "hint": "fysiskt under jorden"
+  },
+  "sendero|n": {
+    "sv": "stig",
+    "addSyn": [
+      "gångstig",
+      "led"
+    ]
+  },
+  "agradecimiento|n": {
+    "sv": "tacksamhet",
+    "addSyn": [
+      "tack"
+    ]
+  },
+  "integrante|n": {
+    "sv": "medlem",
+    "alt": [
+      "miembro"
+    ]
+  },
+  "cintura|n": {
+    "sv": "midja",
+    "addSyn": [
+      "liv"
+    ]
+  },
+  "atardecer|n": {
+    "sv": "skymning",
+    "addSyn": [
+      "kvällning"
+    ]
+  },
+  "auxiliar|v": {
+    "sv": "bistå",
+    "addSyn": [
+      "hjälpa",
+      "assistera"
+    ]
+  },
+  "luminoso|adj": {
+    "sv": "ljusstark",
+    "addSyn": [
+      "lysande",
+      "ljus"
+    ],
+    "alt": [
+      "luminosa"
+    ]
+  },
+  "contraer|v": {
+    "sv": "dra ihop",
+    "addSyn": [
+      "ådra sig"
+    ]
+  },
+  "tentar|v": {
+    "sv": "fresta",
+    "addSyn": [
+      "försöka",
+      "pröva"
+    ]
+  },
+  "inquietar|v": {
+    "alt": [
+      "preocupar"
+    ]
+  },
+  "conmover|v": {
+    "sv": "beröra",
+    "addSyn": [
+      "röra",
+      "gripa"
+    ]
+  },
+  "redactar|v": {
+    "sv": "författa",
+    "addSyn": [
+      "skriva",
+      "redigera"
+    ]
+  },
+  "excursión|n": {
+    "sv": "utflykt",
+    "addSyn": [
+      "exkursion"
+    ]
+  },
+  "cuaderno|n": {
+    "sv": "skrivhäfte",
+    "addSyn": [
+      "anteckningsbok",
+      "häfte"
+    ]
+  },
+  "modalidad|n": {
+    "sv": "variant",
+    "addSyn": [
+      "form",
+      "modalitet"
+    ]
+  },
+  "relativamente|adv": {
+    "sv": "relativt",
+    "addSyn": [
+      "förhållandevis",
+      "ganska"
+    ]
+  },
+  "escalón|n": {
+    "sv": "trappsteg",
+    "addSyn": [
+      "steg",
+      "pinnhål"
+    ]
+  },
+  "cancha|n": {
+    "sv": "spelplan",
+    "addSyn": [
+      "plan",
+      "bana"
+    ]
+  },
+  "clandestino|adj": {
+    "sv": "underjordisk",
+    "addSyn": [
+      "hemlig",
+      "svart"
+    ],
+    "hint": "i hemlighet — svartklubben",
+    "alt": [
+      "clandestina"
+    ]
+  },
+  "olla|n": {
+    "sv": "gryta",
+    "addSyn": [
+      "kastrull",
+      "panna"
+    ]
+  },
+  "canalla|n": {
+    "sv": "kanalje",
+    "addSyn": [
+      "skurk",
+      "kräk"
+    ]
+  },
+  "alabar|v": {
+    "sv": "prisa",
+    "addSyn": [
+      "lovorda",
+      "berömma"
+    ]
+  },
+  "gratuito|adj": {
+    "sv": "gratis",
+    "addSyn": [
+      "kostnadsfri",
+      "grundlös"
+    ],
+    "alt": [
+      "gratis",
+      "gratuita"
+    ]
+  },
+  "quebrar|v": {
+    "sv": "knäcka",
+    "addSyn": [
+      "gå i konkurs",
+      "bryta"
+    ]
+  },
+  "delgado|adj": {
+    "sv": "smal",
+    "addSyn": [
+      "tunn",
+      "slank"
+    ],
+    "alt": [
+      "delgada"
+    ]
+  },
+  "sutil|adj": {
+    "sv": "subtil",
+    "addSyn": [
+      "hårfin",
+      "fin"
+    ]
+  },
+  "preservar|v": {
+    "alt": [
+      "conservar"
+    ],
+    "sv": "bevara"
+  },
+  "fundamento|n": {
+    "sv": "grundval",
+    "addSyn": [
+      "fundament",
+      "grund"
+    ]
+  },
+  "regir|v": {
+    "sv": "styra",
+    "addSyn": [
+      "gälla",
+      "råda"
+    ]
+  },
+  "agrupar|v": {
+    "sv": "gruppera",
+    "addSyn": [
+      "samla"
+    ]
+  },
+  "recobrar|v": {
+    "alt": [
+      "recuperar"
+    ]
+  },
+  "entendimiento|n": {
+    "sv": "förstånd",
+    "addSyn": [
+      "samförstånd",
+      "sinne"
+    ]
+  },
+  "disolver|v": {
+    "sv": "upplösa",
+    "addSyn": [
+      "lösa upp"
+    ]
+  },
+  "reportaje|n": {
+    "sv": "reportage"
+  },
+  "vestuario|n": {
+    "sv": "omklädningsrum",
+    "addSyn": [
+      "garderob",
+      "kostym"
+    ]
+  },
+  "maldecir|v": {
+    "sv": "förbanna",
+    "addSyn": [
+      "svära"
+    ]
+  },
+  "fractura|n": {
+    "sv": "fraktur",
+    "addSyn": [
+      "benbrott",
+      "brott"
+    ]
+  },
+  "espontáneo|adj": {
+    "sv": "spontan",
+    "addSyn": [
+      "naturlig"
+    ],
+    "alt": [
+      "espontánea"
+    ]
+  },
+  "aterrador|adj": {
+    "sv": "skräckinjagande",
+    "addSyn": [
+      "hemsk"
+    ]
+  },
+  "defraudar|v": {
+    "sv": "göra besviken",
+    "alt": [
+      "decepcionar"
+    ],
+    "addSyn": [
+      "svika",
+      "lura"
+    ]
+  },
+  "intimidar|v": {
+    "sv": "skrämmas",
+    "addSyn": [
+      "hota",
+      "kuva"
+    ]
+  },
+  "aterrar|v": {
+    "sv": "förskräcka",
+    "addSyn": [
+      "skrämma"
+    ]
+  },
+  "intacto|adj": {
+    "sv": "intakt",
+    "addSyn": [
+      "orörd",
+      "hel"
+    ],
+    "alt": [
+      "intacta"
+    ]
+  },
+  "distinción|n": {
+    "sv": "utmärkelse",
+    "addSyn": [
+      "åtskillnad",
+      "ära"
+    ]
+  },
+  "fanático|n": {
+    "sv": "fanatiker",
+    "addSyn": [
+      "fantast",
+      "fan"
+    ]
+  },
+  "costoso|adj": {
+    "sv": "kostsam",
+    "addSyn": [
+      "dyr",
+      "dyrbar"
+    ],
+    "alt": [
+      "costosa"
+    ]
+  },
+  "fortalecer|v": {
+    "sv": "stärka",
+    "addSyn": [
+      "styrka",
+      "förstärka"
+    ]
+  },
+  "diferenciar|v": {
+    "sv": "särskilja",
+    "alt": [
+      "distinguir"
+    ]
+  },
+  "retorno|n": {
+    "alt": [
+      "regreso"
+    ]
+  },
+  "ensuciar|v": {
+    "sv": "smutsa ner",
+    "addSyn": [
+      "söla"
+    ]
+  },
+  "puñetazo|n": {
+    "sv": "knytnävsslag",
+    "addSyn": [
+      "smäll"
+    ]
+  },
+  "ahorcar|v": {
+    "sv": "hänga",
+    "hint": "avrätta i snara"
+  },
+  "vicio|n": {
+    "sv": "last",
+    "hint": "ovanan — lasten man har"
+  },
+  "capullo|n": {
+    "sv": "knopp",
+    "addSyn": [
+      "kokong",
+      "tölp"
+    ]
+  },
+  "estrecho|adj": {
+    "sv": "trång",
+    "addSyn": [
+      "smal",
+      "nära"
+    ],
+    "alt": [
+      "estrecha"
+    ]
+  },
+  "halar|v": {
+    "sv": "hala",
+    "addSyn": [
+      "dra",
+      "slita"
+    ]
+  },
+  "proposición|n": {
+    "sv": "proposition",
+    "addSyn": [
+      "förslag",
+      "frieri"
+    ]
+  },
+  "cabalgar|v": {
+    "sv": "rida",
+    "alt": [
+      "montar"
+    ]
+  },
+  "licenciado|n": {
+    "sv": "akademiker",
+    "addSyn": [
+      "kandidat"
+    ]
+  },
+  "aspirante|n": {
+    "sv": "aspirant",
+    "addSyn": [
+      "sökande",
+      "kandidat"
+    ]
+  },
+  "eficiente|adj": {
+    "alt": [
+      "efectivo"
+    ]
+  },
+  "arrebatar|v": {
+    "sv": "rycka till sig",
+    "addSyn": [
+      "slita åt sig"
+    ]
+  },
+  "simular|v": {
+    "alt": [
+      "fingir"
+    ]
+  },
+  "pantalón|n": {
+    "sv": "byxor",
+    "alt": [
+      "pantalones"
+    ]
+  },
+  "presenciar|v": {
+    "sv": "bevittna",
+    "addSyn": [
+      "närvara vid"
+    ]
+  },
+  "catástrofe|n": {
+    "alt": [
+      "desastre"
+    ]
+  },
+  "laguna|n": {
+    "sv": "lagun",
+    "addSyn": [
+      "lucka",
+      "tjärn"
+    ]
+  },
+  "vestíbulo|n": {
+    "sv": "vestibul",
+    "addSyn": [
+      "entré",
+      "hall"
+    ]
+  },
+  "cojo|n": {
+    "sv": "haltande",
+    "addSyn": [
+      "krympling"
+    ]
+  },
+  "repugnante|adj": {
+    "sv": "motbjudande",
+    "addSyn": [
+      "äcklig",
+      "vidrig"
+    ]
+  },
+  "modales|n": {
+    "sv": "fasoner",
+    "addSyn": [
+      "manér",
+      "uppförande"
+    ]
+  },
+  "occidente|n": {
+    "sv": "västerlandet",
+    "addSyn": [
+      "väst"
+    ]
+  },
+  "blando|adj": {
+    "alt": [
+      "suave",
+      "blanda"
+    ],
+    "sv": "mjuk"
+  },
+  "flojo|adj": {
+    "sv": "slapp",
+    "addSyn": [
+      "lös",
+      "lat",
+      "svag"
+    ],
+    "alt": [
+      "floja"
+    ]
+  },
+  "extenso|adj": {
+    "sv": "vidsträckt",
+    "addSyn": [
+      "omfattande",
+      "vid"
+    ],
+    "alt": [
+      "extensa"
+    ]
+  },
+  "tejado|n": {
+    "sv": "tak",
+    "hint": "yttertaket — tegeltaket"
+  },
+  "brutal|adj": {
+    "sv": "brutal",
+    "addSyn": [
+      "rå",
+      "vild"
+    ]
+  },
+  "usualmente|adv": {
+    "alt": [
+      "normalmente"
+    ]
+  },
+  "bando|n": {
+    "sv": "falang",
+    "addSyn": [
+      "läger",
+      "sida",
+      "kungörelse"
+    ]
+  },
+  "divorciado|adj": {
+    "sv": "frånskild",
+    "addSyn": [
+      "skild"
+    ],
+    "alt": [
+      "divorciada"
+    ]
+  },
+  "inocencia|n": {
+    "sv": "oskuld",
+    "hint": "oskulden — att vara utan skuld"
+  },
+  "doncella|n": {
+    "sv": "jungfru",
+    "addSyn": [
+      "mö",
+      "oskuld"
+    ]
+  },
+  "notificar|v": {
+    "sv": "underrätta",
+    "addSyn": [
+      "meddela",
+      "delge"
+    ]
+  },
+  "lote|n": {
+    "sv": "sats",
+    "addSyn": [
+      "parti",
+      "omgång",
+      "tomt"
+    ]
+  },
+  "contribución|n": {
+    "sv": "bidrag",
+    "addSyn": [
+      "insats",
+      "skatt"
+    ]
+  },
+  "aportación|n": {
+    "sv": "tillskott",
+    "alt": [
+      "aporte"
+    ],
+    "addSyn": [
+      "bidrag",
+      "insats"
+    ]
+  },
+  "aporte|n": {
+    "sv": "tillskott",
+    "alt": [
+      "aportación"
+    ],
+    "addSyn": [
+      "bidrag",
+      "insats"
+    ]
+  },
+  "amarrar|v": {
+    "sv": "förtöja",
+    "addSyn": [
+      "binda fast",
+      "koppla"
+    ]
+  },
+  "muñeco|n": {
+    "sv": "docka",
+    "hint": "figuren — snögubben"
+  },
+  "pabellón|n": {
+    "sv": "paviljong",
+    "addSyn": [
+      "avdelning",
+      "klinik"
+    ]
+  },
+  "pronóstico|n": {
+    "sv": "prognos",
+    "addSyn": [
+      "utsikt",
+      "förutsägelse"
+    ]
+  },
+  "apuro|n": {
+    "sv": "trångmål",
+    "addSyn": [
+      "knipa",
+      "brådska"
+    ]
+  },
+  "yate|n": {
+    "sv": "yacht",
+    "addSyn": [
+      "lustjakt"
+    ]
+  },
+  "trazar|v": {
+    "sv": "rita upp",
+    "addSyn": [
+      "dra",
+      "skissera",
+      "staka ut"
+    ]
+  },
+  "desafortunado|adj": {
+    "alt": [
+      "desgraciado",
+      "infeliz",
+      "desafortunada"
+    ]
+  },
+  "espectro|n": {
+    "sv": "spektrum",
+    "addSyn": [
+      "spöke",
+      "vålnad"
+    ]
+  },
+  "catedral|n": {
+    "sv": "katedral",
+    "addSyn": [
+      "domkyrka"
+    ]
+  },
+  "veredicto|n": {
+    "sv": "utslag",
+    "addSyn": [
+      "dom",
+      "utlåtande"
+    ]
+  },
+  "crucial|adj": {
+    "sv": "avgörande",
+    "addSyn": [
+      "kritisk"
+    ],
+    "alt": [
+      "decisivo"
+    ]
+  },
+  "caldo|n": {
+    "sv": "buljong",
+    "addSyn": [
+      "spad",
+      "soppa"
+    ]
+  },
+  "equivalente|adj": {
+    "sv": "likvärdig",
+    "addSyn": [
+      "motsvarande",
+      "ekvivalent"
+    ]
+  },
+  "asilo|n": {
+    "sv": "asyl",
+    "addSyn": [
+      "hem",
+      "tillflykt"
+    ]
+  },
+  "amparo|n": {
+    "sv": "beskydd",
+    "addSyn": [
+      "skydd",
+      "stöd"
+    ]
+  },
+  "contraseña|n": {
+    "sv": "lösenord",
+    "alt": [
+      "clave"
+    ]
+  },
+  "despido|n": {
+    "sv": "uppsägning",
+    "addSyn": [
+      "avsked",
+      "sparken"
+    ]
+  },
+  "revelación|n": {
+    "sv": "avslöjande",
+    "addSyn": [
+      "uppenbarelse"
+    ]
+  },
+  "billetera|n": {
+    "alt": [
+      "cartera"
+    ]
+  },
+  "caña|n": {
+    "sv": "vass",
+    "addSyn": [
+      "sockerrör",
+      "metspö",
+      "liten öl"
+    ]
+  },
+  "siniestro|adj": {
+    "sv": "olycksbådande",
+    "addSyn": [
+      "vänster",
+      "skum"
+    ],
+    "alt": [
+      "siniestra"
+    ]
+  },
+  "alba|n": {
+    "alt": [
+      "amanecer"
+    ]
+  },
+  "preferencia|n": {
+    "sv": "företräde",
+    "addSyn": [
+      "preferens"
+    ]
+  },
+  "apelar|v": {
+    "alt": [
+      "recurrir"
+    ]
+  },
+  "burla|n": {
+    "sv": "drift",
+    "hint": "gyckel — att driva med någon"
+  },
+  "cereal|n": {
+    "sv": "spannmål",
+    "addSyn": [
+      "flingor",
+      "säd"
+    ]
+  },
+  "fomentar|v": {
+    "alt": [
+      "promover"
+    ]
+  },
+  "relatar|v": {
+    "sv": "återberätta",
+    "addSyn": [
+      "skildra",
+      "relatera"
+    ]
+  },
+  "inauguración|n": {
+    "sv": "invigning",
+    "addSyn": [
+      "öppning"
+    ]
+  },
+  "atormentar|v": {
+    "alt": [
+      "torturar"
+    ]
+  },
+  "supermercado|n": {
+    "sv": "stormarknad",
+    "addSyn": [
+      "snabbköp",
+      "mataffär"
+    ]
+  },
+  "gigantesco|adj": {
+    "sv": "gigantisk",
+    "addSyn": [
+      "jättelik"
+    ],
+    "alt": [
+      "gigantesca"
+    ]
+  },
+  "ignorante|adj": {
+    "sv": "okunnig",
+    "addSyn": [
+      "ovetande"
+    ]
+  },
+  "zumo|n": {
+    "sv": "juice",
+    "hint": "ordet i Spanien",
+    "alt": [
+      "jugo"
+    ]
+  },
+  "ratificar|v": {
+    "sv": "ratificera",
+    "addSyn": [
+      "bekräfta"
+    ]
+  },
+  "disminución|n": {
+    "alt": [
+      "reducción"
+    ]
+  },
+  "doctrina|n": {
+    "sv": "doktrin",
+    "addSyn": [
+      "lära"
+    ]
+  },
+  "acta|n": {
+    "sv": "protokoll",
+    "hint": "mötesprotokollet — akten"
+  },
+  "cariñoso|adj": {
+    "alt": [
+      "tierno",
+      "cariñosa"
+    ]
+  },
+  "torta|n": {
+    "alt": [
+      "tarta"
+    ],
+    "addSyn": [
+      "örfil"
+    ]
+  },
+  "estafa|n": {
+    "sv": "bluff",
+    "alt": [
+      "fraude"
+    ],
+    "addSyn": [
+      "bedrägeri",
+      "skoj"
+    ]
+  },
+  "suite|n": {
+    "sv": "svit",
+    "addSyn": [
+      "hotellsvit"
+    ]
+  },
+  "consentimiento|n": {
+    "sv": "samtycke",
+    "addSyn": [
+      "medgivande"
+    ]
+  },
+  "exagerado|adj": {
+    "alt": [
+      "excesivo",
+      "exagerada"
+    ]
+  },
+  "muslo|n": {
+    "sv": "lår",
+    "addSyn": [
+      "kycklinglår"
+    ]
+  },
+  "rudo|adj": {
+    "sv": "grov",
+    "addSyn": [
+      "rå",
+      "burdus"
+    ],
+    "alt": [
+      "ruda"
+    ]
+  },
+  "furia|n": {
+    "alt": [
+      "rabia"
+    ]
+  },
+  "perforar|v": {
+    "sv": "borra",
+    "addSyn": [
+      "genomborra",
+      "spränga"
+    ]
+  },
+  "sereno|n": {
+    "sv": "nattvakt",
+    "addSyn": [
+      "dagg",
+      "lugn"
+    ]
+  },
+  "longitud|n": {
+    "sv": "längd",
+    "hint": "måttet — longituden"
+  },
+  "excitar|v": {
+    "sv": "hetsa upp",
+    "addSyn": [
+      "egga",
+      "reta"
+    ]
+  },
+  "maricón|n": {
+    "alt": [
+      "marica"
+    ]
+  },
+  "golfo|n": {
+    "sv": "golf",
+    "hint": "havsbukten — inte sporten",
+    "addSyn": [
+      "bukt",
+      "slyngel"
+    ]
+  },
+  "bandeja|n": {
+    "sv": "bricka",
+    "hint": "serveringsbrickan"
+  },
+  "expedición|n": {
+    "sv": "expedition",
+    "addSyn": [
+      "upptäcktsfärd"
+    ]
+  },
+  "aspiración|n": {
+    "sv": "strävan",
+    "addSyn": [
+      "andetag",
+      "aspiration"
+    ]
+  },
+  "anfitrión|n": {
+    "sv": "värd",
+    "addSyn": [
+      "festvärd"
+    ]
+  },
+  "casero|n": {
+    "sv": "hyresvärd",
+    "addSyn": [
+      "värd"
+    ]
+  },
+  "cumplimiento|n": {
+    "sv": "fullgörande",
+    "addSyn": [
+      "uppfyllelse",
+      "komplimang"
+    ]
+  },
+  "cortesía|n": {
+    "sv": "artighet",
+    "addSyn": [
+      "komplimang",
+      "hövlighet"
+    ]
+  },
+  "imprescindible|adj": {
+    "alt": [
+      "indispensable"
+    ]
+  },
+  "indispensable|adj": {
+    "alt": [
+      "imprescindible"
+    ]
+  },
+  "picar|v": {
+    "sv": "sticka",
+    "hint": "insekten sticks — kliar; hacka"
+  },
+  "pinchar|v": {
+    "sv": "sticka",
+    "hint": "sticka hål — punktera"
+  },
+  "contradicción|n": {
+    "sv": "motsägelse",
+    "addSyn": [
+      "motsats"
+    ]
+  },
+  "contraste|n": {
+    "sv": "kontrast",
+    "addSyn": [
+      "motsats"
+    ]
+  },
+  "ardiente|adj": {
+    "sv": "brinnande",
+    "addSyn": [
+      "glödande",
+      "passionerad"
+    ]
+  },
+  "convento|n": {
+    "sv": "kloster",
+    "hint": "nunneklostret"
+  },
+  "monasterio|n": {
+    "sv": "kloster",
+    "hint": "munkklostret"
+  },
+  "sobrepasar|v": {
+    "alt": [
+      "exceder"
+    ]
+  },
+  "exceder|v": {
+    "alt": [
+      "sobrepasar"
+    ]
+  },
+  "encarcelar|v": {
+    "sv": "fängsla",
+    "addSyn": [
+      "sätta i fängelse",
+      "bura in"
+    ]
+  },
+  "fascinar|v": {
+    "sv": "fascinera",
+    "addSyn": [
+      "fängsla",
+      "trollbinda"
+    ]
+  },
+  "escalar|v": {
+    "sv": "bestiga",
+    "addSyn": [
+      "klättra",
+      "eskalera"
+    ]
+  },
+  "magnitud|n": {
+    "sv": "magnitud",
+    "addSyn": [
+      "storlek",
+      "storhet"
+    ]
+  },
+  "sucesivo|adj": {
+    "sv": "efterföljande",
+    "addSyn": [
+      "successiv",
+      "i rad"
+    ],
+    "alt": [
+      "sucesiva"
+    ]
+  },
+  "consecutivo|adj": {
+    "sv": "konsekutiv",
+    "addSyn": [
+      "i rad",
+      "rak"
+    ],
+    "alt": [
+      "consecutiva"
+    ]
+  },
+  "vigor|n": {
+    "sv": "vigör",
+    "addSyn": [
+      "kraft",
+      "spänst"
+    ]
+  },
+  "bastón|n": {
+    "sv": "käpp",
+    "addSyn": [
+      "stav",
+      "batong"
+    ]
+  },
+  "salón|n": {
+    "sv": "salong",
+    "syn": [
+      "vardagsrum",
+      "sal"
+    ]
+  },
+  "hall|n": {
+    "sv": "hall"
+  },
+  "contenido|n": {
+    "sv": "innehåll",
+    "syn": [
+      "halt",
+      "behärskad"
+    ]
+  },
+  "comportamiento|n": {
+    "sv": "beteende",
+    "syn": [
+      "uppförande",
+      "skick"
+    ],
+    "alt": [
+      "conducta"
+    ]
+  },
+  "oeste|n": {
+    "sv": "väster",
+    "syn": [
+      "väst",
+      "västern"
+    ]
+  },
+  "excelencia|n": {
+    "sv": "excellens",
+    "syn": [
+      "förträfflighet"
+    ]
+  },
+  "secuencia|n": {
+    "sv": "sekvens",
+    "syn": [
+      "svit",
+      "följd"
+    ]
+  },
+  "cajón|n": {
+    "sv": "byrålåda",
+    "syn": [
+      "låda",
+      "lår"
+    ]
+  },
+  "bahía|n": {
+    "sv": "bukt",
+    "syn": [
+      "vik"
+    ]
+  },
+  "secretaría|n": {
+    "sv": "sekretariat",
+    "syn": [
+      "expedition",
+      "kansli"
+    ]
+  },
+  "inspiración|n": {
+    "sv": "inspiration",
+    "syn": [
+      "inandning",
+      "ingivelse"
+    ]
+  },
+  "aprobación|n": {
+    "sv": "godkännande",
+    "syn": [
+      "gillande",
+      "samtycke"
+    ]
+  },
+  "fraude|n": {
+    "sv": "bedrägeri",
+    "alt": [
+      "estafa",
+      "engaño"
+    ],
+    "syn": [
+      "skoj",
+      "fusk"
+    ]
+  },
+  "muñeca|n": {
+    "hint": "dockan — även handleden"
+  },
+  "virgen|n": {
+    "hint": "jungfrun — den orörda"
+  },
+  "techo|n": {
+    "hint": "innertaket — taket över huvudet"
+  },
+  "colgar|v": {
+    "hint": "hänga upp — lägga på luren"
+  },
+  "carga|n": {
+    "hint": "lasten man bär — laddningen"
+  },
+  "protocolo|n": {
+    "hint": "regelverket — etiketten"
+  },
+  "duración|n": {
+    "hint": "tiden något varar"
+  },
+  "ficha|n": {
+    "hint": "spelbrickan — registerkortet"
+  },
+  "rabia|n": {
+    "alt": [
+      "furia"
+    ]
+  },
+  "torturar|v": {
+    "alt": [
+      "atormentar"
+    ]
+  },
+  "reducción|n": {
+    "alt": [
+      "disminución"
+    ]
+  },
+  "jugo|n": {
+    "sv": "juice",
+    "hint": "ordet i Latinamerika",
+    "alt": [
+      "zumo"
+    ]
+  },
+  "tarta|n": {
+    "alt": [
+      "torta"
+    ]
+  },
+  "marica|n": {
+    "alt": [
+      "maricón"
+    ]
+  },
+  "recurrir|v": {
+    "alt": [
+      "apelar"
+    ]
+  },
+  "amanecer|n": {
+    "alt": [
+      "alba"
+    ]
+  },
+  "cartera|n": {
+    "alt": [
+      "billetera"
+    ]
+  },
+  "fingir|v": {
+    "alt": [
+      "simular"
+    ]
+  },
+  "desastre|n": {
+    "alt": [
+      "catástrofe"
+    ]
+  },
+  "regreso|n": {
+    "alt": [
+      "retorno"
+    ]
+  },
+  "normalmente|adv": {
+    "alt": [
+      "usualmente"
+    ]
+  },
+  "pantalones|n": {
+    "sv": "byxor",
+    "alt": [
+      "pantalón"
+    ]
+  },
+  "miembro|n": {
+    "alt": [
+      "integrante"
+    ]
+  },
+  "recuperar|v": {
+    "alt": [
+      "recobrar"
+    ]
+  },
+  "preocupar|v": {
+    "alt": [
+      "inquietar"
+    ]
+  },
+  "agrícola|adj": {
+    "alt": [
+      "agrario"
+    ]
+  },
+  "repetir|v": {
+    "alt": [
+      "reiterar"
+    ]
+  },
+  "sencillamente|adv": {
+    "alt": [
+      "simplemente"
+    ]
+  },
+  "contener|v": {
+    "sv": "innehålla",
+    "syn": [
+      "rymma",
+      "hålla tillbaka"
+    ]
+  },
+  "pedazo|n": {
+    "sv": "bit",
+    "syn": [
+      "stycke",
+      "del"
+    ],
+    "alt": [
+      "trozo"
+    ]
+  },
+  "párrafo|n": {
+    "hint": "textstycket"
+  },
+  "bus|n": {
+    "alt": [
+      "autobús"
+    ]
+  },
+  "autobús|n": {
+    "alt": [
+      "bus"
+    ]
+  },
+  "referente|n": {
+    "sv": "riktmärke",
+    "addSyn": [
+      "referens",
+      "förebild"
+    ]
+  },
+  "gratis|adj": {
+    "alt": [
+      "gratuito"
+    ]
+  },
+  "sostenido|adj": {
+    "alt": [
+      "continuo",
+      "sostenida"
+    ]
+  },
+  "recostar|v": {
+    "sv": "halvligga",
+    "syn": [
+      "luta sig",
+      "lägga sig ner"
+    ]
+  },
+  "autonómico|adj": {
+    "sv": "självstyrande",
+    "syn": [
+      "regional",
+      "autonom"
+    ],
+    "alt": [
+      "autonómica"
+    ]
+  },
+  "manifestación|n": {
+    "sv": "demonstration",
+    "syn": [
+      "manifestation",
+      "yttring",
+      "utslag"
+    ]
+  },
+  "impulso|n": {
+    "sv": "impuls",
+    "syn": [
+      "drivkraft",
+      "sats"
+    ]
+  },
+  "distribución|n": {
+    "sv": "distribution",
+    "syn": [
+      "fördelning",
+      "spridning"
+    ]
+  },
+  "lata|n": {
+    "hint": "plåtburken — konservburken"
+  },
+  "frasco|n": {
+    "hint": "glasburken — lilla flaskan"
+  },
+  "fluido|n": {
+    "alt": [
+      "líquido"
+    ]
+  },
+  "líquido|n": {
+    "alt": [
+      "fluido"
+    ]
+  },
+  "variedad|n": {
+    "sv": "variation",
+    "syn": [
+      "mångfald",
+      "sort",
+      "varieté"
+    ]
+  },
+  "lanzamiento|n": {
+    "sv": "uppskjutning",
+    "syn": [
+      "kast",
+      "lansering"
+    ]
+  },
+  "tara|n": {
+    "hint": "medfödda defekten — taravikten"
+  },
+  "choque|n": {
+    "sv": "krock",
+    "syn": [
+      "kollision",
+      "chock",
+      "stöt"
+    ]
+  },
+  "ascenso|n": {
+    "sv": "befordran",
+    "syn": [
+      "uppstigning",
+      "uppgång"
+    ]
+  },
+  "prever|v": {
+    "alt": [
+      "anticipar"
+    ]
+  },
+  "anticipar|v": {
+    "alt": [
+      "prever"
+    ],
+    "addSyn": [
+      "förekomma",
+      "tidigarelägga"
+    ]
+  },
+  "carbón|n": {
+    "hint": "kolet man grillar med"
+  },
+  "alojar|v": {
+    "alt": [
+      "albergar"
+    ]
+  },
+  "albergar|v": {
+    "alt": [
+      "alojar"
+    ]
+  },
+  "cucharada|n": {
+    "sv": "skedfull",
+    "syn": [
+      "matsked"
+    ]
+  },
+  "baúl|n": {
+    "hint": "reskistan — kofferten",
+    "addSyn": [
+      "koffert"
+    ]
+  },
+  "estacionar|v": {
+    "alt": [
+      "aparcar"
+    ]
+  },
+  "aparcar|v": {
+    "alt": [
+      "estacionar"
+    ]
+  },
+  "privacidad|n": {
+    "sv": "privatliv",
+    "syn": [
+      "integritet"
+    ]
+  },
+  "relajado|adj": {
+    "sv": "avslappnad",
+    "syn": [
+      "slapp",
+      "lugn"
+    ],
+    "alt": [
+      "relajada"
+    ]
+  },
+  "simplemente|adv": {
+    "alt": [
+      "sencillamente"
+    ]
+  },
+  "trozo|n": {
+    "alt": [
+      "pedazo"
+    ]
+  },
+  "demostración|n": {
+    "sv": "uppvisande",
+    "addSyn": [
+      "bevis",
+      "demonstration"
+    ]
+  },
+  "promoción|n": {
+    "sv": "lansering",
+    "addSyn": [
+      "befordran",
+      "kampanj",
+      "årskull"
+    ]
+  },
+  "difunto|adj": {
+    "alt": [
+      "difunta"
+    ]
+  },
+  "sobrio|adj": {
+    "alt": [
+      "sobria"
+    ]
+  },
+  "concentrado|adj": {
+    "alt": [
+      "concentrada"
+    ]
+  },
+  "variado|adj": {
+    "alt": [
+      "variada"
+    ]
+  },
+  "polaco|adj": {
+    "alt": [
+      "polaca"
+    ]
+  },
+  "ebrio|adj": {
+    "alt": [
+      "ebria"
+    ]
+  },
+  "publicitario|adj": {
+    "alt": [
+      "publicitaria"
+    ]
+  },
+  "vergonzoso|adj": {
+    "alt": [
+      "vergonzosa"
+    ]
+  },
+  "tóxico|adj": {
+    "alt": [
+      "tóxica"
+    ]
+  },
+  "poético|adj": {
+    "alt": [
+      "poética"
+    ]
+  },
+  "asiático|adj": {
+    "alt": [
+      "asiática"
+    ]
+  },
+  "drogado|adj": {
+    "alt": [
+      "drogada"
+    ]
+  },
+  "podrido|adj": {
+    "alt": [
+      "podrida"
+    ]
+  },
+  "amistoso|adj": {
+    "alt": [
+      "amistosa"
+    ]
+  },
+  "fugitivo|adj": {
+    "alt": [
+      "fugitiva"
+    ]
+  },
+  "repentino|adj": {
+    "alt": [
+      "repentina"
+    ]
+  },
+  "acordado|adj": {
+    "alt": [
+      "acordada"
+    ]
+  },
+  "corrupto|adj": {
+    "alt": [
+      "corrupta"
+    ]
+  },
+  "sofisticado|adj": {
+    "alt": [
+      "sofisticada"
+    ]
+  },
+  "seleccionado|adj": {
+    "alt": [
+      "seleccionada"
+    ]
+  },
+  "moderado|adj": {
+    "alt": [
+      "moderada"
+    ]
+  },
+  "lastimado|adj": {
+    "alt": [
+      "lastimada"
+    ]
+  },
+  "imaginario|adj": {
+    "alt": [
+      "imaginaria"
+    ]
+  },
+  "localizado|adj": {
+    "alt": [
+      "localizada"
+    ]
+  },
+  "ambicioso|adj": {
+    "alt": [
+      "ambiciosa"
+    ]
+  },
+  "pendejo|adj": {
+    "alt": [
+      "pendeja"
+    ]
+  },
+  "asignado|adj": {
+    "alt": [
+      "asignada"
+    ]
+  },
+  "incorrecto|adj": {
+    "alt": [
+      "incorrecta"
+    ]
+  },
+  "sueco|adj": {
+    "alt": [
+      "sueca"
+    ]
+  },
+  "defensivo|adj": {
+    "alt": [
+      "defensiva"
+    ]
+  },
+  "glorioso|adj": {
+    "alt": [
+      "gloriosa"
+    ]
+  },
+  "chiflado|adj": {
+    "alt": [
+      "chiflada"
+    ]
+  },
+  "egipcio|adj": {
+    "alt": [
+      "egipcia"
+    ]
+  },
+  "ejecutado|adj": {
+    "alt": [
+      "ejecutada"
+    ]
+  },
+  "sangriento|adj": {
+    "alt": [
+      "sangrienta"
+    ]
+  },
+  "magnético|adj": {
+    "alt": [
+      "magnética"
+    ]
+  },
+  "obligatorio|adj": {
+    "alt": [
+      "obligatoria"
+    ]
+  },
+  "atrevido|adj": {
+    "alt": [
+      "atrevida"
+    ]
+  },
+  "psiquiátrico|adj": {
+    "alt": [
+      "psiquiátrica"
+    ]
+  },
+  "cinematográfico|adj": {
+    "alt": [
+      "cinematográfica"
+    ]
+  },
+  "clasificado|adj": {
+    "alt": [
+      "clasificada"
+    ]
+  },
+  "apasionado|adj": {
+    "alt": [
+      "apasionada"
+    ]
+  },
+  "inspirado|adj": {
+    "alt": [
+      "inspirada"
+    ]
+  },
+  "picado|adj": {
+    "alt": [
+      "picada"
+    ]
+  },
+  "mezclado|adj": {
+    "alt": [
+      "mixto",
+      "mezclada"
+    ]
+  },
+  "extendido|adj": {
+    "alt": [
+      "extendida"
+    ]
+  },
+  "pésimo|adj": {
+    "alt": [
+      "pésima"
+    ]
+  },
+  "callejero|adj": {
+    "alt": [
+      "callejera"
+    ]
+  },
+  "petrolero|adj": {
+    "alt": [
+      "petrolera"
+    ]
+  },
+  "creado|adj": {
+    "alt": [
+      "creada"
+    ]
+  },
+  "dotado|adj": {
+    "alt": [
+      "dotada"
+    ]
+  },
+  "repetido|adj": {
+    "alt": [
+      "repetida"
+    ]
+  },
+  "atómico|adj": {
+    "alt": [
+      "atómica"
+    ]
+  },
+  "encontrado|adj": {
+    "alt": [
+      "encontrada"
+    ]
+  },
+  "calificado|adj": {
+    "alt": [
+      "calificada"
+    ]
+  },
+  "farmacéutico|adj": {
+    "alt": [
+      "farmacéutica"
+    ]
+  },
+  "ecológico|adj": {
+    "alt": [
+      "ecológica"
+    ]
+  },
+  "agrario|adj": {
+    "alt": [
+      "agrícola",
+      "agraria"
+    ]
+  },
+  "hispano|adj": {
+    "alt": [
+      "hispana"
+    ]
+  },
+  "perseguido|adj": {
+    "alt": [
+      "perseguida"
+    ]
+  },
+  "terapéutico|adj": {
+    "alt": [
+      "terapéutica"
+    ]
+  },
+  "perpetuo|adj": {
+    "alt": [
+      "perpetua"
+    ]
+  },
+  "titulado|adj": {
+    "alt": [
+      "titulada"
+    ]
+  },
+  "bobo|adj": {
+    "alt": [
+      "boba"
+    ]
+  },
+  "innecesario|adj": {
+    "alt": [
+      "innecesaria"
+    ]
+  },
+  "adjunto|adj": {
+    "alt": [
+      "adjunta"
+    ]
+  },
+  "envenenado|adj": {
+    "alt": [
+      "envenenada"
+    ]
+  },
+  "abandonado|adj": {
+    "alt": [
+      "abandonada"
+    ]
+  },
+  "simbólico|adj": {
+    "alt": [
+      "simbólica"
+    ]
+  },
+  "ingenioso|adj": {
+    "alt": [
+      "ingeniosa"
+    ]
+  },
+  "maligno|adj": {
+    "alt": [
+      "maligna"
+    ]
+  },
+  "atrasado|adj": {
+    "alt": [
+      "atrasada"
+    ]
+  },
+  "disfrazado|adj": {
+    "alt": [
+      "disfrazada"
+    ]
+  },
+  "invitado|adj": {
+    "alt": [
+      "invitada"
+    ]
+  },
+  "procesado|adj": {
+    "alt": [
+      "procesada"
+    ]
+  },
+  "inmobiliario|adj": {
+    "alt": [
+      "inmobiliaria"
+    ]
+  },
+  "irónico|adj": {
+    "alt": [
+      "irónica"
+    ]
+  },
+  "cocido|adj": {
+    "alt": [
+      "cocida"
+    ]
+  },
+  "místico|adj": {
+    "alt": [
+      "mística"
+    ]
+  },
+  "paranoico|adj": {
+    "alt": [
+      "paranoica"
+    ]
+  },
+  "curado|adj": {
+    "alt": [
+      "curada"
+    ]
+  },
+  "ajustado|adj": {
+    "alt": [
+      "ajustada"
+    ]
+  },
+  "batido|adj": {
+    "alt": [
+      "batida"
+    ]
+  },
+  "frustrado|adj": {
+    "alt": [
+      "frustrada"
+    ]
+  },
+  "heleno|adj": {
+    "alt": [
+      "helena"
+    ]
+  },
+  "erótico|adj": {
+    "alt": [
+      "erótica"
+    ]
+  },
+  "iluminado|adj": {
+    "alt": [
+      "iluminada"
+    ]
+  },
+  "competitivo|adj": {
+    "alt": [
+      "competitiva"
+    ]
+  },
+  "tibio|adj": {
+    "alt": [
+      "tibia"
+    ]
+  },
+  "progresivo|adj": {
+    "alt": [
+      "progresiva"
+    ]
+  },
+  "respiratorio|adj": {
+    "alt": [
+      "respiratoria"
+    ]
+  },
+  "mixto|adj": {
+    "alt": [
+      "mezclado",
+      "mixta"
+    ]
+  },
+  "invertido|adj": {
+    "alt": [
+      "invertida"
+    ]
+  },
+  "rosado|adj": {
+    "alt": [
+      "rosada"
+    ]
+  },
+  "privilegiado|adj": {
+    "alt": [
+      "privilegiada"
+    ]
+  },
+  "fotográfico|adj": {
+    "alt": [
+      "fotográfica"
+    ]
+  },
+  "diminuto|adj": {
+    "alt": [
+      "diminuta"
+    ]
+  },
+  "entusiasmado|adj": {
+    "alt": [
+      "entusiasmada"
+    ]
+  },
+  "robado|adj": {
+    "alt": [
+      "robada"
+    ]
+  },
+  "pacífico|adj": {
+    "alt": [
+      "pacífica"
+    ]
+  },
+  "prolongado|adj": {
+    "alt": [
+      "prolongada"
+    ]
+  },
+  "distinguido|adj": {
+    "alt": [
+      "distinguida"
+    ]
+  },
+  "exquisito|adj": {
+    "alt": [
+      "exquisita"
+    ]
+  },
+  "rígido|adj": {
+    "alt": [
+      "rígida"
+    ]
+  },
+  "indefenso|adj": {
+    "alt": [
+      "indefensa"
+    ]
+  },
+  "filosófico|adj": {
+    "alt": [
+      "filosófica"
+    ]
+  },
+  "alérgico|adj": {
+    "alt": [
+      "alérgica"
+    ]
+  },
+  "calmado|adj": {
+    "alt": [
+      "calmada"
+    ]
+  },
+  "exótico|adj": {
+    "alt": [
+      "exótica"
+    ]
+  },
+  "civilizado|adj": {
+    "alt": [
+      "civilizada"
+    ]
+  },
+  "bárbaro|adj": {
+    "alt": [
+      "bárbara"
+    ]
+  },
+  "sellado|adj": {
+    "alt": [
+      "sellada"
+    ]
+  },
+  "centrado|adj": {
+    "alt": [
+      "centrada"
+    ]
+  },
+  "denso|adj": {
+    "alt": [
+      "densa"
+    ]
+  },
+  "combinado|adj": {
+    "alt": [
+      "combinada"
+    ]
+  },
+  "conducta|n": {
+    "alt": [
+      "comportamiento"
+    ]
+  },
+  "pijama|n": {
+    "art": "el"
   }
 }
