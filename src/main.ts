@@ -12,26 +12,26 @@ import { PassView } from "./views/pass";
 import { renderOrdlista } from "./views/ordlista";
 import { renderTopplista } from "./views/topplista";
 
+// pass-skärmen finns kvar men har ingen flik — dit kommer man via Starta-knapparna
 const TABS = [
   {
     id: "idag", label: "Idag",
-    icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>',
-  },
-  {
-    id: "pass", label: "Pass",
-    icon: '<svg viewBox="0 0 24 24"><path d="M4 20l4-1L19.5 7.5a2.1 2.1 0 0 0-3-3L5 16l-1 4z"/><path d="M13.5 6.5l3 3"/></svg>',
+    icon: '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>',
+    iconOn: '<svg class="icf" viewBox="0 0 24 24"><circle class="fl" cx="12" cy="12" r="4.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>',
   },
   {
     id: "ordlista", label: "Ordlista",
-    icon: '<svg viewBox="0 0 24 24"><path d="M5 4h13a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 4v14a2 2 0 0 0 2 2"/><path d="M10 9h6M10 13h4"/></svg>',
+    icon: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 4h13a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 4v14a2 2 0 0 0 2 2"/><path d="M10 9h6M10 13h4"/></svg>',
+    iconOn: '<svg class="icf" viewBox="0 0 24 24"><path class="fl" d="M5 4h13a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 4v14a2 2 0 0 0 2 2"/></svg>',
   },
   {
     id: "topplista", label: "Topplista",
-    icon: '<svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8 20h8"/></svg>',
+    icon: '<svg class="ico" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8 20h8"/></svg>',
+    iconOn: '<svg class="icf" viewBox="0 0 24 24"><path class="fl" d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8 20h8"/></svg>',
   },
 ] as const;
 
-type TabId = (typeof TABS)[number]["id"];
+type TabId = (typeof TABS)[number]["id"] | "pass";
 
 async function boot(): Promise<void> {
   initViewportFit();
@@ -97,7 +97,7 @@ async function boot(): Promise<void> {
     <div class="screen" id="screen-topplista" hidden></div>
     <nav class="tabbar" aria-label="Flikar">
       ${TABS.map(
-        (t) => `<button type="button" data-tab="${t.id}">${t.icon}${t.label}</button>`
+        (t) => `<button type="button" data-tab="${t.id}">${t.icon}${t.iconOn}${t.label}</button>`
       ).join("")}
     </nav>`;
 

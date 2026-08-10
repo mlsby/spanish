@@ -50,6 +50,11 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .tabbar button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;
                    stroke-linecap:round;stroke-linejoin:round}
 .tabbar button.on{color:var(--accent)}
+/* vald flik visar den ifyllda ikonvarianten */
+.tabbar button svg.icf{display:none}
+.tabbar button.on svg.ico{display:none}
+.tabbar button.on svg.icf{display:block}
+.tabbar button svg .fl{fill:currentColor;stroke:none}
 
 /* ---------- gemensamt ---------- */
 .btn{display:block;width:100%;border:0;border-radius:12px;padding:13px 16px;font-size:15.5px;font-weight:600;
