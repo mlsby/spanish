@@ -111,7 +111,7 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .heat .d{aspect-ratio:1;border-radius:3px;background:var(--heat0)}
 .heat .d.h1{background:var(--heat1)} .heat .d.h2{background:var(--heat2)}
 .heat .d.h3{background:var(--heat3)} .heat .d.h4{background:var(--heat4)}
-.heat .d.idag{outline:2px solid var(--accent);outline-offset:-1px}
+.heat .d.nu{outline:2px solid var(--accent);outline-offset:-1px}
 .heat .d.framtid{opacity:.35}
 .heatcap{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
          font-size:10.5px;color:var(--muted);margin-top:8px}

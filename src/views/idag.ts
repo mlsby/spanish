@@ -56,7 +56,7 @@ function heatmapHtml(days: Record<string, number>): string {
       const isToday = key === dayKey(today);
       const future = date.getTime() > today.getTime() && !isToday;
       cells.push(
-        `<div class="d ${heatClass(n)}${isToday ? " idag" : ""}${future ? " framtid" : ""}"` +
+        `<div class="d ${heatClass(n)}${isToday ? " nu" : ""}${future ? " framtid" : ""}"` +
           ` title="${key}: ${n} kort"></div>`
       );
     }
