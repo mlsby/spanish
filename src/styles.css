@@ -61,16 +61,36 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 
 /* ---------- idag ---------- */
 .idag{padding:20px 16px 14px;gap:13px;display:flex;flex-direction:column}
-.apphead{display:flex;justify-content:space-between;align-items:baseline}
+.apphead{display:flex;justify-content:space-between;align-items:center}
 .apphead .brand{font-family:var(--serif);font-weight:600;font-size:20px}
 .apphead .brand i{color:var(--accent);font-style:normal}
 .apphead .date{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.ahright{display:flex;align-items:center;gap:10px}
+.gearbtn{background:none;border:0;color:var(--muted);width:34px;height:34px;padding:6px;
+         margin:-6px -6px -6px 0;border-radius:10px;cursor:pointer}
+.gearbtn svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;
+             stroke-linecap:round;stroke-linejoin:round}
+.gearbtn.on{color:var(--accent);background:var(--accent-soft)}
+.streakrow{display:flex;align-items:baseline;gap:7px;font-size:13px;color:var(--muted);
+           padding:0 2px}
+.streakrow b{color:var(--ink);font-weight:600}
+.streakrow .sep{opacity:.6}
 .hero{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 18px;text-align:center}
+.hero .plabel{margin-bottom:8px}
 .hero .big{font-family:var(--serif);font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.hero .big small{font-family:var(--sans);font-size:15px;color:var(--muted);font-weight:400}
 .hero .cap{color:var(--muted);font-size:13px;margin-top:4px}
 .hero .cap b{color:var(--ink);font-weight:600}
+.hero .capfine{font-size:11px}
 .hero .btn{margin-top:14px}
 .hero .btn.ghost{margin-top:8px}
+.hero .ghostrow{display:flex;gap:8px;margin-top:8px}
+.hero .ghostrow .btn{flex:1;margin-top:0;font-size:13.5px;padding:10px 8px}
+.hero.klar{background:var(--good-bg);border-color:var(--good-line)}
+.hero .klartxt{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--good)}
+.resaleg{display:flex;gap:14px;margin-top:9px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.resaleg span{display:inline-flex;align-items:center;gap:5px}
+.resaleg b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 .statrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
 .stat .n{font-family:var(--serif);font-size:21px;font-variant-numeric:tabular-nums}
@@ -136,6 +156,9 @@ details.om summary{cursor:pointer;font-size:13.5px;font-weight:600;padding:2px 0
       text-align:center;gap:10px;overflow-y:auto}
 .card.st-question{background-image:repeating-linear-gradient(to bottom,transparent 0 27px,var(--rule) 27px 28px)}
 .card.st-good{background:var(--good-bg);border-color:var(--good-line)}
+/* håll-för-paus: långtryck får inte trigga textmarkering eller iOS delningsmeny */
+.card.st-good,.card.st-hard,.card.st-override{
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .card.st-hard,.card.st-override{background:var(--warn-bg);border-color:var(--warn-line)}
 .card.st-wrong,.card.st-forced{background:var(--bad-bg);border-color:var(--bad-line)}
 .cd{position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;overflow:hidden}
@@ -158,6 +181,9 @@ details.om summary{cursor:pointer;font-size:13.5px;font-weight:600;padding:2px 0
 .cmp .cl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:right}
 .cmp code{font-family:var(--mono);font-size:17px;text-align:left;word-break:break-word}
 .cmp code.wrote{text-decoration:line-through;text-decoration-thickness:1.5px;opacity:.75}
+/* stavfelet markerat: tecknen som skilde sig från ditt svar */
+.cmp code u{color:var(--bad);font-weight:700;text-decoration:underline;
+            text-decoration-thickness:2px;text-underline-offset:3px}
 .mnembox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;max-width:100%}
 .mlabel{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
 .mtext{font-family:var(--serif);font-style:italic;font-size:15.5px;margin:3px 0 0;line-height:1.4;word-break:break-word}
@@ -181,6 +207,12 @@ details.om summary{cursor:pointer;font-size:13.5px;font-weight:600;padding:2px 0
 .btnrow .btn{flex:1;padding:11px 8px;font-size:13.5px;border-radius:11px;white-space:nowrap}
 .tapnote{font-size:11px;color:var(--muted);margin:4px 0 0}
 .linkbtn{background:none;border:0;color:var(--accent);font-size:13px;text-decoration:underline;padding:4px}
+.vetinte{text-align:center;margin:2px 0 0}
+.vetinte button{background:none;border:0;color:var(--muted);font-size:12.5px;
+                text-decoration:underline;text-decoration-thickness:1px;
+                text-underline-offset:3px;padding:6px 14px;cursor:pointer}
+html.kbd .vetinte{margin:0}
+html.kbd .vetinte button{padding:3px 14px}
 .answerbar{display:flex;gap:10px;align-items:center;padding-top:2px}
 .answerbar input{flex:1;min-width:0;background:transparent;border:0;border-bottom:2px solid var(--line);
                  border-radius:0;padding:9px 2px;font-family:var(--mono);font-size:17px;color:var(--ink)}

@@ -1,3 +1,4 @@
+import { diffTarget } from "../lib/diff";
 import { Session, type Pending } from "../lib/session";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
@@ -9,7 +10,8 @@ type UiState =
   | "wrong" | "forced" | "done";
 
 const AUTO_STATES: UiState[] = ["good", "hard", "override"];
-const AUTO_MS: Record<string, number> = { good: 1500, hard: 2600, override: 2600 };
+// stavfel/override visas längre — tiden ska räcka till att SE vad som blev fel
+const AUTO_MS: Record<string, number> = { good: 1500, hard: 4000, override: 4000 };
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -24,6 +26,7 @@ export class PassView {
   private tRemain = 0;
   private tStart = 0;
   private paused = false;
+  private gaveUp = false;            // "vet inte" — fel-flödet utan "du skrev"-rad
   private showMnem = false;          // ✎-utfällt minnesregelfält i fel-läget
   private friendRules: FriendRule[] = [];
   private pendingSno: string | null = null; // regelägare som får poäng om snodd regel sparas
@@ -65,6 +68,9 @@ export class PassView {
             <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
           </button>
         </form>
+        <p class="vetinte" id="vetInte" hidden>
+          <button type="button" data-act="giveup">vet inte</button>
+        </p>
       </div>`;
     this.card = el.querySelector("#passCard")!;
     this.input = el.querySelector("#answerInput")!;
@@ -83,7 +89,28 @@ export class PassView {
       if ((e.target as HTMLElement).closest("button")) e.preventDefault();
     };
     this.form.addEventListener("pointerdown", keepFocus);
-    this.card.addEventListener("pointerdown", keepFocus);
+    const vetInte = el.querySelector<HTMLElement>("#vetInte")!;
+    vetInte.addEventListener("pointerdown", keepFocus);
+    vetInte.querySelector("button")!.addEventListener("click", () => this.onAction("giveup"));
+
+    // håll in kortet = paus (baren fryser), släpp = fortsätt
+    this.card.addEventListener("pointerdown", (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("button")) { e.preventDefault(); return; }
+      if (t.closest("textarea,input,a")) return;
+      if (AUTO_STATES.includes(this.state)) {
+        e.preventDefault(); // tangentbordet ska inte fällas ihop
+        this.holdPause(true);
+      }
+    });
+    const release = () => this.holdPause(false);
+    this.card.addEventListener("pointerup", release);
+    this.card.addEventListener("pointercancel", release);
+    this.card.addEventListener("pointerleave", release);
+    this.card.addEventListener("contextmenu", (e) => {
+      // iOS långtryck ska pausa, inte öppna delningsmenyn
+      if (AUTO_STATES.includes(this.state)) e.preventDefault();
+    });
     this.card.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       const sno = target.closest<HTMLElement>("[data-snoidx]");
@@ -101,8 +128,6 @@ export class PassView {
       }
       const act = target.closest<HTMLElement>("[data-act]")?.dataset.act;
       if (act) { this.onAction(act); return; }
-      if (target.closest("textarea,input,button,a")) return;
-      if (AUTO_STATES.includes(this.state)) this.togglePause();
     });
   }
 
@@ -154,6 +179,7 @@ export class PassView {
     }
     const p = s.answer(raw);
     this.input.value = "";
+    this.gaveUp = false;
     this.showMnem = false;
     this.friendRules = [];
     this.pendingSno = null;
@@ -193,6 +219,20 @@ export class PassView {
     if (act === "restart") { this.onDone(); return; }
     const s = this.session;
     if (!s) return;
+    if (act === "giveup") {
+      // "vet inte" = ge upp utan att hitta på ett svar — samma fel-flöde, ärligare rubrik
+      if (this.state !== "question") return;
+      const p = s.answer("");
+      this.input.value = "";
+      this.gaveUp = true;
+      this.showMnem = false;
+      this.friendRules = [];
+      this.pendingSno = null;
+      this.state = p.forcedMnem ? "forced" : "wrong";
+      this.render();
+      if (this.state === "forced") void this.loadFriendRules(p.word.id);
+      return;
+    }
     if (act === "togglemnem") {
       this.showMnem = true;
       this.render();
@@ -229,6 +269,7 @@ export class PassView {
     const s = this.session;
     if (!s) return;
     this.clearTimer();
+    this.gaveUp = false;
     this.showMnem = false;
     this.pendingSno = null;
     this.friendRules = [];
@@ -258,20 +299,21 @@ export class PassView {
     const bar = this.card.querySelector<HTMLElement>("#cdbar");
     if (bar) bar.style.animationDuration = `${ms}ms`;
   }
-  private togglePause(): void {
+  private holdPause(on: boolean): void {
+    if (!AUTO_STATES.includes(this.state)) return;
     const note = this.card.querySelector<HTMLElement>("#tapnote");
-    if (!this.paused) {
+    if (on && !this.paused) {
       if (this.timer !== null) { window.clearTimeout(this.timer); this.timer = null; }
       this.tRemain -= Date.now() - this.tStart;
       this.paused = true;
       this.card.classList.add("paused");
-      if (note) note.textContent = "pausat — tryck för att fortsätta";
-    } else {
+      if (note) note.textContent = "pausat — släpp för att gå vidare";
+    } else if (!on && this.paused) {
       this.tStart = Date.now();
       this.timer = window.setTimeout(() => this.advance(), Math.max(this.tRemain, 300));
       this.paused = false;
       this.card.classList.remove("paused");
-      if (note) note.textContent = "tryck för paus · Enter för nästa";
+      if (note) note.textContent = "håll för paus · Enter för nästa";
     }
   }
 
@@ -286,6 +328,13 @@ export class PassView {
     const m = this.store.userWord(wordId).mnem;
     if (!m) return "";
     return `<div class="mnembox"><span class="mlabel">Din minnesregel</span><p class="mtext">${esc(m)}</p></div>`;
+  }
+  /** Facit med de tecken som skiljer sig från svaret markerade. */
+  private markedTarget(p: Pending): string {
+    const target = p.matched ?? this.facit(p);
+    return diffTarget(p.raw, target)
+      .map((m) => (m.diff ? `<u>${esc(m.ch)}</u>` : esc(m.ch)))
+      .join("");
   }
   private alsoLine(p: Pending): string {
     if (p.card.dir === "es2sv") {
@@ -330,7 +379,7 @@ export class PassView {
       const busy = this.syncBusy();
       return `<div class="tomt">
         <div class="stor">Inget pass igång</div>
-        <p>${st.due} repetitioner och ${st.newAvailable} nya ord väntar.</p>
+        <p>${st.due + st.newAvailable * 2} kort väntar — ${st.due} repetitioner + ${st.newAvailable} nya ord.</p>
         <div class="btnrow" style="max-width:280px">
           <button class="btn" data-act="startFull" ${total === 0 || busy ? "disabled" : ""}>${busy ? "Synkar …" : "Starta pass"}</button>
           <button class="btn ghost" data-act="startRep" ${st.due === 0 || busy ? "disabled" : ""}>Bara rep.</button>
@@ -361,27 +410,27 @@ export class PassView {
           <p class="verdict v-good">${IC_OK}Rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.hintLine(p.word)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
-          <p class="tapnote" id="tapnote">tryck för paus · Enter för nästa</p>`;
+          <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "hard":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.hintLine(p.word)}
           <div class="cmp"><span class="cl">du skrev</span><code>${esc(p.raw)}</code>
-          <span class="cl">rättstavat</span><code>${esc(p.matched ?? "")}</code></div>
+          <span class="cl">rättstavat</span><code>${this.markedTarget(p)}</code></div>
           ${this.mnemBox(p.word.id)}
           <p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>
-          <p class="tapnote" id="tapnote">tryck för paus · Enter för nästa</p>`;
+          <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "override":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
           <p class="also">»<b>${esc(p.raw)}</b>« sparas som synonym — nästa gång rättas den direkt.</p>
-          <p class="tapnote" id="tapnote">tryck för paus · Enter för nästa</p>`;
+          <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "wrong":
-        return `<p class="verdict v-bad">${IC_X}Fel</p>
-          <p class="wrote">du skrev <s>${esc(p.raw)}</s>
-            <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>
+        return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"}</p>
+          ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
+            <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.hintLine(p.word)}${this.alsoLine(p)}
           ${this.showMnem
@@ -390,9 +439,9 @@ export class PassView {
                 <button type="button" class="btn ghost" data-act="togglemnem">✎ Minnesregel</button>
                 <button type="button" class="btn" data-act="next">Gå vidare</button></div>`}`;
       case "forced":
-        return `<p class="verdict v-bad">${IC_X}Fel — andra missen</p>
-          <p class="wrote">du skrev <s>${esc(p.raw)}</s>
-            <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>
+        return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"} — andra missen</p>
+          ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
+            <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.hintLine(p.word)}${this.alsoLine(p)}
           <p class="mustnote">Skriv din egen minnesregel för att gå vidare</p>
@@ -411,6 +460,7 @@ export class PassView {
     this.card.className = `card st-${this.state}`;
     this.card.innerHTML = this.template();
     this.el.querySelector<HTMLButtonElement>("#passExit")!.hidden = !this.live;
+    this.el.querySelector<HTMLElement>("#vetInte")!.hidden = this.state !== "question";
     document.getElementById("app")?.classList.toggle("pass-live", this.live);
     if (s && this.state !== "idle") {
       const pr = s.progress();

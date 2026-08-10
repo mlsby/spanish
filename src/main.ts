@@ -148,6 +148,19 @@ async function boot(): Promise<void> {
     showTab("pass");
   }
 
+  /** +5 bonusord utöver dagstakten — startar (eller utökar) dagens pass. */
+  function startBonus(): void {
+    if (!sync.session) {
+      showTab("idag");
+      flashKonto();
+      return;
+    }
+    if (sync.status === "syncing") return;
+    store.introduceBonus(5);
+    pass.start(store.dueCards());
+    showTab("pass");
+  }
+
   const social = new Social(sb, () => sync.session?.user.id ?? null);
 
   /** Ladda upp mina topplistesiffror (streak, dagar, kan det-ord). */
@@ -171,7 +184,7 @@ async function boot(): Promise<void> {
   pass.render();
 
   function renderIdagTab(): void {
-    renderIdag(screens.idag, store, { startPass }, cloud);
+    renderIdag(screens.idag, store, { startPass, startBonus }, cloud);
   }
 
   sync.onStatus = () => {

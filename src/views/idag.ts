@@ -1,10 +1,12 @@
 import type { Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
+import { activityStats } from "../lib/streak";
 import { addDays, dayKey, fmtDate, weekdayMon } from "../lib/time";
 import type { SyncStatus } from "../lib/sync";
 
 export interface IdagCallbacks {
   startPass(includeNew: boolean): void;
+  startBonus(): void;
 }
 
 export interface CloudUi {
@@ -17,12 +19,16 @@ export interface CloudUi {
   signOut(): Promise<void>;
 }
 
-// tvåstegsflödet för engångskoden (modul-state så det överlever omrenderingar)
+// modul-state så det överlever omrenderingar
 let pendingEmail = "";
 let authError = "";
+let settingsOpen = false;
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const IC_GEAR =
+  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>';
 
 function heatClass(n: number): string {
   if (n <= 0) return "";
@@ -128,107 +134,163 @@ function kontoHtml(cloud: CloudUi): string {
     </div>${err}`;
 }
 
-export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, cloud: CloudUi): void {
+/** Hero-kortet: dagens pass i KORT (samma tal som passet visar), eller klart-läget. */
+function heroHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
-  const totalToday = s.due + s.newAvailable;
-  el.innerHTML = `
-    <div class="idag">
-      <div class="apphead">
-        <span class="brand">Glosa<i>.</i></span>
-        <span class="date">${esc(fmtDate())}</span>
+  const totalCards = s.due + s.newAvailable * 2;
+  const doneToday = store.data.days[dayKey()] ?? 0;
+  const busy = cloud.status === "syncing";
+
+  const bonus = `<button class="btn ghost" id="bonusBtn" ${busy ? "disabled" : ""}>+5 bonusord</button>`;
+
+  if (!cloud.email) {
+    return `<div class="hero">
+      <p class="plabel">Dagens pass</p>
+      <div class="big">${totalCards}<small> kort</small></div>
+      <div class="cap"><b>${s.due}</b> repetitioner + <b>${s.newAvailable}</b> nya ord <span class="capfine">(2 kort/ord)</span></div>
+      <button class="btn" id="startFull" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
+      <p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>
+    </div>`;
+  }
+
+  if (totalCards === 0) {
+    return `<div class="hero klar">
+      <p class="plabel">Dagens pass</p>
+      <div class="klartxt">✓ Klart för idag</div>
+      <div class="cap">${doneToday > 0 ? `<b>${doneToday}</b> kort idag — streaken säkrad` : "inget förfallet just nu"}</div>
+      <div class="ghostrow">${bonus}</div>
+    </div>`;
+  }
+
+  const capParts: string[] = [];
+  if (s.due > 0) capParts.push(`<b>${s.due}</b> repetitioner`);
+  if (s.newAvailable > 0) capParts.push(`<b>${s.newAvailable}</b> nya ord <span class="capfine">(2 kort/ord)</span>`);
+  return `<div class="hero">
+    <p class="plabel">Dagens pass</p>
+    <div class="big">${totalCards}<small> kort</small></div>
+    <div class="cap">${capParts.join(" + ")}</div>
+    <button class="btn" id="startFull" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Starta"}</button>
+    <div class="ghostrow">
+      <button class="btn ghost" id="startRep" ${s.due === 0 || busy ? "disabled" : ""}>Bara repetitioner · ${s.due}</button>
+      ${bonus}
+    </div>
+  </div>`;
+}
+
+function streakRowHtml(store: Store): string {
+  const act = activityStats(store.data.days);
+  const doneToday = (store.data.days[dayKey()] ?? 0) > 0;
+  const label = `${act.streak} ${act.streak === 1 ? "dag" : "dagar"} i rad`;
+  const hint = doneToday
+    ? "säkrad till midnatt"
+    : act.streak > 0 ? `öva idag så blir det ${act.streak + 1}` : "öva idag så tänds den";
+  return `<div class="streakrow">🔥 <b>${label}</b><span class="sep">·</span><span>${hint}</span></div>`;
+}
+
+function dashboardHtml(store: Store, cloud: CloudUi): string {
+  const s = store.stats();
+  return `
+    ${streakRowHtml(store)}
+    ${heroHtml(store, cloud)}
+    ${cloud.email ? "" : `<div class="panel" id="kontoPanel">
+      <p class="plabel">Konto &amp; molnsynk</p>
+      ${kontoHtml(cloud)}
+    </div>`}
+    <div class="panel">
+      <p class="plabel">Din resa · mål ${s.goal.toLocaleString("sv-SE")} ord</p>
+      <div class="meter"><i style="width:${Math.min(100, (s.started / s.total) * 100).toFixed(1)}%"></i></div>
+      <div class="metercap"><span><b>${s.started}</b> påbörjade</span><span>${s.total.toLocaleString("sv-SE")} i basen</span></div>
+      <div class="resaleg">
+        <span><i class="dot ny"></i><b>${s.ny}</b> nya</span>
+        <span><i class="dot lar"></i><b>${s.lar}</b> lär mig</span>
+        <span><i class="dot kan"></i><b>${s.kan}</b> kan det</span>
       </div>
+    </div>
+    <div class="panel">
+      <p class="plabel">Övningskalender · 15 veckor</p>
+      ${heatmapHtml(store.data.days)}
+    </div>
+    <div class="panel">
+      <p class="plabel">Kan det · över tid</p>
+      ${sparklineHtml(store.data.snapshots)}
+    </div>`;
+}
 
-      <div class="hero">
-        <div class="big">${totalToday}</div>
-        <div class="cap"><b>${s.due}</b> repetitioner · <b>${s.newAvailable}</b> nya ord</div>
-        <button class="btn" id="startFull"
-          ${(totalToday === 0 && cloud.email) || cloud.status === "syncing" ? "disabled" : ""}>
-          ${!cloud.email ? "Logga in för att öva" : cloud.status === "syncing" ? "Synkar …" : "Starta dagens pass"}</button>
-        <button class="btn ghost" id="startRep"
-          ${s.due === 0 || !cloud.email || cloud.status === "syncing" ? "disabled" : ""}>Bara repetitioner (${s.due})</button>
-        ${cloud.email ? "" : `<p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>`}
-      </div>
-
-      ${cloud.email ? "" : `<div class="panel" id="kontoPanel">
-        <p class="plabel">Konto &amp; molnsynk</p>
-        ${kontoHtml(cloud)}
-      </div>`}
-
-      <div class="statrow">
-        <div class="stat"><div class="n">${s.ny}</div><div class="l"><span class="dot ny"></span>Nya</div></div>
-        <div class="stat"><div class="n">${s.lar}</div><div class="l"><span class="dot lar"></span>Lär mig</div></div>
-        <div class="stat"><div class="n">${s.kan}</div><div class="l"><span class="dot kan"></span>Kan det</div></div>
-      </div>
-
-      <div class="panel">
-        <p class="plabel">Progression · mål ${s.goal.toLocaleString("sv-SE")} ord</p>
-        <div class="meter"><i style="width:${Math.min(100, (s.started / s.goal) * 100).toFixed(2)}%"></i></div>
-        <div class="metercap"><span>${s.started} påbörjade · ${s.kan} kan</span><span>${s.total.toLocaleString("sv-SE")} i basen</span></div>
-      </div>
-
-      <div class="panel">
-        <p class="plabel">Övningskalender · 15 veckor</p>
-        ${heatmapHtml(store.data.days)}
-      </div>
-
-      <div class="panel">
-        <p class="plabel">Kan det · över tid</p>
-        ${sparklineHtml(store.data.snapshots)}
-      </div>
-
-      <div class="panel setting">
-        <span class="t">Nya ord per dag</span>
-        <span class="stepper">
-          <button type="button" aria-label="Färre nya ord" id="paceDown">−</button>
-          <span class="v" id="paceVal">${store.data.settings.newPerDay}</span>
-          <button type="button" aria-label="Fler nya ord" id="paceUp">+</button>
-        </span>
-      </div>
-
-      ${cloud.email ? `<div class="panel" id="kontoPanel">
-        <p class="plabel">Konto &amp; molnsynk</p>
-        ${kontoHtml(cloud)}
-      </div>` : ""}
-
-      <div class="mer">
+function settingsHtml(store: Store, cloud: CloudUi): string {
+  return `
+    <div class="panel setting">
+      <span class="t">Nya ord per dag</span>
+      <span class="stepper">
+        <button type="button" aria-label="Färre nya ord" id="paceDown">−</button>
+        <span class="v" id="paceVal">${store.data.settings.newPerDay}</span>
+        <button type="button" aria-label="Fler nya ord" id="paceUp">+</button>
+      </span>
+    </div>
+    <div class="panel" id="kontoPanel">
+      <p class="plabel">Konto &amp; molnsynk</p>
+      ${kontoHtml(cloud)}
+    </div>
+    <div class="panel">
+      <p class="plabel">Backup</p>
+      <div class="mer" style="margin:0">
         <button class="btn ghost" id="exportBtn">Exportera backup</button>
         <button class="btn ghost" id="importBtn">Importera</button>
         <input type="file" id="importFile" accept="application/json" hidden>
       </div>
+    </div>
+    <details class="om panel">
+      <summary>Om Glosa & källor</summary>
+      <p class="omtext" style="margin-top:8px">
+        Skrivträning på de vanligaste spanska orden med FSRS-schemaläggning och egna
+        minnesregler (aldrig AI-genererade). Datat sparas lokalt och synkas till molnet
+        när du är inloggad — exportera en backup då och då. Ordbasen: frekvens &amp;
+        ordklass ur doozan/spanish_data (CC BY-SA, OpenSubtitles via
+        hermitdave/FrequencyWords); svenska översättningar ur Lexins svensk-spanska
+        lexikon, Institutet för språk och folkminnen (CC BY 4.0); genus ur
+        en.wiktionary (CC BY-SA).
+      </p>
+    </details>`;
+}
 
-      <details class="om panel">
-        <summary>Om Glosa & källor</summary>
-        <p class="omtext" style="margin-top:8px">
-          Skrivträning på de vanligaste spanska orden med FSRS-schemaläggning och egna
-          minnesregler (aldrig AI-genererade). Datat sparas lokalt i webbläsaren i v1 —
-          exportera en backup då och då. Ordbasen: frekvens &amp; ordklass ur
-          doozan/spanish_data (CC BY-SA, OpenSubtitles via hermitdave/FrequencyWords);
-          svenska översättningar ur Lexins svensk-spanska lexikon,
-          Institutet för språk och folkminnen (CC BY 4.0); genus ur en.wiktionary (CC BY-SA).
-        </p>
-      </details>
+export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, cloud: CloudUi): void {
+  el.innerHTML = `
+    <div class="idag">
+      <div class="apphead">
+        <span class="brand">Glosa<i>.</i></span>
+        <span class="ahright">
+          <span class="date">${esc(fmtDate())}</span>
+          <button type="button" class="gearbtn${settingsOpen ? " on" : ""}" id="gearBtn"
+            aria-label="${settingsOpen ? "Tillbaka" : "Inställningar"}">${IC_GEAR}</button>
+        </span>
+      </div>
+      ${settingsOpen ? settingsHtml(store, cloud) : dashboardHtml(store, cloud)}
     </div>`;
-
-  el.querySelector<HTMLButtonElement>("#startFull")!.onclick = () => cb.startPass(true);
-  el.querySelector<HTMLButtonElement>("#startRep")!.onclick = () => cb.startPass(false);
 
   const rerender = () => renderIdag(el, store, cb, cloud);
 
+  el.querySelector<HTMLButtonElement>("#gearBtn")!.onclick = () => {
+    settingsOpen = !settingsOpen;
+    rerender();
+  };
+  el.querySelector<HTMLButtonElement>("#startFull")?.addEventListener("click", () => cb.startPass(true));
+  el.querySelector<HTMLButtonElement>("#startRep")?.addEventListener("click", () => cb.startPass(false));
+  el.querySelector<HTMLButtonElement>("#bonusBtn")?.addEventListener("click", () => cb.startBonus());
+
   const bump = (d: number) => {
     store.setPace(Math.max(0, Math.min(50, store.data.settings.newPerDay + d)));
-    rerender(); // uppdatera "nya ord"-siffrorna
+    rerender();
   };
-  el.querySelector<HTMLButtonElement>("#paceDown")!.onclick = () => bump(-1);
-  el.querySelector<HTMLButtonElement>("#paceUp")!.onclick = () => bump(1);
+  el.querySelector<HTMLButtonElement>("#paceDown")?.addEventListener("click", () => bump(-1));
+  el.querySelector<HTMLButtonElement>("#paceUp")?.addEventListener("click", () => bump(1));
 
-  el.querySelector<HTMLButtonElement>("#exportBtn")!.onclick = () => {
+  el.querySelector<HTMLButtonElement>("#exportBtn")?.addEventListener("click", () => {
     const url = URL.createObjectURL(exportBlob(store.data));
     const a = document.createElement("a");
     a.href = url;
     a.download = `glosa-backup-${dayKey()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
+  });
   // ----- konto & synk -----
   const busy = (b: HTMLButtonElement, on: boolean) => { b.disabled = on; };
   el.querySelector<HTMLButtonElement>("#authSend")?.addEventListener("click", async (e) => {
@@ -268,19 +330,22 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
   });
   el.querySelector<HTMLButtonElement>("#authOut")?.addEventListener("click", () => { void cloud.signOut(); });
 
-  const fileInput = el.querySelector<HTMLInputElement>("#importFile")!;
-  el.querySelector<HTMLButtonElement>("#importBtn")!.onclick = () => fileInput.click();
-  fileInput.onchange = async () => {
-    const f = fileInput.files?.[0];
-    if (!f) return;
-    try {
-      const data = parseImport(await f.text());
-      if (confirm("Ersätt all lokal inlärningsdata med backupen?")) {
-        new LocalStorageAdapter().save(data);
-        location.reload();
+  const fileInput = el.querySelector<HTMLInputElement>("#importFile");
+  const importBtn = el.querySelector<HTMLButtonElement>("#importBtn");
+  if (fileInput && importBtn) {
+    importBtn.onclick = () => fileInput.click();
+    fileInput.onchange = async () => {
+      const f = fileInput.files?.[0];
+      if (!f) return;
+      try {
+        const data = parseImport(await f.text());
+        if (confirm("Ersätt all lokal inlärningsdata med backupen?")) {
+          new LocalStorageAdapter().save(data);
+          location.reload();
+        }
+      } catch (e) {
+        alert(String(e instanceof Error ? e.message : e));
       }
-    } catch (e) {
-      alert(String(e instanceof Error ? e.message : e));
-    }
-  };
+    };
+  }
 }

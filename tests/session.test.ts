@@ -38,6 +38,18 @@ describe("introduktion av nya ord", () => {
     expect(store.introduceToday()).toHaveLength(0); // samma dag → inget mer
   });
 
+  it("bonusord går utanför dagstakten och stjäl inte morgondagens kvot", () => {
+    const store = makeStore();
+    store.data.settings.newPerDay = 1;
+    expect(store.introduceToday()).toHaveLength(2); // dagens enda ord
+    const bonus = store.introduceBonus(2);
+    expect(bonus).toHaveLength(4); // 2 bonusord × 2 riktningar, trots full budget
+    // imorgon räknas bara morgondagens introduktioner — full kvot igen
+    const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
+    expect(store.introducedToday(tomorrow)).toBe(0);
+    expect(store.stats(tomorrow).newAvailable).toBe(0); // bara 3 ord i testbasen, alla tagna
+  });
+
   it("dagsbudgeten delas mellan enheter — härleds ur korten, inte en lokal räknare", () => {
     const store = makeStore();
     store.data.settings.newPerDay = 2;
@@ -108,6 +120,17 @@ describe("session: betygsmappning och tvåfelsregeln", () => {
     const p2 = s.answer("nöjd");
     expect(p2.grade).toBe("again");
     expect(p2.forcedMnem).toBe(true); // andra missen → regel krävs
+  });
+
+  it("'vet inte' (tomt svar) → again, och tvåfelsregeln gäller som vanligt", () => {
+    const card = newCardRec("feliz|adj", "es2sv", new Date());
+    const s = new Session(store, [card]);
+    const p1 = s.answer("");
+    expect(p1).toMatchObject({ grade: "again", step: "none", forcedMnem: false });
+    s.commit();
+    expect(store.data.reviews[0]).toMatchObject({ grade: "again", raw: "" });
+    const p2 = s.answer("");
+    expect(p2.forcedMnem).toBe(true); // andra missen → regel krävs även via vet inte
   });
 
   it("'jag hade rätt' uppgraderar till hard och sparar synonymen", () => {

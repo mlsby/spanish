@@ -127,11 +127,25 @@ export class Store {
   introduceToday(now: Date = new Date()): CardRec[] {
     const already = this.introducedToday(now);
     const room = Math.max(0, this.data.settings.newPerDay - already);
-    if (room === 0) return [];
+    return this.introduceWords(room, now);
+  }
+
+  /**
+   * Bonusord: plockar n extra ord utanför dagstaktens rumskoll. Eftersom
+   * introducedToday() bara räknar dagens kalenderdag påverkas inte
+   * morgondagens kvot — bonus är gratis imorgon. (Plockas bonus innan dagens
+   * vanliga ord är slut räknas de dock in i dagens tak.)
+   */
+  introduceBonus(n: number, now: Date = new Date()): CardRec[] {
+    return this.introduceWords(n, now);
+  }
+
+  private introduceWords(count: number, now: Date): CardRec[] {
+    if (count <= 0) return [];
     // es→sv-korten först, sv→es-korten efter — så förhörs inte samma ord rygg i rygg
     const picked: string[] = [];
     for (const w of this.words) {
-      if (picked.length >= room) break;
+      if (picked.length >= count) break;
       if (!this.card(w.id, "es2sv")) picked.push(w.id);
     }
     const fresh: CardRec[] = [];

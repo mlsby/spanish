@@ -1,4 +1,5 @@
 import { gradeAnswer, normalize, type GradeResult } from "./grading";
+import { insertSpaced, spaceSiblings } from "./queue";
 import { applyReview, dueDate } from "./scheduler";
 import type { Store } from "./store";
 import type { CardRec, Dir, Grade, Step, Word } from "./types";
@@ -26,7 +27,8 @@ export class Session {
   pending: Pending | null = null;
 
   constructor(private store: Store, cards: CardRec[]) {
-    this.queue = [...cards];
+    // syskonkort (samma ord, olika riktning) hålls isär så facit aldrig står kvar på skärmen
+    this.queue = spaceSiblings(cards);
   }
 
   get current(): CardRec | null {
@@ -96,7 +98,7 @@ export class Session {
     this.done++;
     const nextDue = dueDate(updated).getTime() - now.getTime();
     if (p.grade === "again") {
-      this.queue.splice(Math.min(3, this.queue.length), 0, updated);
+      insertSpaced(this.queue, updated, 3);
     } else if (nextDue <= RELEARN_WINDOW_MS && this.queue.length > 0) {
       this.queue.push(updated);
     }

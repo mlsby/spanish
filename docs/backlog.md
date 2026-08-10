@@ -1,68 +1,6 @@
-# Backlog — antecknat, inte påbörjat
+# Backlog
 
-Småsaker som Lucas noterat och som ska fixas vid tillfälle. Inget här är påbörjat.
-
-## Syskonkort får inte visas rygg i rygg (antecknad 2026-08-10)
-
-Observerat: "vad är *que*?" → svar "som" → direkt nästa kort: "hur säger man *som*?"
-Samma ords två riktningar (es→sv och sv→es) hamnar intill varandra i kön, och då
-är svaret på kort 2 gratis.
-
-Tänkt fix (Ankis "bury siblings", light): när passkön byggs i `Session` — och vid
-omkösning efter fel — garantera ett minsta avstånd (t.ex. ≥ 3 positioner) mellan
-två kort som delar `wordId`. Om kön är för kort för att hålla avståndet (t.ex.
-bara syskonen kvar på slutet) får de ligga intill — bättre än att tappa kort.
-Testfall: nyintroducerade ord (båda riktningarna skapas samtidigt och hamnar
-annars alltid intill varandra), omkösning via Again (+3) och korta köer.
-
-## Hemskärmen görs om (antecknad 2026-08-10)
-
-1. **Siffrorna går inte ihop.** Heron visar `due + newAvailable` — men `due` är
-   *kort* och `newAvailable` är *ord*, och varje nytt ord blir två kort. Lucas
-   såg "33" på hemskärmen och "47 kort kvar" i passet (19 rep + 14 nya ord →
-   19 + 28 kort). Fix: räkna kort överallt och visa uträkningen öppet, t.ex.
-   "19 repetitioner + 14 nya ord (28 kort)". Gäller även knappen
-   "Bara repetitioner (N)" — den är redan i kort, behåll.
-2. **Bonusord.** Man ska alltid kunna plocka fler nya ord utöver dagstakten
-   (t.ex. "+5 bonusord" när dagens nya är slut). Obs: `introduceToday()` är
-   idempotent per dag via `introducedToday()` — bonus behöver ett eget API som
-   medvetet går förbi dagsbudgeten, annars äter bonusorden morgondagens kvot
-   på andra enheter efter synk (eller tvärtom). Bestäm: ska bonus räknas in i
-   `introducedToday` (bonus idag = färre imorgon) eller inte? Luta åt *inte* —
-   bonus ska kännas gratis.
-3. **Allmän logiköversyn av Idag-fliken** — ordning och hierarki (vad är
-   handling, vad är statistik). Mockupförslag finns i `design/startsida.html`:
-   A Passet först · B Checklistan · C Kalendern främst · D Ringen — alla med
-   kort-räkning, bonusord, streak på startsidan och ⚙ för konto/inställningar.
-   Väntar på Lucas val (eller mix).
-
-## Feedback-vyn: längre visning vid stavfel + håll-för-paus (antecknad 2026-08-10)
-
-1. **Rätt-med-stavfel ska visas längre.** Idag: good 1500 ms, hard/override
-   2600 ms (`AUTO_MS` i `pass.ts`) — hard är alltså redan längre, men inte
-   tillräckligt. Förslag: hard/override ≈ 4000 ms, och markera själva stavfelet
-   visuellt (t.ex. rätt stavning med de avvikande tecknen betonade) så att den
-   extra tiden faktiskt används till att se vad som blev fel.
-2. **Håll in kortet för att pausa.** Idag finns tap-toggle ("tryck för paus")
-   och nedräkningsbaren fryser redan via `.card.paused .cdbar
-   {animation-play-state:paused}`. Ändra interaktionen till *håll*: pointerdown
-   på kortet → paus så länge fingret ligger kvar, pointerup → fortsätt.
-   Fällor: kortets befintliga pointerdown-hanterare (keepFocus, preventDefault)
-   ska samsas med detta; iOS långtryck behöver `-webkit-touch-callout:none` +
-   `user-select:none` på kortet i feedbacklägena så inte textmarkering/
-   delningsmenyn triggas; behåll Enter-för-nästa.
-
-## "Vet inte" i passet (antecknad 2026-08-10)
-
-Man måste kunna ge upp ett kort utan att hitta på ett svar — idag är enda
-vägen att medvetet skriva fel (tomt svar skakar bara). Diskret **"vet inte"**-
-länk under svarsfältet, med samma pointerdown/preventDefault-knep som övriga
-knappar så tangentbordet inte fälls ihop. Beteende: räknas som Again och går
-in i **exakt samma fel-flöde** som ett felsvar (facit, minnesregel,
-tvåfelsregeln, omkösning +3) — men utan "du skrev"-raden, och med rubriken
-"Visste inte" istället för "Fel". Tomt svar + enter ska *fortsätta* skaka —
-bara den explicita länken betyder "vet inte", annars kostar en slarv-enter
-ett kort. Mockup: sista sektionen i `design/startsida.html`.
+Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
 ## Verbböjningar (antecknad 2026-08-10) — störst av backlogpunkterna
 
@@ -210,7 +148,31 @@ Viktiga egenskaper:
   avsändare. När det funkar: putsa inloggningscopyn till kod-först i `idag.ts`.
 - **Migration 0002** (`supabase/migrations/20260809_0002_social.sql`) ska köras
   i SQL-editorn — Topplistan visar fel tills dess. Verifiera via REST efteråt.
-- **AI-rättningsfallback** (kravspec §3 steg 3) som Supabase Edge Function;
-  Claude-nyckeln som Supabase-secret, aldrig i klienten.
+- **PARKERAD (Lucas 2026-08-10):** AI-rättningsfallbacken (kravspec §3 steg 3)
+  väntar — Lucas har fler AI-idéer och vill ta dem i ett svep senare.
+  (Upplägget står fast: Supabase Edge Function, Claude-nyckeln som
+  Supabase-secret, aldrig i klienten.)
 - **Batch 2** av ordbasen (rank 1001–2000): `node seed/build-seed.mjs` enligt
   README, granska kollisioner på samma sätt som batch 1.
+
+## Klart (byggt 2026-08-10, släpp "startsida A + småfixar")
+
+- **Startsidan enligt alternativ A** ("Passet först") med Kan det-grafen
+  synlig (Lucas tillägg): streakrad 🔥 med kontext, hero i KORT med synlig
+  uträkning ("19 repetitioner + 14 nya ord (2 kort/ord)"), klart-läge med
+  grön kvittens, "Din resa"-panel (mätare mot basen + ny/lär/kan-legend),
+  kalender, graf. Konto/takt/backup/om flyttade bakom ⚙-kugghjulet.
+- **+5 bonusord** (`store.introduceBonus`) — utanför dagsbudgeten, stjäl
+  inte morgondagens kvot (introducedToday räknar per kalenderdag). Den
+  öppna "Plocka fler"-varianten ligger kvar i förkunskapspaketet.
+- **Syskonkort hålls isär** — `spaceSiblings` (≥3 positioner) när passkön
+  byggs + `insertSpaced` vid omkösning efter fel; olösliga korta köer
+  släpps igenom hellre än att kort tappas.
+- **Stavfelsfeedback**: hard/override 2600 → 4000 ms och felstavade tecken
+  markeras i facit (`diffTarget`, Levenshtein-backtrace).
+- **Håll-för-paus** ersätter tap-toggle: pointerdown fryser baren, släpp
+  fortsätter; `user-select/touch-callout:none` + contextmenu-skydd på
+  feedbackkorten så iOS-långtryck inte öppnar delningsmenyn.
+- **"Vet inte"-länk** under svarsfältet: räknas som Again, samma fel-flöde
+  inkl. tvåfelsregeln, rubrik "Visste inte", ingen "du skrev"-rad, ingen
+  "jag hade rätt"-länk; tomt svar + enter skakar fortfarande bara.
