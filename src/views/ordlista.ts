@@ -1,17 +1,28 @@
 import type { Social } from "../lib/social";
 import type { Store, WordStatus } from "../lib/store";
-import { stabilityDays } from "../lib/scheduler";
-import { POS_LABEL } from "../lib/types";
+import type { Level } from "../lib/types";
+import { LEVEL_SV, POS_LABEL } from "../lib/types";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const PAGE = 100;
 
+const LEVELS: Level[] = ["ny", "ovar", "pagang", "kan"];
+
+/** Bekräftelseraden under stegen direkt efter en flytt. */
+const MOVED_MSG: Record<Level, string> = {
+  ny: "Ordet börjar om — kommer som nytt i passet.",
+  ovar: "Läggs i dagens pass.",
+  pagang: "På gång — kollas om 14 dagar.",
+  kan: "Kan det — kollas om 30 dagar.",
+};
+
 export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): void {
   let query = "";
   let shown = PAGE;
   let openId: string | null = null;
+  let moved: { id: string; text: string } | null = null;
 
   el.innerHTML = `
     <div class="lista">
@@ -50,11 +61,34 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     return `<div><div class="xl">Böjningar · presens</div><div class="syns">${chips}</div></div>`;
   }
 
+  /** Radens miniatyr: fyra prickar ifyllda till nuvarande nivå. */
+  function pathHtml(ws: WordStatus): string {
+    const fill = ws.level === "ny" ? 0
+      : ws.level === "ovar" ? (ws.minStability < 1 ? 1 : 2)
+      : ws.level === "pagang" ? 3 : 4;
+    const dots = LEVELS.map((_, i) => `<i class="${i < fill ? `f-${ws.level}` : ""}"></i>`).join("");
+    return `<span class="lpath" aria-label="nivå: ${LEVEL_SV[ws.level]}">${dots}</span>`;
+  }
+
+  /** Den tryckbara stegen i expansionen — tryck på ett steg för att flytta ordet. */
+  function stegeHtml(ws: WordStatus): string {
+    const cur = LEVELS.indexOf(ws.level);
+    const stops = LEVELS.map((lvl, i) => {
+      const cls = i === cur ? " on" : i < cur ? " past" : "";
+      return `${i ? '<span class="leg"></span>' : ""}
+        <button type="button" class="steg${cls}" data-setlvl="${lvl}"
+          aria-pressed="${i === cur}"><i></i><span>${LEVEL_SV[lvl]}</span></button>`;
+    }).join("");
+    const tip = moved?.id === ws.word.id
+      ? `<p class="stegtips flyttad">${esc(moved.text)}</p>`
+      : `<p class="stegtips">tryck på ett steg för att flytta ordet</p>`;
+    return `<div class="stege">${stops}</div>${tip}`;
+  }
+
   function rowHtml(ws: WordStatus): string {
-    const { word, status, cards } = ws;
+    const { word } = ws;
     const uw = store.userWord(word.id);
     const open = word.id === openId;
-    const stab = cards.length ? `${Math.min(...cards.map(stabilityDays))} d` : "—";
     const es = word.art ? `${word.art} ${word.es}` : word.es;
     const baseSyns = word.syn.map((s) => `<span class="syn">${esc(s)}</span>`).join("");
     const ownSyns = uw.syn
@@ -66,12 +100,12 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
           <span class="es">${esc(es)}</span><span class="sv">${esc(word.sv)}</span>
           <span class="meta">
             ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
-            <span class="stab">${stab}</span>
-            <span class="dot ${status === "kan" ? "kan" : status === "lar" ? "lar" : "ny"}"></span>
+            ${pathHtml(ws)}
           </span>
         </button>
         <div class="rowx">
-          <div><div class="xl">${esc(POS_LABEL[word.pos] ?? word.pos)} · rank ${word.rank}</div>
+          ${stegeHtml(ws)}
+          <div><div class="xl">${esc(POS_LABEL[word.pos] ?? word.pos)}</div>
             ${word.hint ? `<p class="omtext" style="margin:4px 0 0">Ledtråd: <i>(${esc(word.hint)})</i></p>` : ""}
             ${word.alt?.length ? `<p class="omtext" style="margin:4px 0 0">Accepteras även: ${word.alt.map(esc).join(", ")}</p>` : ""}</div>
           <div><div class="xl">Synonymer</div>
@@ -97,6 +131,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
   searchEl.addEventListener("input", () => {
     query = searchEl.value.trim();
     shown = PAGE;
+    moved = null;
     renderRows();
   });
   moreBtn.addEventListener("click", () => {
@@ -109,6 +144,16 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const row = t.closest<HTMLElement>(".row");
     if (!row) return;
     const id = row.dataset.id!;
+    const steg = t.closest<HTMLElement>("[data-setlvl]");
+    if (steg) {
+      const lvl = steg.dataset.setlvl as Level;
+      const w = store.byId.get(id);
+      if (lvl === "ny" && !window.confirm(`Nollställa "${w?.es ?? id}"? Ordet börjar om från Ny.`)) return;
+      store.setLevel(id, lvl);
+      moved = { id, text: MOVED_MSG[lvl] };
+      renderRows();
+      return;
+    }
     const del = t.closest<HTMLElement>("[data-delsyn]");
     if (del) {
       store.removeUserSyn(id, del.dataset.delsyn!);
@@ -124,6 +169,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     if (t.closest("textarea,input")) return;
     if (t.closest(".rowbtn")) {
       openId = openId === id ? null : id;
+      moved = null;
       renderRows();
       if (openId === id) loadFriendRules(id);
     }

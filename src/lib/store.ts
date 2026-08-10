@@ -1,6 +1,6 @@
-import type { AppData, CardRec, Dir, DirtyKind, ReviewRec, UserWord, VerbForm, Word } from "./types";
+import type { AppData, CardRec, Dir, DirtyKind, Level, ReviewRec, UserWord, VerbForm, Word } from "./types";
 import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
-import { dueDate, isKnown, newCardRec } from "./scheduler";
+import { dueDate, isKnown, levelCardRec, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
 import { dayKey, endOfToday } from "./time";
 
@@ -12,6 +12,8 @@ export interface WordStatus {
   cards: CardRec[];
   status: "ny" | "lar" | "kan";
   minStability: number;
+  /** nivå för ordlistans stege: ny · övar (<7 d) · på gång (7–30 d) · kan det (≥30 d båda håll) */
+  level: Level;
 }
 
 export class Store {
@@ -299,10 +301,45 @@ export class Store {
   wordStatus(word: Word): WordStatus {
     const cards = [this.card(word.id, "es2sv"), this.card(word.id, "sv2es")]
       .filter((c): c is CardRec => !!c);
-    if (cards.length === 0) return { word, cards, status: "ny", minStability: 0 };
+    if (cards.length === 0) return { word, cards, status: "ny", minStability: 0, level: "ny" };
     const minStability = Math.min(...cards.map((c) => c.fsrs.stability));
     const status = cards.length === 2 && cards.every(isKnown) ? "kan" : "lar";
-    return { word, cards, status, minStability };
+    // "ny" = inte mött än — gäller även introducerade men obesvarade (och nollställda) ord
+    const level: Level = cards.every((c) => c.fsrs.reps === 0) ? "ny"
+      : status === "kan" ? "kan"
+      : minStability >= 7 ? "pagang" : "ovar";
+    return { word, cards, status, minStability, level };
+  }
+
+  /**
+   * Nivåstegen: flytta ett ord för hand. Markeringen är ärlig mot FSRS —
+   * "på gång"/"kan det" sätter stabilitet (14/30 d) och kollas när kortet
+   * förfaller; "övar" lägger ordet i dagens pass; "ny" börjar om från noll.
+   */
+  setLevel(wordId: string, level: Level, now: Date = new Date()): void {
+    const dirs: Dir[] = ["es2sv", "sv2es"];
+    if (level === "ny" && dirs.every((d) => !this.card(wordId, d))) return; // redan orört
+    for (const dir of dirs) {
+      const cur = this.card(wordId, dir);
+      if (level === "ny") {
+        // färskt orört kort, förfallet nu — ordet kommer som nytt i passet
+        this.putCard(newCardRec(wordId, dir, now));
+      } else if (level === "ovar") {
+        const base = cur ?? newCardRec(wordId, dir, now);
+        this.putCard({
+          ...base,
+          fsrs: {
+            ...base.fsrs,
+            due: now.toISOString(),
+            // in i övar-bandet — men sänk aldrig något som redan är kort
+            stability: Math.min(base.fsrs.stability, 3),
+          },
+        });
+      } else {
+        this.putCard(levelCardRec(cur, wordId, dir, level === "kan" ? 30 : 14, now));
+      }
+    }
+    this.save();
   }
 
   stats(now: Date = new Date()) {

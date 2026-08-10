@@ -2,6 +2,32 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-10, släpp "nivåstegen i ordlistan")
+
+- **Nivåstegen (design B, Lucas val):** "Rank X" borta ur ordlistan
+  (ordklassen kvar). Varje ord har en nivå beräknad ur FSRS: **Ny** (inte
+  mött än — inga kort eller inget svar) · **Övar** (stabilitet < 7 d) ·
+  **På gång** (7–30 d) · **Kan det** (≥ 30 d i båda riktningarna). Raden
+  visar en fyrpricksstege (bärnsten/brons/grönt), expansionen en stor
+  tryckbar stege: tryck på ett steg för att flytta ordet.
+  - *Kan det:* ~30 d stabilitet på båda korten, kollas ärligt när kortet
+    förfaller — failar man tar vanlig inlärning över (självrättande).
+  - *På gång:* samma fast 14 d.
+  - *Övar:* båda korten förfaller NU (läggs i dagens pass); hög stabilitet
+    sänks in i bandet (max 3 d). På ett orört ord = äkta första möte i
+    dagens pass (fast-track/kan redan gäller fortfarande).
+  - *Ny:* nollställning med bekräftelsedialog — färska kort, ordet kommer
+    som nytt i passet (radering synkar inte; färska kort gör det).
+  - Bekräftelserad under stegen efter flytt ("Kan det — kollas om 30
+    dagar" osv). Budget: nyskapade kort räknas som dagens introduktioner
+    (samma semantik som Plocka fler); imorgon är kvoten fri.
+- **Rättningsfixar:** snedstreck i facit expanderas till riktiga synonymer
+  vid rättning ("han/hon är" ⇒ "han är" + "hon är" exakta; stavfel diffas
+  mot närmaste variant). Formkort accepterar alla rimliga pronomen
+  (han/hon/den/det, de/dom). "Jag hade rätt" på formkort sparade synonymen
+  på moderverbet där formrättningen aldrig läste den — nu bor den på
+  formens eget id och läses i båda riktningarna.
+
 ## Klart (byggt 2026-08-10, släpp "förkunskaper + verbböjningar")
 
 - **Förkunskapspaketet:** exakt rätt vid ett korts allra första möte ⇒ FSRS

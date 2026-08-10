@@ -67,6 +67,13 @@ export interface CardRec {
 export type Grade = "again" | "hard" | "good";
 export type Step = "exact" | "syn" | "fuzzy" | "override" | "none";
 
+/** Ordets nivå i ordlistan — beräknad ur FSRS, men flyttbar för hand (nivåstegen). */
+export type Level = "ny" | "ovar" | "pagang" | "kan";
+
+export const LEVEL_SV: Record<Level, string> = {
+  ny: "Ny", ovar: "Övar", pagang: "På gång", kan: "Kan det",
+};
+
 export interface ReviewRec {
   ts: string;
   wordId: string;

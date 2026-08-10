@@ -5,6 +5,7 @@
   --good:#54683A; --good-bg:#EEF1E1; --good-line:#D8DFC2;
   --warn:#96660F; --warn-bg:#F8EFD9; --warn-line:#E8D9AE;
   --bad:#A44F38;  --bad-bg:#F7E9E1;  --bad-line:#E8CFC0;
+  --brons:#8A6F4D;
   --heat0:#F0EADD; --heat1:#E7DCC4; --heat2:#CDB694; --heat3:#9A7F5B; --heat4:#59452F;
   --serif:ui-serif,"Iowan Old Style",Georgia,Cambria,"Times New Roman",serif;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -18,6 +19,7 @@
     --good:#A3BE7E; --good-bg:#20290F; --good-line:#3E4A22;
     --warn:#DDB666; --warn-bg:#2F250D; --warn-line:#5C4B20;
     --bad:#E39A82;  --bad-bg:#331B12;  --bad-line:#5E3423;
+    --brons:#C2A576;
     --heat0:#2B2416; --heat1:#43371F; --heat2:#6E5A38; --heat3:#A98F60; --heat4:#D9C29E;
   }
 }
@@ -275,7 +277,6 @@ html.kbd .vetinte button{padding:3px 14px}
 .row .es{font-family:var(--serif);font-weight:600;font-size:15.5px;white-space:nowrap}
 .row .sv{color:var(--muted);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .meta{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
-.row .stab{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .chip-regel{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);
             background:var(--accent-soft);border:0;border-radius:99px;padding:2px 7px}
 .rowx{display:none;border-top:1px solid var(--line);padding:12px 13px;flex-direction:column;gap:10px}
@@ -292,6 +293,29 @@ html.kbd .vetinte button{padding:3px 14px}
 .rowx .mini{align-self:flex-end;border:0;background:var(--accent-soft);color:var(--accent);font-weight:600;
             font-size:12.5px;border-radius:9px;padding:7px 14px}
 .visafler{align-self:center;margin:4px 0 10px}
+
+/* ---------- nivåstegen (ordlistan) ---------- */
+/* radens miniatyr: fyra prickar ifyllda till nuvarande nivå */
+.lpath{display:inline-flex;align-items:center;gap:4px}
+.lpath i{width:6px;height:6px;border-radius:50%;background:var(--rule);border:1px solid var(--line)}
+.lpath i.f-ovar{background:var(--warn);border-color:var(--warn)}
+.lpath i.f-pagang{background:var(--brons);border-color:var(--brons)}
+.lpath i.f-kan{background:var(--good);border-color:var(--good)}
+
+/* stor tryckbar stege i expansionen */
+.stege{display:flex;align-items:flex-start;margin:2px 0 0}
+.steg{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+      background:none;border:0;padding:4px 2px 2px;border-radius:9px}
+.steg i{width:13px;height:13px;border-radius:50%;background:var(--rule);
+        border:1.5px solid var(--line);transition:transform .12s ease}
+.steg span{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.steg.on i{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
+.steg.on span{color:var(--ink);font-weight:700}
+.steg.past i{background:var(--accent);border-color:var(--accent);opacity:.3}
+.steg:active i{transform:scale(1.25)}
+.leg{height:1.5px;background:var(--line);flex:1;max-width:34px;margin-top:10px}
+.stegtips{margin:0;text-align:center;font-size:11px;color:var(--muted)}
+.stegtips.flyttad{color:var(--accent);font-weight:600}
 
 /* ---------- tangentbordet uppe = grundläget: kompakt pass-layout ----------
    html.kbd sätts av viewport.ts när den synliga ytan är < 620px

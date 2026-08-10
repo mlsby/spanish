@@ -56,6 +56,31 @@ export function applyReview(rec: CardRec, grade: Grade, now: Date, opts?: { easy
   };
 }
 
+/**
+ * Manuellt satt nivå (nivåstegen i ordlistan): kortet får Review-status med
+ * vald stabilitet och kollas ärligt när det förfaller — failar man då tar
+ * vanlig inlärning över. Saknas kortet skapas det (räknas som dagens intro).
+ */
+export function levelCardRec(
+  base: CardRec | undefined, wordId: string, dir: Dir, days: number, now: Date
+): CardRec {
+  const b = base ?? newCardRec(wordId, dir, now);
+  return {
+    ...b,
+    fsrs: {
+      ...b.fsrs,
+      state: State.Review,
+      reps: Math.max(b.fsrs.reps, 1),
+      stability: days,
+      difficulty: b.fsrs.difficulty || 5,
+      elapsed_days: 0,
+      scheduled_days: days,
+      due: new Date(now.getTime() + days * 86400e3).toISOString(),
+      last_review: now.toISOString(),
+    },
+  };
+}
+
 export function dueDate(rec: CardRec): Date {
   return new Date(rec.fsrs.due);
 }
