@@ -60,13 +60,16 @@ const kanIds = introducerade.filter((id) => {
   const p = perId.get(id);
   return p.dirs >= 2 && p.minS >= KNOWN_DAYS;
 });
+// Lucas idé: ge modellen dubbelt så många kandidater som målet och låt den
+// välja de N som ger naturligast text — slacket köper flyt.
 const ovningsKandidater = introducerade
   .filter((id) => !kanIds.includes(id))
   .sort((a, b) => perId.get(a).minS - perId.get(b).minS);
-const ovningsord = ovningsKandidater.slice(0, N_OVNING);
+const kandidater = ovningsKandidater.slice(0, N_OVNING * 2);
 
 // ---------- ytformer ----------
-const ARTIKLAR = ["el", "la", "los", "las", "un", "una", "unos", "unas"];
+// alltid tillåten glue: artiklar + a/al/del/no — quizzas aldrig, bara bindväv
+const SMAORD = ["el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no"];
 
 function ytform(id) {
   return formById.get(id)?.es ?? wordById.get(id)?.es ?? null;
@@ -84,8 +87,9 @@ function visning(id) {
 }
 
 /** Vitlista för validatorn: tillåtna tokens i texten. */
+const BOJBARA = new Set(["n", "adj", "determiner", "pron", "num"]);
 function byggVitlista() {
-  const ok = new Set(ARTIKLAR);
+  const ok = new Set(SMAORD);
   for (const id of introducerade) {
     const f = formById.get(id);
     if (f) {
@@ -95,12 +99,14 @@ function byggVitlista() {
     const w = wordById.get(id);
     if (!w) continue;
     for (const tok of w.es.toLowerCase().split(/\s+/)) ok.add(tok);
-    if (w.pos === "n" || w.pos === "adj") {
+    if (BOJBARA.has(w.pos)) {
       const es = w.es.toLowerCase();
       ok.add(es + (/[aeiouáéíóú]$/.test(es) ? "s" : "es")); // regelbunden plural
-      if (w.pos === "adj" && es.endsWith("o")) {
+      if (es.endsWith("o")) {
+        // femininum + plural: todo→toda/todos/todas, otro→otra/otros/otras
         ok.add(es.slice(0, -1) + "a");
         ok.add(es.slice(0, -1) + "as");
+        ok.add(es.slice(0, -1) + "os");
       }
     }
   }
@@ -117,11 +123,11 @@ function validera(meningar) {
   for (const m of meningar) {
     for (const tok of tokenisera(m.es)) if (!ok.has(tok)) brott.add(tok);
   }
-  const text = meningar.map((m) => m.es).join(" ").toLowerCase();
-  const saknade = ovningsord.filter(
-    (id) => !text.includes(ytform(id).toLowerCase()),
+  const text = " " + meningar.map((m) => m.es).join(" ").toLowerCase() + " ";
+  const anvanda = kandidater.filter((id) =>
+    new RegExp(`(^|[^a-záéíóúñü])${ytform(id).toLowerCase()}([^a-záéíóúñü]|$)`).test(text),
   );
-  return { brott: [...brott], saknade };
+  return { brott: [...brott], anvanda, forFa: anvanda.length < N_OVNING };
 }
 
 // ---------- prompten ----------
@@ -131,23 +137,46 @@ function systemPrompt() {
 HÅRDA REGLER:
 - Använd ENDAST ord från listan TILLÅTNA ORD nedan. Inga andra ord, inga namn, inga siffertecken (skriv aldrig 1, 2, 3).
 - Verb får bara användas i exakt de former som står i listan (infinitiv eller angiven böjning). Skriv hellre om med "ir a + infinitiv", "querer/poder + infinitiv" än att böja fritt.
-- Substantiv och adjektiv får böjas i regelbunden plural och femininum. Artiklarna el/la/los/las/un/una är alltid tillåtna.
-- Varje ÖVNINGSORD ska förekomma exakt en gång, i exakt den angivna formen, och högst ett övningsord per mening.
-- Skriv exakt ${N_MENINGAR} meningar som hänger ihop till en liten vardagsscen. Enkelt, naturligt, presens.
-- Max 12 ord per mening. Använd ¿…? om du ställer en fråga.
+- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum (todo→todos, otro→otra).
+- Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no.
+- VANLIGASTE FELET är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med). Kontrollera varje verbform mot verblistan innan du svarar — skriv om med infinitivkonstruktion om formen saknas.
+- Bland KANDIDATORDEN nedan: välj de ${N_OVNING} som ger den naturligaste texten och använd dem i exakt den angivna formen. Högst ett kandidatord per mening.
+- Skriv ungefär ${N_MENINGAR} meningar som hänger ihop till en liten vardagsscen. Sikta på 8–10 ord per mening. Enkelt, naturligt, presens.
+- Använd ¿…? om du ställer en fråga.
 
 Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (övningsordet som används i meningen, eller "" om inget).`;
 }
 
 function userPrompt() {
-  const palett = introducerade
-    .filter((id) => !ovningsord.includes(id))
-    .map(visning)
-    .join(", ");
-  const ovn = ovningsord
+  // verben grupperade med sina tillåtna ytformer — tydligare karta än ordsoppa
+  const verbFormer = new Map(); // lemma-id → [ytformer]
+  const ovriga = [];
+  for (const id of introducerade) {
+    const f = formById.get(id);
+    if (f) {
+      const list = verbFormer.get(f.parent) ?? [];
+      list.push(f.es);
+      verbFormer.set(f.parent, list);
+      continue;
+    }
+    const w = wordById.get(id);
+    if (!w) continue;
+    if (w.pos === "v") {
+      if (!verbFormer.has(id)) verbFormer.set(id, []);
+    } else {
+      ovriga.push(visning(id));
+    }
+  }
+  const verb = [...verbFormer.entries()]
+    .map(([id, former]) => {
+      const inf = wordById.get(id)?.es ?? id;
+      return former.length ? `${inf}: ${inf}, ${former.join(", ")}` : inf;
+    })
+    .join(" · ");
+  const kand = kandidater
     .map((id) => `${ytform(id)} (${gloss(id)})`)
     .join("\n");
-  return `TILLÅTNA ORD:\n${palett}\n\nÖVNINGSORD (måste användas, exakt dessa former):\n${ovn}`;
+  return `VERB — endast dessa former är tillåtna:\n${verb}\n\nÖVRIGA TILLÅTNA ORD:\n${ovriga.join(", ")}\n\nKANDIDATORD (välj ${N_OVNING} st, exakt dessa former):\n${kand}`;
 }
 
 // ---------- körning ----------
@@ -168,7 +197,7 @@ const schema = {
   },
 };
 
-console.log(`Profil: ${introducerade.length} mötta · ${kanIds.length} kan · övningsord: ${ovningsord.map(visning).join(", ")}`);
+console.log(`Profil: ${introducerade.length} mötta · ${kanIds.length} kan · kandidater: ${kandidater.map((id) => ytform(id)).join(", ")}`);
 
 if (flag("torr") || flag("visa-prompt")) {
   console.log("\n===== SYSTEM =====\n" + systemPrompt());
@@ -187,13 +216,16 @@ let kostnad = 0;
 
 for (let forsok = 1; forsok <= 3; forsok++) {
   const extra = meningar
-    ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${validera(meningar).brott.join(", ") || "-"}. Saknade övningsord: ${validera(meningar).saknade.map(ytform).join(", ") || "-"}. Skriv om och håll dig strikt till listan.`
+    ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${validera(meningar).brott.join(", ") || "-"}. Använda kandidatord: ${validera(meningar).anvanda.length} av minst ${N_OVNING}. Skriv om och håll dig strikt till listan.`
     : "";
+  const outputConfig = { format: { type: "json_schema", schema } };
+  const effort = arg("effort");
+  if (effort) outputConfig.effort = effort;
   const res = await client.messages.create({
     model: MODELL,
-    max_tokens: 1500,
+    max_tokens: 6000,
     system: systemPrompt(),
-    output_config: { format: { type: "json_schema", schema } },
+    output_config: outputConfig,
     messages: [{ role: "user", content: userPrompt() + extra }],
   });
   kostnad += (res.usage.input_tokens * 3 + res.usage.output_tokens * 15) / 1e6;
@@ -201,16 +233,22 @@ for (let forsok = 1; forsok <= 3; forsok++) {
     console.error("Modellen avböjde (refusal) — försök igen.");
     process.exit(1);
   }
-  meningar = JSON.parse(res.content.find((b) => b.type === "text").text).meningar;
+  const textBlock = res.content.find((b) => b.type === "text");
+  if (!textBlock) {
+    console.error(`Inget textsvar (stop_reason: ${res.stop_reason}) — höj max_tokens?`);
+    process.exit(1);
+  }
+  meningar = JSON.parse(textBlock.text).meningar;
 
-  const { brott, saknade } = validera(meningar);
+  const { brott, anvanda, forFa } = validera(meningar);
   console.log(`\n--- försök ${forsok} ---`);
   for (const m of meningar) console.log(`  ${m.es}${m.ovningsord ? `   [${m.ovningsord}]` : ""}`);
-  if (!brott.length && !saknade.length) {
+  console.log(`  valda kandidater: ${anvanda.map(ytform).join(", ") || "-"}`);
+  if (!brott.length && !forFa) {
     console.log(`\n✅ GODKÄND av validatorn · ~${(kostnad * 9.5 * 100).toFixed(1)} öre`);
     process.exit(0);
   }
-  console.log(`❌ otillåtna: ${brott.join(", ") || "-"} · saknade övningsord: ${saknade.map(ytform).join(", ") || "-"}`);
+  console.log(`❌ otillåtna: ${brott.join(", ") || "-"}${forFa ? ` · för få kandidatord (${anvanda.length}/${N_OVNING})` : ""}`);
 }
 console.log("\nUnderkänd efter 3 försök — hellre lucka än fel.");
 process.exit(1);
