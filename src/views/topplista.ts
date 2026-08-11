@@ -58,7 +58,7 @@ export async function renderTopplista(el: HTMLElement, deps: TopplistaDeps): Pro
   const boards: Board[] = [
     { emoji: "🔥", name: "Eld i baken", what: "dagar i rad", value: (u) => statBy.get(u)?.streak ?? 0 },
     { emoji: "📅", name: "Trotjänaren", what: "dagar totalt", value: (u) => statBy.get(u)?.total_days ?? 0 },
-    { emoji: "🧠", name: "Ordmästaren", what: "kan det-ord", value: (u) => statBy.get(u)?.known_words ?? 0 },
+    { emoji: "🧠", name: "Ordmästaren", what: "poäng — kan + på väg", value: (u) => statBy.get(u)?.score ?? 0 },
     { emoji: "💡", name: "Regelfabriken", what: "snodda regler", value: (u) => adopts.get(u) ?? 0 },
   ];
 

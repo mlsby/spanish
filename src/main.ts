@@ -173,12 +173,12 @@ async function boot(): Promise<void> {
 
   const social = new Social(sb, () => sync.session?.user.id ?? null);
 
-  /** Ladda upp mina topplistesiffror (streak, dagar, kan det-ord). */
+  /** Ladda upp mina topplistesiffror (streak, dagar, resapoäng). */
   function pushMyStats(): void {
     if (!sync.session) return;
     const a = activityStats(store.data.days);
     void social
-      .pushStats({ streak: a.streak, totalDays: a.totalDays, knownWords: store.stats().kan })
+      .pushStats({ streak: a.streak, totalDays: a.totalDays, score: store.stats().score })
       .catch(() => { /* topplistan är grädde — aldrig blockera */ });
   }
 

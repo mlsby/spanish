@@ -10,7 +10,7 @@ export interface StatsRow {
   user_id: string;
   streak: number;
   total_days: number;
-  known_words: number;
+  score: number; // resapoängen: kan det + på väg
 }
 
 export interface FriendRule {
@@ -63,7 +63,7 @@ export class Social {
 
   async allStats(): Promise<StatsRow[]> {
     const { data, error } = await this.sb
-      .from("public_stats").select("user_id,streak,total_days,known_words");
+      .from("public_stats").select("user_id,streak,total_days,score");
     if (error) throw new Error(error.message);
     return (data ?? []) as StatsRow[];
   }
@@ -80,12 +80,12 @@ export class Social {
     return counts;
   }
 
-  async pushStats(s: { streak: number; totalDays: number; knownWords: number }): Promise<void> {
+  async pushStats(s: { streak: number; totalDays: number; score: number }): Promise<void> {
     const uid = this.uid();
     if (!uid) return;
     await this.sb.from("public_stats").upsert({
       user_id: uid, streak: s.streak, total_days: s.totalDays,
-      known_words: s.knownWords, updated_at: new Date().toISOString(),
+      score: s.score, updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
   }
 

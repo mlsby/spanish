@@ -17,11 +17,12 @@ create policy "profiles_update_own" on public.profiles for update using (auth.ui
 -- ---------- public_stats: topplistesiffror, skrivs av ägaren själv ----------
 -- (klienten räknar ut sina egna siffror ur sin data och laddar upp — enkelt
 --  och gott nog för en kompisgrupp)
+-- score = resapoängen: kan det + på väg (ord med minst ett svar)
 create table public.public_stats (
   user_id     uuid primary key references auth.users(id) on delete cascade,
   streak      int not null default 0,
   total_days  int not null default 0,
-  known_words int not null default 0,
+  score       int not null default 0,
   updated_at  timestamptz not null default now()
 );
 alter table public.public_stats enable row level security;
