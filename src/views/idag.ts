@@ -26,6 +26,7 @@ export interface CloudUi {
 let pendingEmail = "";
 let authError = "";
 let settingsOpen = false;
+let resaOpen = false; // nivåtrappan utfälld? (minns tills appen laddas om)
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -203,15 +204,25 @@ function streakRowHtml(store: Store): string {
   return `<div class="streakrow">🔥 <b>${label}</b><span class="sep">·</span><span>${hint}</span></div>`;
 }
 
-/** Nivåresan: färgad bar mot NÄSTA tröskel — grönt = kan, gult = lär mig. */
+/** Nivåresan: färgad bar mot NÄSTA tröskel — tryck på panelen fäller ut hela trappan. */
 function resaPanelHtml(s: { kan: number; lar: number; score: number }): string {
   const r = resaFor(s.score);
   const scale = r.next ? r.next.min : Math.max(s.score, TITLAR[TITLAR.length - 1].min);
   const kanPct = Math.min(100, (s.kan / scale) * 100);
   const larPct = Math.min(100 - kanPct, (s.lar / scale) * 100);
+  const trappa = resaOpen
+    ? `<div class="trappa">${TITLAR.map((t, i) => {
+        const cls = i < r.nr - 1 ? "klar" : i === r.nr - 1 ? "nu" : "last";
+        const krav = cls === "nu" ? (r.next ? `${s.score}/${r.next.min}` : "MAX") : String(t.min);
+        return `<div class="niv ${cls}"><span class="pricken">${cls === "klar" ? "✓" : ""}</span>
+          <span class="nnamn">${t.name}</span>
+          <span class="nsub">${cls === "nu" ? "du är här" : t.sub}</span>
+          <span class="nkrav">${krav}</span></div>`;
+      }).join("")}</div>`
+    : "";
   return `
-    <div class="panel">
-      <p class="plabel">Din resa · nivå ${r.nr} av ${TITLAR.length}</p>
+    <div class="panel resapanel" id="resaPanel" role="button" tabindex="0" aria-expanded="${resaOpen}">
+      <p class="plabel">Din resa · nivå ${r.nr} av ${TITLAR.length}<span class="resapil">${resaOpen ? "▴" : "▾"}</span></p>
       <div class="nivrow">🏅 <b>${r.titel.name}</b><span class="nivsub">${r.titel.sub}</span></div>
       <div class="meter resa">
         <i class="seg kan" style="width:${kanPct.toFixed(1)}%"></i><i class="seg lar" style="width:${larPct.toFixed(1)}%"></i>
@@ -223,6 +234,7 @@ function resaPanelHtml(s: { kan: number; lar: number; score: number }): string {
           ? `<span class="tillnasta"><b>${r.kvar}</b> kvar till ${r.next.name}</span>`
           : `<span class="tillnasta">toppen nådd — ¡Maestro!</span>`}
       </div>
+      ${trappa}
     </div>`;
 }
 
@@ -313,6 +325,10 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
   };
   el.querySelector<HTMLButtonElement>("#startBtn")?.addEventListener("click", () => cb.startPass());
   el.querySelector<HTMLButtonElement>("#repBtn")?.addEventListener("click", () => cb.startRep());
+  el.querySelector<HTMLElement>("#resaPanel")?.addEventListener("click", () => {
+    resaOpen = !resaOpen;
+    rerender();
+  });
 
   const bumpFirst = (d: number) => {
     store.setNewFirst(Math.max(0, Math.min(50, store.data.settings.newFirst + d)));

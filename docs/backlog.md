@@ -4,6 +4,10 @@ Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
 ## Klart (byggt 2026-08-11, släpp "nivåresan")
 
+- **Nivåtrappan i Din resa (Lucas):** panelen är tryckbar — utfälld visar
+  den alla 10 nivåerna som lodrät trappa (klarade = grön bock, nuvarande =
+  accentprick + "du är här · 185/200", kommande dämpade med trösklar).
+  Läget minns tills appen laddas om.
 - **21-dagarsgränsen + optimistisk poäng (Lucas):** "kan det" = stabilitet
   ≥ 21 d (Anki-mature; research i docs/research-troskel.md — tredje lyckade
   repetitionen ~25 d ska räcka, 30 missade den med en hårsmån). Banden nu

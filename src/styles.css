@@ -111,6 +111,30 @@ button{font-family:inherit;cursor:pointer;color:inherit}
         border-radius:11px;padding:9px 14px;font-size:14px;margin:0 0 10px}
 .nivupp b{font-family:var(--serif);font-size:16px}
 
+/* nivåtrappan — utfälld under resan */
+.resapanel{cursor:pointer;user-select:none;-webkit-user-select:none}
+.resapanel .plabel{display:flex;justify-content:space-between;align-items:center}
+.resapil{color:var(--muted);font-size:12px}
+.trappa{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column}
+.niv{display:flex;align-items:center;gap:10px;padding:6px;border-radius:9px;position:relative}
+.niv .pricken{width:15px;height:15px;border-radius:50%;flex:none;display:flex;align-items:center;
+              justify-content:center;font-size:9px;color:var(--accent-on);position:relative;z-index:1}
+.niv.klar .pricken{background:var(--good)}
+.niv.nu .pricken{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.niv.last .pricken{background:var(--rule);border:1px solid var(--line)}
+.niv::before{content:"";position:absolute;left:13px;top:-10px;bottom:-10px;width:1.5px;background:var(--line)}
+.niv:first-child::before{top:50%}
+.niv:last-child::before{bottom:50%}
+.niv .nnamn{font-weight:600;font-size:14px}
+.niv .nsub{color:var(--muted);font-size:11px}
+.niv .nkrav{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.niv.klar .nnamn{color:var(--muted);font-weight:500}
+.niv.klar .nkrav{color:var(--good)}
+.niv.nu{background:var(--accent-soft)}
+.niv.nu .nnamn{font-family:var(--serif);font-size:15.5px}
+.niv.nu .nkrav{color:var(--ink);font-weight:600}
+.niv.last .nnamn{color:var(--muted);font-weight:500}
+
 .resaleg{display:flex;gap:14px;margin-top:9px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
 .resaleg span{display:inline-flex;align-items:center;gap:5px}
 .resaleg b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
