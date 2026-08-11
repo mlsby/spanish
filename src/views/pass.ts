@@ -361,6 +361,14 @@ export class PassView {
     }
     return p.card.dir === "es2sv" ? p.word.sv : this.displayEs(p);
   }
+  /** Frågesidan i fel-lägena — man ska se hela paret, inte bara svaret. */
+  private promptLine(p: Pending): string {
+    const q = p.form
+      ? p.card.dir === "es2sv" ? p.form.es : `${PERSON_SV[p.form.person]} ${p.form.svPres}`
+      : p.card.dir === "es2sv" ? this.displayEs(p) : p.word.sv;
+    return `<p class="qline">${esc(q)} =</p>`;
+  }
+
   /** Stödraden på böjningskort: alltid moderverbet i facit (kravet från Lucas). */
   private parentLine(p: Pending): string {
     if (!p.form) return "";
@@ -499,6 +507,7 @@ export class PassView {
       case "override":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
+          ${this.promptLine(p)}
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}
           <p class="also">»<b>${esc(p.raw)}</b>« sparas som synonym — nästa gång rättas den direkt.</p>
@@ -507,6 +516,7 @@ export class PassView {
         return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"}</p>
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
             <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
+          ${this.promptLine(p)}
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, true)}${this.alsoLine(p)}
           ${this.showMnem
@@ -518,6 +528,7 @@ export class PassView {
         return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"} — andra missen</p>
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
             <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
+          ${this.promptLine(p)}
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, true)}${this.alsoLine(p)}
           <p class="mustnote">Skriv din egen minnesregel för att gå vidare</p>
