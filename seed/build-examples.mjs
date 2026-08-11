@@ -11,9 +11,12 @@
 //    (allt utom namn måste finnas i es_50k — exemplet får inte vara svårare
 //    än ordet självt)
 //  - poäng: max-rank bland övriga ord + längdstraff + namnstraff − svensk-bonus;
-//    lägst vinner. Direkta spanska↔svenska par föredras (aldrig kedjeöversätt).
+//    lägst vinner. Svensk översättning via direktlänk först, annars via det
+//    engelska originalet som LÄNKBRYGGA (båda meningarna människoskrivna —
+//    ingen maskinöversättning). Betydelselås: en kandidat med svensk
+//    översättning måste bekräfta målets glosa, annars förkastas den.
 //  - ord med parentes-ledtråd (betydelsedubbletter) får bara exempel när en
-//    direktlänkad svensk mening bekräftar rätt betydelse — annars ingen alls.
+//    svensklänkad mening bekräftar rätt betydelse — annars ingen alls.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -56,15 +59,50 @@ for (const line of readFileSync(join(DIR, "swe_sentences.tsv"), "utf8").split("\
   const [id, , text] = line.split("\t");
   if (id && text) svById.set(id, text);
 }
-const svLink = new Map(); // spa-id → kortaste svenska meningen
+const svDirect = new Map(); // spa-id → kortaste direktlänkade svenska meningen
 for (const line of readFileSync(join(DIR, "spa-swe_links.tsv"), "utf8").split("\n")) {
   const [es, sv] = line.split("\t");
   const t = svById.get(sv?.trim());
   if (!es || !t) continue;
-  const prev = svLink.get(es);
-  if (!prev || t.length < prev.length) svLink.set(es, t);
+  const prev = svDirect.get(es);
+  if (!prev || t.length < prev.length) svDirect.set(es, t);
 }
-console.log(`spanska↔svenska direktpar: ${svLink.size}`);
+console.log(`spanska↔svenska direktpar: ${svDirect.size}`);
+
+// Engelska som LÄNKBRYGGA (ingen maskinöversättning): den spanska och den
+// svenska meningen är båda människoskrivna översättningar av samma engelska
+// original. Direktlänk vinner alltid; bryggan fyller luckorna.
+const sweByEng = new Map(); // eng-id → kortaste svenska meningen
+for (const line of readFileSync(join(DIR, "swe-eng_links.tsv"), "utf8").split("\n")) {
+  const [sv, en] = line.split("\t");
+  const t = svById.get(sv?.trim());
+  if (!en || !t) continue;
+  const k = en.trim();
+  const prev = sweByEng.get(k);
+  if (!prev || t.length < prev.length) sweByEng.set(k, t);
+}
+const svPivot = new Map(); // spa-id → svensk mening via engelskt original
+for (const line of readFileSync(join(DIR, "spa-eng_links.tsv"), "utf8").split("\n")) {
+  const [es, en] = line.split("\t");
+  if (!es || !en) continue;
+  const t = sweByEng.get(en.trim());
+  if (!t) continue;
+  const prev = svPivot.get(es);
+  if (!prev || t.length < prev.length) svPivot.set(es, t);
+}
+console.log(`nåbara via engelsk brygga: ${svPivot.size}`);
+
+/** Svensk mening för en spansk: direktlänk före brygga, med längdrimlighetskoll. */
+const svFor = (sid, esText) => {
+  const direct = svDirect.get(sid);
+  if (direct) return { text: direct, via: "direkt" };
+  const p = svPivot.get(sid);
+  // bryggade par med orimligt olika längd är ofta olika meningar — hellre lucka
+  if (p && p.length >= esText.length * 0.35 && p.length <= esText.length * 2.6) {
+    return { text: p, via: "brygga" };
+  }
+  return null;
+};
 
 // ---------- mål-tokens ----------
 const singleTargets = new Set(); // token → målsökning via index
@@ -85,7 +123,12 @@ const cands = new Map(); // token/multi-id → [{sid,text,toks,score-delar}]
 const push = (key, entry) => {
   let a = cands.get(key);
   if (!a) { a = []; cands.set(key, a); }
-  if (a.length < 400) a.push(entry); // tak per mål — räcker gott för att hitta en bra
+  if (a.length < 400) { a.push(entry); return; } // tak per mål
+  // fullt: en översatt mening får peta ut en oöversatt — svenskan är guld i fel-läget
+  if (entry.sv) {
+    const i = a.findIndex((e) => !e.sv);
+    if (i >= 0) a[i] = entry;
+  }
 };
 
 // homograf-vakter: "sus diferencias" (substantivläsning av verbform) och
@@ -135,7 +178,7 @@ for (const line of lines) {
   if (unknown || names > 1) continue;
   scanned++;
 
-  const entry = { sid, text, toks, names, sv: svLink.get(sid) };
+  const entry = { sid, text, toks, names, sv: svFor(sid, text) };
   const seen = new Set();
   for (let i = 0; i < toks.length; i++) {
     const t = toks[i];
@@ -169,7 +212,8 @@ const score = (e, needle, pos) => {
   }
   // substantiv läses tryggast med artikel framför — belöna "la casa" över "paso casa"
   const nounBonus = pos === "n" && DET.has(e.prev) ? -800 : 0;
-  return maxOther + 150 * Math.abs(e.toks.length - 5) + e.names * 700 - (e.sv ? 2500 : 0) + nounBonus;
+  const svBonus = e.sv ? (e.sv.via === "direkt" ? 4000 : 2500) : 0;
+  return maxOther + 150 * Math.abs(e.toks.length - 5) + e.names * 700 - svBonus + nounBonus;
 };
 
 /** ordgränsad förekomst av svensk glosa-stam i den svenska meningen */
@@ -185,7 +229,7 @@ for (const w of words) if (!posByEs.has(w.es.toLowerCase())) posByEs.set(w.es.to
 const VERBSET = new Set([
   ...forms.map((f) => f.es.toLowerCase()),
   ...words.filter((w) => w.pos === "v").map((w) => w.es.toLowerCase()),
-  "hay", "ha", "he", "has", "hemos", "han", "había", "habían", "hubo", "habrá",
+  "hay", // OBS: övriga haber-former utelämnas — "haber pedido" är particip, inte substantiv
 ]);
 const NOUNCONJ = new Set(["y", "o", "ni", "que", "como", "más", "menos", "otra", "otro"]);
 const CLITIC2 = new Set(["me", "te", "se", "nos", "os", "no", "yo", "tú", "él", "ella", "quién"]);
@@ -193,7 +237,8 @@ const QDET = new Set(["qué", "cuántas", "cuántos", "cuánta", "cuánto"]);
 const formEsSet = new Set(forms.map((f) => f.es.toLowerCase()));
 
 const ex = {};
-let nWords = 0, nForms = 0, nSv = 0, nHintOk = 0, nHintSkipped = 0;
+let nWords = 0, nForms = 0, nSv = 0, nBrygga = 0, nHintOk = 0, nHintSkipped = 0;
+const via = new Map();
 const pick = (id, hintStems, opts = {}) => {
   const tgt = targetOf.get(id);
   if (!tgt) return;
@@ -205,8 +250,14 @@ const pick = (id, hintStems, opts = {}) => {
   if (opts.verbish) {
     usable = usable.filter((e) => !DET.has(e.prev) && !ADJCTX.has(e.prev));
     usable = usable.filter((e) => !(ADVBRIDGE.has(e.prev) && ADJCTX.has(e.prev2)));
+    // "del mismo parecer": artikel + adjektiv + mål är en substantivfras —
+    // men "el que guarda" (relativsats) är legitim verbkontext
+    usable = usable.filter((e) => !(DET.has(e.prev2) && e.prev !== "que"));
     // "Maduro es un hombre": två finita verb i rad är omöjligt — namnet/adjektivet avslöjas
     usable = usable.filter((e) => !formEsSet.has(e.next) && !ADJCTX.has(e.next));
+    // "Quiero que se sienten aquí": "que se/me/te + form" är ofta konjunktiv av ETT
+    // ANNAT verb (sentarse, inte sentir) — presenskorten håller sig borta från ramen
+    usable = usable.filter((e) => !(e.prev2 === "que" && ["se", "me", "te", "nos"].includes(e.prev)));
   }
   if (opts.formish) usable = usable.filter((e) => !PREPCTX.has(e.prev));
   if (opts.homograph) usable = usable.filter((e) => SAFEVERB.has(e.prev));
@@ -230,36 +281,46 @@ const pick = (id, hintStems, opts = {}) => {
   if (opts.homograph) {
     usable = usable.filter((e) => !(QDET.has(e.prev) && e.next !== ""));
   }
+  // betydelselås: en KANDIDAT MED svensk översättning måste bekräfta målets
+  // glosa — annars är den ofta en homograf i förklädnad ("No se sienten en el
+  // sofá" är sentarse, inte sentir). Oöversatta kandidater berörs inte.
+  if (opts.senseStems) {
+    usable = usable.filter((e) => !e.sv || svMatches(e.sv.text, opts.senseStems));
+  }
   if (hintStems) {
     // betydelsedubblett: kräver svensk mening som bekräftar rätt glosa
-    usable = usable.filter((e) => e.sv && svMatches(e.sv, hintStems));
+    usable = usable.filter((e) => e.sv && svMatches(e.sv.text, hintStems));
     if (!usable.length) { nHintSkipped++; return; }
     nHintOk++;
   }
   if (!usable.length) return;
   usable = [...usable].sort((a, b) => score(a, needle, opts.pos) - score(b, needle, opts.pos));
   const best = usable[0];
-  ex[id] = best.sv ? [best.text, best.sv] : [best.text];
-  if (best.sv) nSv++;
+  ex[id] = best.sv ? [best.text, best.sv.text] : [best.text];
+  if (best.sv) { nSv++; if (best.sv.via === "brygga") nBrygga++; via.set(id, best.sv.via); }
 };
 
+const glosaStems = (w) => new Set([
+  ...w.sv.toLowerCase().split(/[,\s]+/).filter((x) => x.length >= 2),
+  ...(w.syn ?? []).flatMap((x) => x.toLowerCase().split(/\s+/)).filter((x) => x.length >= 2),
+  ...(svPresByParent.get(w.id) ?? []),
+]);
+
 for (const w of words) {
-  const stems = w.hint
-    ? new Set([
-        ...w.sv.toLowerCase().split(/[,\s]+/).filter((s) => s.length >= 2),
-        ...(w.syn ?? []).flatMap((s) => s.toLowerCase().split(/\s+/)),
-        ...(svPresByParent.get(w.id) ?? []),
-      ])
-    : null;
+  const stems = glosaStems(w);
   const before = ex[w.id];
-  pick(w.id, stems, { pos: w.pos, verbish: w.pos === "v" });
+  pick(w.id, w.hint ? stems : null, { pos: w.pos, verbish: w.pos === "v", senseStems: stems });
   if (!before && ex[w.id]) nWords++;
 }
 const baseEs = new Set(words.map((w) => w.es.toLowerCase()));
+const wordById = new Map(words.map((w) => [w.id, w]));
 for (const f of forms) {
   const b = ex[f.id];
   const strict = baseEs.has(f.es.toLowerCase()) || f.person === "1s" || f.person === "2s";
-  pick(f.id, null, { verbish: true, formish: true, homograph: strict });
+  const parent = wordById.get(f.parent);
+  const stems = parent ? glosaStems(parent) : null;
+  if (stems) for (const x of f.svPres.toLowerCase().split(/\s+/)) stems.add(x);
+  pick(f.id, null, { verbish: true, formish: true, homograph: strict, senseStems: stems });
   if (!b && ex[f.id]) nForms++;
 }
 
@@ -273,18 +334,18 @@ const out = {
 writeFileSync(OUT, JSON.stringify(out));
 const hintWords = words.filter((w) => w.hint).length;
 console.log(`exempel: ${nWords}/${words.length} ord (varav ${nHintOk}/${hintWords} ledtrådsord; ${nHintSkipped} skippade för säkerhets skull)`);
-console.log(`         ${nForms}/${forms.length} former · ${nSv} med svensk översättning`);
+console.log(`         ${nForms}/${forms.length} former · ${nSv} med svensk översättning (${nSv - nBrygga} direkta + ${nBrygga} via bryggan)`);
 console.log(`storlek: ${(JSON.stringify(out).length / 1024).toFixed(0)} kB → ${OUT}`);
 
 // ---------- rapport för ögongranskning ----------
 const sample = (ids, n) => ids.filter((id) => ex[id]).filter((_, i, a) => i % Math.max(1, Math.floor(a.length / n)) === 0).slice(0, n);
-let md = `# Exempelmeningar — stickprov (${out.generated})\n\n| mål | mening | svensk |\n|---|---|---|\n`;
+let md = `# Exempelmeningar — stickprov (${out.generated})\n\n| mål | mening | svensk | via |\n|---|---|---|---|\n`;
 const row = (id, label) => {
   const [es, sv] = ex[id];
-  md += `| ${label} | ${es} | ${sv ?? "—"} |\n`;
+  md += `| ${label} | ${es} | ${sv ?? "—"} | ${via.get(id) ?? "—"} |\n`;
 };
 for (const id of sample(words.map((w) => w.id), 40)) row(id, id.split("|")[0]);
-md += "\n## Former\n\n| mål | mening | svensk |\n|---|---|---|\n";
+md += "\n## Former\n\n| mål | mening | svensk | via |\n|---|---|---|---|\n";
 for (const id of sample(forms.map((f) => f.id), 25)) row(id, id.split("#")[0].split("|")[0] + "→" + forms.find((f) => f.id === id).es);
 md += "\n## Ledtrådsord (betydelsekollade via svensk länk)\n\n| mål | ledtråd | mening | svensk |\n|---|---|---|---|\n";
 for (const w of words.filter((w) => w.hint && ex[w.id]).slice(0, 25)) {

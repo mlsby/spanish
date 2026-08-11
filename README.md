@@ -114,17 +114,23 @@ node seed/build-forms.mjs --jehle jehle_verb_database.csv \
 
 `public/data/examples.json` byggs av `seed/build-examples.mjs` ur Tatoeba
 (CC BY 2.0 FR): en kort spansk mening per ord/böjningsform, vald så att
-övriga ord är vanligare än målordet och med homograf-vakter (verbformer får
-inte exemplifieras av substantiv-/adjektivläsningar, substantiv kräver
-otvetydig substantivposition). Direkta spanska↔svenska par ger svensk
-översättning — aldrig kedjeöversättning via engelska. Betydelsedubbletter
-(ord med parentes-ledtråd) får bara exempel när en svensk länk bekräftar
-rätt betydelse. Exemplen visas enbart i facit-lägena, aldrig i frågan;
-översättningen bara vid fel. Granskning: `seed/report-examples.md`.
+övriga ord är vanligare än målordet och med homograf-vakter i flera lager
+(verbformer får inte exemplifieras av substantiv-/adjektivläsningar,
+substantiv kräver otvetydig substantivposition, "que se + form"-ramen
+undviks eftersom den ofta är konjunktiv av ett annat verb). Svensk
+översättning tas i första hand från direkta spanska↔svenska par, i andra
+hand via det engelska originalet som länkbrygga — båda meningarna är då
+människoskrivna översättningar av samma engelska mening (ingen
+maskinöversättning). Betydelselås: en kandidat med svensk översättning
+måste bekräfta målets glosa, annars förkastas den — det fångar även
+homografer som "No se sienten en el sofá" (sentarse, inte sentir).
+Exemplen visas enbart i facit-lägena, aldrig i frågan; översättningen
+bara vid fel. Granskning: `seed/report-examples.md`.
 
 ```bash
 # källor: https://downloads.tatoeba.org/exports/per_language/
-#   spa/spa_sentences.tsv.bz2, swe/swe_sentences.tsv.bz2, spa/spa-swe_links.tsv.bz2
+#   spa/spa_sentences.tsv.bz2, swe/swe_sentences.tsv.bz2,
+#   spa/spa-swe_links.tsv.bz2, spa/spa-eng_links.tsv.bz2, swe/swe-eng_links.tsv.bz2
 # + es_50k.txt (hermitdave/FrequencyWords)
 node seed/build-examples.mjs --tatoeba <katalog-med-filerna>
 ```

@@ -2,6 +2,26 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "exempelmeningar v2 — svensk brygga")
+
+- **Fler svenska översättningar (Lucas: "fick aldrig se svenskan"):** utöver
+  de 3 623 direkta spanska↔svenska paren används nu det engelska originalet
+  som LÄNKBRYGGA (spa→eng→swe via Tatoebas länkfiler) — båda meningarna är
+  människoskrivna översättningar av samma engelska mening, ingen
+  maskinöversättning. 1 790 exempel har svensk översättning (818 direkta +
+  972 via bryggan); i frekvensbandet 1–500 har 79 % av orden svensk mening,
+  501–1000: 53 %. Längdrimlighetskoll på bryggade par.
+- **Betydelselås:** en kandidatmening MED svensk översättning måste bekräfta
+  målets glosa (ordets sv/synonymer/presensformer), annars förkastas den.
+  Fångade "No se sienten en el sofá" (sentarse, inte sentir) och "haber
+  pedido" (particip, inte substantivet). Nya vakter dessutom: "que se/me/te
+  + form" (konjunktivram av annat verb), determinerare+adjektiv+mål
+  ("del mismo parecer" var substantivet åsikt, inte verbet verka — Lucas
+  skärmdump), haber-former borttagna ur substantivens trygga föregångare.
+- *Kvar till verbfas 2:* generera konjunktivytor ur Jehle och kolla
+  present-mot-konjunktiv-krockar systematiskt (sienten-klassen) redan i
+  build-forms.
+
 ## Klart (byggt 2026-08-11, släpp "fortsätt övningen")
 
 - **Avbruten övning kan fortsättas:** passet sparas lokalt på enheten efter
