@@ -120,11 +120,10 @@ function kontoHtml(cloud: CloudUi): string {
   if (pendingEmail) {
     return `
       <p class="omtext" style="margin:0 0 10px">Mejl skickat till <b>${esc(pendingEmail)}</b>.
-      Håll inne inloggningslänken i mejlet → <b>Kopiera länk</b> → klistra in här
-      (eller skriv engångskoden om mejlet har en):</p>
+      Skriv koden ur mejlet:</p>
       <div class="authrow">
-        <input id="authCode" autocomplete="one-time-code" autocapitalize="none"
-               placeholder="inklistrad länk eller kod" aria-label="Inloggningslänk eller engångskod">
+        <input id="authCode" autocomplete="one-time-code" inputmode="numeric"
+               autocapitalize="none" placeholder="6-siffrig kod" aria-label="Engångskod">
         <button class="btn" id="authVerify">Logga in</button>
       </div>${err}
       <button type="button" class="linkbtn" id="authRestart">Byt adress / skicka nytt mejl</button>`;
