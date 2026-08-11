@@ -123,23 +123,18 @@ export function ordITexten(es: string, text: string): boolean {
   return new RegExp(`(^|[^a-záéíóúñü])${safe}([^a-záéíóúñü]|$)`).test(` ${text.toLowerCase()} `);
 }
 
-/** En fråga per mening som innehåller ett kandidatord — i textens ordning. */
+/**
+ * En fråga per ANVÄNT kandidatord, i textens ordning. Kandidater får numera
+ * klumpa ihop sig i samma mening — därför letar vi per kandidat, inte per
+ * mening, så inget ord tappas när två delar mening.
+ */
 export function byggQuiz(meningar: LasMening[], kandidater: LasKandidat[]): LasFraga[] {
-  const ut: LasFraga[] = [];
-  const tagna = new Set<string>();
-  for (const m of meningar) {
-    let k = m.ovningsord
-      ? kandidater.find((kk) => kk.es.toLowerCase() === m.ovningsord.toLowerCase())
-      : undefined;
-    if (!k || tagna.has(k.id) || !ordITexten(k.es, m.es)) {
-      k = kandidater.find((kk) => !tagna.has(kk.id) && ordITexten(kk.es, m.es));
-    }
-    if (k && !tagna.has(k.id)) {
-      tagna.add(k.id);
-      ut.push({ kandidat: k, mening: m.es });
-    }
+  const traffar: { fraga: LasFraga; ordning: number }[] = [];
+  for (const k of kandidater) {
+    const i = meningar.findIndex((m) => ordITexten(k.es, m.es));
+    if (i >= 0) traffar.push({ fraga: { kandidat: k, mening: meningar[i].es }, ordning: i });
   }
-  return ut;
+  return traffar.sort((a, b) => a.ordning - b.ordning).map((t) => t.fraga);
 }
 
 /** Hämta text från Edge Functionen (kräver inloggning — JWT följer med klienten). */

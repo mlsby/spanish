@@ -116,6 +116,14 @@ describe("byggQuiz + ordITexten", () => {
     ], kandidater);
     expect(quiz).toHaveLength(1);
   });
+
+  it("två kandidater i samma mening ger två frågor", () => {
+    const quiz = byggQuiz([
+      { es: "Cada día es feliz.", ovningsord: "cada" },
+    ], kandidater);
+    expect(quiz.map((q) => q.kandidat.es).sort()).toEqual(["cada", "feliz"]);
+    expect(quiz[0].mening).toBe("Cada día es feliz.");
+  });
 });
 
 describe("lasCommit", () => {

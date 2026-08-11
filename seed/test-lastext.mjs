@@ -65,7 +65,7 @@ const kanIds = introducerade.filter((id) => {
 const ovningsKandidater = introducerade
   .filter((id) => !kanIds.includes(id))
   .sort((a, b) => perId.get(a).minS - perId.get(b).minS);
-const kandidater = ovningsKandidater.slice(0, N_OVNING * 2);
+const kandidater = ovningsKandidater.slice(0, N_OVNING * 3);
 
 // ---------- ytformer ----------
 // alltid tillåten glue: artiklar + a/al/del/no — quizzas aldrig, bara bindväv
@@ -132,17 +132,15 @@ function validera(meningar) {
 
 // ---------- prompten ----------
 function systemPrompt() {
-  return `Du skriver pyttesmå spanska läsövningar för svenska nybörjare, i stil med graded readers.
+  return `Du skriver en pytteliten sammanhängande scen på enkel spanska (presens) för svenska nybörjare — ungefär ${N_MENINGAR} meningar som hör ihop.
 
-HÅRDA REGLER:
-- Använd ENDAST ord från listan TILLÅTNA ORD nedan. Inga andra ord, inga namn, inga siffertecken (skriv aldrig 1, 2, 3).
-- Verb får bara användas i exakt de former som står i listan (infinitiv eller angiven böjning). Skriv hellre om med "ir a + infinitiv", "querer/poder + infinitiv" än att böja fritt.
-- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum (todo→todos, otro→otra).
+REGLER:
+- Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
+- Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
+- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
 - Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no.
-- VANLIGASTE FELET är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med). Kontrollera varje verbform mot verblistan innan du svarar — skriv om med infinitivkonstruktion om formen saknas.
-- Bland KANDIDATORDEN nedan: välj de ${N_OVNING} som ger den naturligaste texten och använd dem i exakt den angivna formen. Högst ett kandidatord per mening.
-- Skriv ungefär ${N_MENINGAR} meningar som hänger ihop till en liten vardagsscen. Sikta på 8–10 ord per mening. Enkelt, naturligt, presens.
-- Använd ¿…? om du ställer en fråga.
+- Använd exakt ${N_OVNING} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
+- Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
 
 Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (övningsordet som används i meningen, eller "" om inget).`;
 }

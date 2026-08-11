@@ -59,7 +59,7 @@ function tolka(body: Record<string, unknown>): Beställning {
     .filter((v) => v.inf);
   const ovriga = (Array.isArray(body.ovriga) ? body.ovriga : []).slice(0, 2000)
     .map((o) => ren(o)).filter(Boolean);
-  const kandidater = (Array.isArray(body.kandidater) ? body.kandidater : []).slice(0, 16)
+  const kandidater = (Array.isArray(body.kandidater) ? body.kandidater : []).slice(0, 24)
     .map((k: Record<string, unknown>) => ({ es: ren(k?.es), sv: ren(k?.sv) }))
     .filter((k) => k.es);
   const vitlista = (Array.isArray(body.vitlista) ? body.vitlista : []).slice(0, 6000)
@@ -70,19 +70,17 @@ function tolka(body: Record<string, unknown>): Beställning {
 }
 
 function systemPrompt(b: Beställning): string {
-  return `Du skriver pyttesmå spanska läsövningar för svenska nybörjare, i stil med graded readers.
+  return `Du skriver en pytteliten sammanhängande scen på enkel spanska (presens) för svenska nybörjare — ungefär ${b.meningar} meningar som hör ihop.
 
-HÅRDA REGLER:
-- Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken (skriv aldrig 1, 2, 3).
-- Verb får bara användas i exakt de former som står i verblistan (infinitiv eller angiven böjning). Skriv hellre om med "ir a + infinitiv", "querer/poder + infinitiv" än att böja fritt.
-- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum (todo→todos, otro→otra).
+REGLER:
+- Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
+- Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
+- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
 - Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no.
-- Bland KANDIDATORDEN nedan: välj de ${b.anvand} som ger den naturligaste texten och använd dem i exakt den angivna formen. Högst ett kandidatord per mening.
-- Skriv ungefär ${b.meningar} meningar som hänger ihop till en liten vardagsscen. Sikta på 8–10 ord per mening. Enkelt, naturligt, presens.
-- Använd ¿…? om du ställer en fråga.
-- VANLIGASTE FELET är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med). Kontrollera varje verbform mot verblistan innan du svarar — skriv om med infinitivkonstruktion om formen saknas.
+- Använd exakt ${b.anvand} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
+- Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
 
-Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet som används i meningen, eller "" om inget).`;
+Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet i meningen, eller "" om inget).`;
 }
 
 function userPrompt(b: Beställning): string {

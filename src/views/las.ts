@@ -59,7 +59,8 @@ export class LasView {
     this.pend = null;
     this.render();
     const p = lasNiva(this.store.stats().score);
-    const underlag = byggUnderlag(this.store, p.anvand * 2);
+    // 3× målet: gott om kandidater att välja bland ger naturligare scener (Lucas)
+    const underlag = byggUnderlag(this.store, p.anvand * 3);
     if (underlag.kandidater.length === 0) {
       this.felText = "Inga övningsord just nu — öva lite först, sen finns det något att läsa om.";
       this.state = "fel";
