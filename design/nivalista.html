@@ -1,0 +1,130 @@
+<title>Glosa · Din resa — nivålistan</title>
+<style>
+  :root{ --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025; }
+  }
+  :root[data-theme="dark"]{ --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:clamp(30px,4.6vw,42px);margin:0;line-height:1.08}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.55;max-width:70ch;margin:12px 0 0}
+  .sub b{color:var(--ink)}
+  .minirow{display:flex;gap:18px;overflow-x:auto;padding:26px 2px 14px;scroll-snap-type:x proximity}
+  .minicol{flex:0 0 262px;display:flex;flex-direction:column}
+  .mini{width:262px;min-height:440px;scroll-snap-align:start;
+        background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
+        border-radius:22px;padding:14px 12px 12px;display:flex;flex-direction:column;gap:8px;
+        box-shadow:0 10px 26px rgba(30,24,16,.12)}
+  .mini,.mini *{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .mlabel{text-align:center;font-family:ui-monospace,Menlo,monospace !important;
+          font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+  .mini{
+    --m-app:#F7F3EB; --m-card:#FFFDF8; --m-ink:#2B241E; --m-muted:#79695A; --m-line:#E6DCCB; --m-rule:#F0EADD;
+    --m-accent:#59452F; --m-soft:#EFE6D6;
+    --m-good:#54683A; --m-goodbg:#EEF1E1; --m-pavag:#A9C286;
+  }
+  .m-serif{font-family:ui-serif,"Iowan Old Style",Georgia,serif !important}
+  .m-panel{background:var(--m-card);border:1px solid var(--m-line);border-radius:12px;padding:10px 11px}
+  .m-pl{font-size:7px;text-transform:uppercase;letter-spacing:.08em;color:var(--m-muted);margin:0 0 6px;
+        display:flex;justify-content:space-between;align-items:center}
+  .m-pl .pil{font-size:8px}
+  .m-nivrow{display:flex;align-items:baseline;gap:5px;margin:0 0 7px;font-size:11px}
+  .m-nivrow b{font-size:14px}
+  .m-nivrow span{color:var(--m-muted);font-size:8px}
+  .m-bar{height:5px;border-radius:3px;background:var(--m-rule);overflow:hidden;display:flex}
+  .m-bar i{height:100%}
+  .m-bar .k{background:var(--m-good);width:66%}
+  .m-bar .p{background:var(--m-pavag);width:26%}
+  .m-leg{display:flex;gap:8px;font-size:7px;color:var(--m-muted);margin-top:6px}
+  .m-leg b{color:var(--m-ink)}
+  .m-leg .sista{margin-left:auto}
+
+  /* nivålistan */
+  .m-trappa{margin-top:4px;border-top:1px solid var(--m-line);padding-top:8px;
+            display:flex;flex-direction:column}
+  .m-niv{display:flex;align-items:center;gap:8px;padding:4.5px 4px;border-radius:8px;position:relative}
+  .m-niv .pricken{width:11px;height:11px;border-radius:50%;flex:none;display:flex;align-items:center;
+                  justify-content:center;font-size:7px;color:#FFFDF8;position:relative;z-index:1}
+  .m-niv.klar .pricken{background:var(--m-good)}
+  .m-niv.nu .pricken{background:var(--m-accent);box-shadow:0 0 0 2.5px var(--m-soft)}
+  .m-niv.last .pricken{background:var(--m-rule);border:1px solid var(--m-line)}
+  /* lodrät linje genom prickarna */
+  .m-niv::before{content:"";position:absolute;left:9.5px;top:-8px;bottom:-8px;width:1.5px;background:var(--m-line)}
+  .m-niv:first-child::before{top:50%}
+  .m-niv:last-child::before{bottom:50%}
+  .m-niv .namn{font-weight:600;font-size:9.5px}
+  .m-niv .undertext{color:var(--m-muted);font-size:7px}
+  .m-niv .krav{margin-left:auto;font-family:ui-monospace,Menlo,monospace !important;
+               font-size:7.5px;color:var(--m-muted)}
+  .m-niv.klar .namn{color:var(--m-muted);font-weight:500}
+  .m-niv.klar .krav{color:var(--m-good)}
+  .m-niv.nu{background:var(--m-soft)}
+  .m-niv.nu .namn{font-size:10.5px}
+  .m-niv.nu .krav{color:var(--m-ink);font-weight:600}
+  .m-niv.last .namn{color:var(--m-muted);font-weight:500}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:14.5px;line-height:1.65;max-width:74ch}
+  footer b{color:var(--ink)}
+</style>
+
+<div class="page" lang="sv">
+  <p class="eyebrow">Sand · din resa · nivålistan · inget byggt än</p>
+  <h1>Tryck på resan — se hela trappan</h1>
+  <p class="sub">Hela "Din resa"-panelen blir tryckbar: stängd ser den ut som idag (med en liten
+  pil som skvallrar), öppnad fäller den ut <b>alla tio nivåerna</b> som en lodrät trappa —
+  klarade gröna med bock, nuvarande markerad med "du är här", kommande nedtonade med sina
+  trösklar. Trycker man igen fälls den ihop. Läget minns tills du stänger appen.</p>
+
+  <div class="minirow">
+    <div class="minicol">
+      <div class="mini">
+        <div class="m-panel">
+          <p class="m-pl">DIN RESA · NIVÅ 4 AV 10 <span class="pil">▾</span></p>
+          <div class="m-nivrow">🏅 <b class="m-serif">Turista</b><span>klarar kaféet</span></div>
+          <div class="m-bar"><i class="k"></i><i class="p"></i></div>
+          <div class="m-leg"><span><b>133</b> kan det</span><span><b>52</b> på väg</span>
+            <span class="sista"><b>15</b> kvar till Viajero</span></div>
+        </div>
+      </div>
+      <div class="mlabel">stängd — som idag + pil</div>
+    </div>
+
+    <div class="minicol">
+      <div class="mini">
+        <div class="m-panel">
+          <p class="m-pl">DIN RESA · NIVÅ 4 AV 10 <span class="pil">▴</span></p>
+          <div class="m-nivrow">🏅 <b class="m-serif">Turista</b><span>klarar kaféet</span></div>
+          <div class="m-bar"><i class="k"></i><i class="p"></i></div>
+          <div class="m-leg"><span><b>133</b> kan det</span><span><b>52</b> på väg</span>
+            <span class="sista"><b>15</b> kvar till Viajero</span></div>
+          <div class="m-trappa">
+            <div class="m-niv klar"><span class="pricken">✓</span><span class="namn">Hola</span><span class="undertext">första orden</span><span class="krav">0</span></div>
+            <div class="m-niv klar"><span class="pricken">✓</span><span class="namn">Curioso</span><span class="undertext">nyfikenheten väckt</span><span class="krav">10</span></div>
+            <div class="m-niv klar"><span class="pricken">✓</span><span class="namn">Estudiante</span><span class="undertext">pluggar på riktigt</span><span class="krav">50</span></div>
+            <div class="m-niv nu"><span class="pricken"></span><span class="namn m-serif">Turista</span><span class="undertext">du är här</span><span class="krav">185/200</span></div>
+            <div class="m-niv last"><span class="pricken"></span><span class="namn">Viajero</span><span class="undertext">klarar resan</span><span class="krav">200</span></div>
+            <div class="m-niv last"><span class="pricken"></span><span class="namn">Amigo</span><span class="undertext">håller igång samtalet</span><span class="krav">500</span></div>
+            <div class="m-niv last"><span class="pricken"></span><span class="namn">Vecino</span><span class="undertext">vardagen sitter</span><span class="krav">1000</span></div>
+            <div class="m-niv last"><span class="pricken"></span><span class="namn">Madrileño</span><span class="undertext">låter som en local</span><span class="krav">2000</span></div>
+            <div class="m-niv last"><span class="pricken"></span><span class="namn">Casi nativo</span><span class="undertext">nästan infödd</span><span class="krav">3000</span></div>
+            <div class="m-niv last"><span class="pricken"></span><span class="namn">Maestro</span><span class="undertext">basen erövrad</span><span class="krav">5000</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mlabel">öppnad — hela trappan</div>
+    </div>
+  </div>
+
+  <footer>
+    Detaljer: klarade nivåer får <b>grön bock</b>, nuvarande får <b>accentprick + "du är här"
+    + 185/200</b>, kommande visar bara namn + tröskel i dämpat. Lodrät linje binder ihop
+    trappan. Panelen togglas med tryck var som helst på den. Säg kör så bygger jag.
+  </footer>
+</div>
