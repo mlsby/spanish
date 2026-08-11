@@ -152,14 +152,18 @@ export class Session {
     if (!p) return;
     this.pending = null;
     this.counts[p.grade]++;
-    const updated = applyReview(p.card, p.grade, now, { easy: p.easy });
+    // stavfel på SVENSKA (modersmålet) straffas inte — visas som stavfel i UI:t
+    // men rättas som rätt; spanska stavfel är kunskap och förblir Hard
+    const fsrsGrade: Grade =
+      p.grade === "hard" && this.answerLang(p.card.dir) === "sv" ? "good" : p.grade;
+    const updated = applyReview(p.card, fsrsGrade, now, { easy: p.easy });
     this.store.putCard(updated);
     this.store.logReview({
       ts: now.toISOString(),
       wordId: p.card.wordId,
       dir: p.card.dir,
       raw: p.raw,
-      grade: p.grade,
+      grade: fsrsGrade,
       step: p.step,
     });
     this.queue.shift();

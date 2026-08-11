@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Session } from "../src/lib/session";
-import { isKnown, newCardRec } from "../src/lib/scheduler";
+import { applyReview, isKnown, newCardRec } from "../src/lib/scheduler";
 import { Store } from "../src/lib/store";
 import { emptyData, type StorageAdapter } from "../src/lib/storage";
 import type { AppData, Word } from "../src/lib/types";
@@ -118,13 +118,28 @@ describe("session: betygsmappning och tvåfelsregeln", () => {
     expect(store.data.reviews[0]).toMatchObject({ grade: "good", step: "exact", raw: "börja" });
   });
 
-  it("stavfel → hard, synonym → good", () => {
+  it("stavfel → hard i UI:t, synonym → good", () => {
     const card = newCardRec("empezar|v", "es2sv", new Date());
     const s = new Session(store, [card]);
     expect(s.answer("börjaa").grade).toBe("hard");
     s.commit();
     const s2 = new Session(store, [store.card("empezar|v", "es2sv")!]);
     expect(s2.answer("starta").grade).toBe("good");
+  });
+
+  it("svenskt stavfel straffas inte: FSRS får good, loggen visar fuzzy", () => {
+    // es→sv-stavfel ("börjaa") rättas som vanlig Good (inte Easy — det är
+    // "kan redan"-knappens jobb) — samma stabilitet som ett rent Good-svar
+    const a = new Session(store, [newCardRec("empezar|v", "es2sv", new Date())]);
+    a.answer("börjaa"); a.commit();
+    const typo = store.card("empezar|v", "es2sv")!.fsrs.stability;
+    expect(store.data.reviews[store.data.reviews.length - 1]).toMatchObject({ grade: "good", step: "fuzzy" });
+    const ref = applyReview(newCardRec("feliz|adj", "es2sv", new Date()), "good", new Date());
+    expect(typo).toBe(ref.fsrs.stability);
+    // spanskt stavfel förblir hard — stavningen ÄR kunskapen åt det hållet
+    const c = new Session(store, [newCardRec("ciudad|n", "sv2es", new Date())]);
+    c.answer("ciudda"); c.commit();
+    expect(store.data.reviews[store.data.reviews.length - 1]).toMatchObject({ grade: "hard", step: "fuzzy" });
   });
 
   it("sv→es: artikeln krävs inte", () => {

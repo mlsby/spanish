@@ -502,7 +502,9 @@ export class PassView {
           ${this.mnemBox(p.word.id)}
           ${p.firstExposure
             ? `<button type="button" class="linkbtn" data-act="claim">kan redan — bara stavfel</button>`
-            : `<p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>`}
+            : p.card.dir === "es2sv"
+              ? `<p class="fine">Svenskt stavfel — räknas som rätt.</p>`
+              : `<p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>`}
           <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "override":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
