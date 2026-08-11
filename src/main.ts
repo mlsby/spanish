@@ -147,6 +147,8 @@ async function boot(): Promise<void> {
     }
     // vänta in första synken — annars kan en andra enhet dubbla dagens nya ord
     if (sync.status === "syncing") return;
+    // misslyckad synk = lokala datat kan vara fel version — öva inte ovanpå det
+    if (sync.status === "error") { flashKonto(); return; }
     // en pausad övning fortsätts alltid först — inga nya ord förrän den är klar
     const paused = loadPass();
     if (paused && pass.resume(paused)) {
@@ -168,6 +170,7 @@ async function boot(): Promise<void> {
       return;
     }
     if (sync.status === "syncing") return;
+    if (sync.status === "error") { flashKonto(); return; }
     const cards = store.repCards();
     if (!cards.length) return;
     pass.start(cards, store.dueSoonCount());
@@ -182,6 +185,7 @@ async function boot(): Promise<void> {
       return;
     }
     if (sync.status === "syncing") return;
+    if (sync.status === "error") { flashKonto(); return; }
     showTab("las");
     void las.start();
   }
@@ -221,9 +225,14 @@ async function boot(): Promise<void> {
 
   let syncedUser = "";
   sb.auth.onAuthStateChange((event, session) => {
-    if (session && syncedUser !== session.user.id) {
+    // kör initialSync vid ny användare — och FÖRSÖK IGEN om förra misslyckades
+    // (utgången token vid appstart gav 401 mitt i pull; nästa TOKEN_REFRESHED läker det)
+    if (session && (syncedUser !== session.user.id || sync.status === "error")) {
       syncedUser = session.user.id;
       void sync.initialSync(session).then(async () => {
+        // efter misslyckad synk är lokala datat inte molnets — pusha aldrig
+        // topplistesiffror då (en tom enhet skulle nollställa poängen publikt)
+        if (sync.status === "error") return;
         try {
           await social.ensureProfile(session.user.email);
         } catch { /* migration 0002 kanske inte körd än — topplistan förklarar */ }
