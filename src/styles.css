@@ -422,6 +422,17 @@ html.kbd .vetinte button{padding:3px 14px}
 .stegtips{margin:0;text-align:center;font-size:11px;color:var(--muted)}
 .stegtips.flyttad{color:var(--accent);font-weight:600}
 
+/* ---------- läsförståelse ---------- */
+.pass.las{justify-content:flex-start;gap:14px;padding-top:14px}
+.lascard{gap:10px}
+.lastext{font-family:var(--serif);font-size:19px;line-height:1.65;margin:4px 0 2px;text-wrap:pretty}
+.lasmening{font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.5;
+           color:var(--muted);margin:0;max-width:40ch}
+.lasmening mark,.lastext mark{background:var(--warn-bg);color:var(--warn);border-radius:4px;
+  padding:0 3px;font-style:normal;font-weight:600}
+.lasknappar{margin-top:auto}
+.lasknappar .btn{flex:1}
+
 /* ---------- tangentbordet uppe = grundläget: kompakt pass-layout ----------
    html.kbd sätts av viewport.ts när den synliga ytan är < 620px
    (tangentbord uppe på mobil, eller ett litet fönster) */

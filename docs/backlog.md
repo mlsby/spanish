@@ -2,6 +2,22 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "läsförståelse")
+
+- **Läs en text (Lucas):** ghostknapp i hjälten från Turista (100 p, inloggad).
+  Edge Functionen las-text (claude-sonnet-5, nyckel i Supabase secrets) skriver
+  en minitext av ENBART mötta ord: alla kan-ord som palett, 2×N FSRS-valda
+  kandidater (skörast först, verbformer räknas som egna enheter) varav modellen
+  väljer N som passar naturligast (Lucas idé). Vitlistevalidator server-side
+  med max 3 försök — hellre lucka än fel; glue-småorden a/al/del/no + artiklar
+  alltid tillåtna, regelbunden plural/femininum för böjbara ordklasser
+  (feliz→felices). Flöde: läs texten → ordfrågor med meningen som kontext och
+  ordet markerat (tolerant rättning, riktiga FSRS-reviews es→sv via lasCommit,
+  svenskt stavfel räknas som rätt) → texten igen med facit-känsla. Längdtrappa
+  per titel i lasNiva (3 meningar/2 ord vid Turista → 8/6 vid Madrileño).
+  Prompt framitererad mot Lucas riktiga kort i seed/test-lastext.mjs;
+  forskningsunderlag i docs/research-lasforstaelse.md.
+
 ## Klart (byggt 2026-08-11, släpp "ordlistan: sortera, filtrera, kompisregler")
 
 - **Sortera & filtrera (Lucas):** två tysta ikonknappar i sökraden (⇅ + tratt)

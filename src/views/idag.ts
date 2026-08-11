@@ -1,3 +1,4 @@
+import { LAS_UNLOCK } from "../lib/lastext";
 import { loadPass } from "../lib/passpaus";
 import { resaFor, TITLAR } from "../lib/resa";
 import type { Store } from "../lib/store";
@@ -10,6 +11,8 @@ export interface IdagCallbacks {
   startPass(): void;
   /** bara repetitioner — inga nya ord (flyktvägen för trötta dagar) */
   startRep(): void;
+  /** läsförståelse — låses upp vid Turista (100 poäng) */
+  startLas(): void;
 }
 
 export interface CloudUi {
@@ -149,6 +152,9 @@ function heroHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
   const doneToday = store.data.days[dayKey()] ?? 0;
   const busy = cloud.status === "syncing";
+  // läsförståelsen låses upp vid Turista — kräver inloggning (texten genereras i molnet)
+  const lasBtn = cloud.email && s.score >= LAS_UNLOCK
+    ? `<button class="btn ghost" id="lasBtn" ${busy ? "disabled" : ""}>Läs en text</button>` : "";
 
   // pausad övning? den fortsätts alltid först — där man slutade
   const paused = loadPass();
@@ -158,7 +164,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
       ${nivBadge(store)}
       <div class="cap">du fortsätter exakt där du slutade</div>
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Fortsätt övningen"}</button>
-      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button></div>
+      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button>${lasBtn}</div>
     </div>`;
   }
 
@@ -181,7 +187,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
       ${nivBadge(store)}
       <div class="klartxt">✓ Klart för idag</div>
       <div class="cap">${doneToday > 0 ? `<b>${doneToday}</b> kort idag — streaken säkrad` : "inget förfallet just nu"}</div>
-      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button></div>
+      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button>${lasBtn}</div>
     </div>`;
   }
 
@@ -189,7 +195,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
     <p class="plabel">${plabel}</p>
     ${nivBadge(store)}
     <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : cta}</button>
-    <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button></div>
+    <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button>${lasBtn}</div>
   </div>`;
 }
 
@@ -324,6 +330,7 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
   };
   el.querySelector<HTMLButtonElement>("#startBtn")?.addEventListener("click", () => cb.startPass());
   el.querySelector<HTMLButtonElement>("#repBtn")?.addEventListener("click", () => cb.startRep());
+  el.querySelector<HTMLButtonElement>("#lasBtn")?.addEventListener("click", () => cb.startLas());
   el.querySelector<HTMLElement>("#resaPanel")?.addEventListener("click", () => {
     resaOpen = !resaOpen;
     rerender();
