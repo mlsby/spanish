@@ -110,6 +110,25 @@ node seed/build-forms.mjs --jehle jehle_verb_database.csv \
   --es50k es_50k.txt --lexin swe_spa.xml
 ```
 
+### Exempelmeningar
+
+`public/data/examples.json` byggs av `seed/build-examples.mjs` ur Tatoeba
+(CC BY 2.0 FR): en kort spansk mening per ord/böjningsform, vald så att
+övriga ord är vanligare än målordet och med homograf-vakter (verbformer får
+inte exemplifieras av substantiv-/adjektivläsningar, substantiv kräver
+otvetydig substantivposition). Direkta spanska↔svenska par ger svensk
+översättning — aldrig kedjeöversättning via engelska. Betydelsedubbletter
+(ord med parentes-ledtråd) får bara exempel när en svensk länk bekräftar
+rätt betydelse. Exemplen visas enbart i facit-lägena, aldrig i frågan;
+översättningen bara vid fel. Granskning: `seed/report-examples.md`.
+
+```bash
+# källor: https://downloads.tatoeba.org/exports/per_language/
+#   spa/spa_sentences.tsv.bz2, swe/swe_sentences.tsv.bz2, spa/spa-swe_links.tsv.bz2
+# + es_50k.txt (hermitdave/FrequencyWords)
+node seed/build-examples.mjs --tatoeba <katalog-med-filerna>
+```
+
 ## Roadmap
 
 - **AI-rättningsfallback** (kravspec §3 steg 3): Supabase Edge Function som
@@ -124,5 +143,6 @@ node seed/build-forms.mjs --jehle jehle_verb_database.csv \
 Ordfrekvenser bygger på OpenSubtitles via hermitdave/FrequencyWords (CC BY-SA
 4.0) och doozan/spanish_data (CC BY-SA). Svenska översättningar ur Lexins
 svensk-spanska lexikon © Institutet för språk och folkminnen, CC BY 4.0.
-Genus ur en.wiktionary (CC BY-SA). Ordbasfilerna i `public/data/` ärver
-CC BY-SA-villkoren.
+Genus ur en.wiktionary (CC BY-SA). Exempelmeningar ur
+[Tatoeba](https://tatoeba.org) (CC BY 2.0 FR). Ordbasfilerna i `public/data/`
+ärver CC BY-SA-villkoren.

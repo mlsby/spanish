@@ -245,11 +245,12 @@ function settingsHtml(store: Store, cloud: CloudUi): string {
       <p class="omtext" style="margin-top:8px">
         Skrivträning på de vanligaste spanska orden med FSRS-schemaläggning och egna
         minnesregler (aldrig AI-genererade). Datat sparas lokalt och synkas till molnet
-        när du är inloggad — exportera en backup då och då. Ordbasen: frekvens &amp;
-        ordklass ur doozan/spanish_data (CC BY-SA, OpenSubtitles via
-        hermitdave/FrequencyWords); svenska översättningar ur Lexins svensk-spanska
-        lexikon, Institutet för språk och folkminnen (CC BY 4.0); genus ur
-        en.wiktionary (CC BY-SA).
+        när du är inloggad — exportera en backup då och då. Glosa är icke-kommersiell.
+        Ordbasen: frekvens &amp; ordklass ur doozan/spanish_data (CC BY-SA,
+        OpenSubtitles via hermitdave/FrequencyWords); svenska översättningar ur Lexins
+        svensk-spanska lexikon, Institutet för språk och folkminnen (CC BY 4.0); genus
+        ur en.wiktionary (CC BY-SA); verbböjningar ur Fred Jehles verbdatabas
+        (CC BY-NC-SA 3.0); exempelmeningar ur Tatoeba (CC BY 2.0 FR).
       </p>
     </details>`;
 }

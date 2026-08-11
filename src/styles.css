@@ -294,6 +294,12 @@ html.kbd .vetinte button{padding:3px 14px}
             font-size:12.5px;border-radius:9px;padding:7px 14px}
 .visafler{align-self:center;margin:4px 0 10px}
 
+/* ---------- exempelmeningar (Tatoeba) ---------- */
+.exline{margin:6px 0 0;font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.4}
+.exsv{margin:2px 0 0;color:var(--muted);font-size:12.5px;line-height:1.4}
+.rowx .exline{font-size:14px;margin:0}
+.rowx .exsv{margin:2px 0 0}
+
 /* ---------- snabbmarkering: ✓ i raden + ångra-remsa ---------- */
 .rowline{display:flex;align-items:center}
 .rowline .rowbtn{flex:1;min-width:0}

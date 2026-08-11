@@ -55,6 +55,15 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     return out;
   }
 
+  /** Exempelmening (Tatoeba) med ev. svensk översättning. */
+  function exampleHtml(wordId: string): string {
+    const ex = store.exampleFor(wordId);
+    if (!ex) return "";
+    return `<div><div class="xl">Exempel</div>
+      <p class="exline">${esc(ex.es)}</p>
+      ${ex.sv ? `<p class="exsv">${esc(ex.sv)}</p>` : ""}</div>`;
+  }
+
   /** Verbets böjningsformer med status-prick (grå = inte introducerad än). */
   function formsHtml(wordId: string): string {
     const forms = store.formsByParent.get(wordId);
@@ -123,6 +132,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
           <div><div class="xl">${esc(POS_LABEL[word.pos] ?? word.pos)}</div>
             ${word.hint ? `<p class="omtext" style="margin:4px 0 0">Ledtråd: <i>(${esc(word.hint)})</i></p>` : ""}
             ${word.alt?.length ? `<p class="omtext" style="margin:4px 0 0">Accepteras även: ${word.alt.map(esc).join(", ")}</p>` : ""}</div>
+          ${exampleHtml(word.id)}
           <div><div class="xl">Synonymer</div>
             <div class="syns">${baseSyns}${ownSyns}
               <input type="text" data-addsyn placeholder="+ lägg till" aria-label="Lägg till synonym"></div></div>

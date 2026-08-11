@@ -2,6 +2,24 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "exempelmeningar")
+
+- **Exempelmeningar (Tatoeba, CC BY 2.0 FR):** en kort äkta mening per
+  ord/böjningsform — 4 433/5 000 ord, 2 233/2 843 former, 1 024 med svensk
+  översättning via direkta spanska↔svenska par (aldrig kedjeöversatt via
+  engelska). Visas ENBART i facit-lägena (aldrig i frågan — fri återkallning
+  kräver att ordet är enda ledtråden); svensk översättning bara vid
+  fel/visste inte, där ingen timer stressar. Ordlistans expansion visar
+  mening + översättning. Urval: max 9 ord, alla övriga ord vanligare än
+  målordet (es_50k), homograf-vakter i flera lager (verbform efter
+  artikel/kopula/preposition förkastas, jag/du-former kräver otvetydig
+  verbkontext, substantiv kräver substantivposition, egennamn spärras,
+  "Maduro es"-vakten mot två finita verb i rad). Betydelsedubbletter med
+  ledtråd får bara exempel när svensk länk bekräftar glosan — 248 skippade
+  hellre än fel. Pipeline: `seed/build-examples.mjs`, granskning i
+  `seed/report-examples.md`, data i `public/data/examples.json` (344 kB,
+  lazy-laddad). Attribution i Om Glosa + README.
+
 ## Klart (byggt 2026-08-10, släpp "en-knapps-modellen")
 
 - **Dagens övning + Öva mer (Lucas modell):** tre knappar och en

@@ -21,6 +21,8 @@ export class Store {
   byId = new Map<string, Word>();
   forms: VerbForm[] = [];
   formById = new Map<string, VerbForm>();
+  /** exempelmeningar (Tatoeba): ord-/form-id → [spansk mening, ev. svensk översättning] */
+  examples = new Map<string, string[]>();
   formsByParent = new Map<string, VerbForm[]>();
   data: AppData = emptyData();
   attribution: string[] = [];
@@ -47,6 +49,21 @@ export class Store {
     try {
       await this.loadForms(baseUrl);
     } catch { /* böjningsdata är valfri — appen funkar med bara orden */ }
+    // exempelmeningarna laddas i bakgrunden — facit funkar utan dem tills de kommit
+    void this.loadExamples(baseUrl).catch(() => { /* valfri data */ });
+  }
+
+  private async loadExamples(baseUrl: string): Promise<void> {
+    const res = await fetch(`${baseUrl}data/examples.json`);
+    if (!res.ok) return;
+    const json = await res.json();
+    this.examples = new Map(Object.entries(json.ex as Record<string, string[]>));
+  }
+
+  /** Exempelmening för ett ord eller en böjningsform (Tatoeba). */
+  exampleFor(wordId: string): { es: string; sv?: string } | null {
+    const e = this.examples.get(wordId);
+    return e ? { es: e[0], sv: e[1] } : null;
   }
 
   private async loadForms(baseUrl: string): Promise<void> {

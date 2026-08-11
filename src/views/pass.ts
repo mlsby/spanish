@@ -341,6 +341,18 @@ export class PassView {
     if (!p.form) return "";
     return `<p class="parentline">av <b>${esc(p.word.es)}</b> = ${esc(p.word.sv)}</p>`;
   }
+  /**
+   * Exempelmening (Tatoeba) — bara i facit-lägena, aldrig i frågan (fri
+   * återkallning kräver att ordet är enda ledtråden). Svensk översättning
+   * visas enbart när man hade fel — där behövs mest hjälp och ingen timer.
+   */
+  private exLine(p: Pending, withSv: boolean): string {
+    const ex = this.store.exampleFor(p.card.wordId);
+    if (!ex) return "";
+    let h = `<p class="exline">${esc(ex.es)}</p>`;
+    if (withSv && ex.sv) h += `<p class="exsv">${esc(ex.sv)}</p>`;
+    return h;
+  }
   private mnemBox(wordId: string): string {
     const m = this.store.userWord(wordId).mnem;
     if (!m) return "";
@@ -439,13 +451,13 @@ export class PassView {
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--good)"></i></div>
           <p class="verdict v-good">${IC_OK}Rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.parentLine(p)}${this.hintLine(p.word)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, false)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
           <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
       case "hard":
         return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
           <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.parentLine(p)}${this.hintLine(p.word)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, false)}
           <div class="cmp"><span class="cl">du skrev</span><code>${esc(p.raw)}</code>
           <span class="cl">rättstavat</span><code>${this.markedTarget(p)}</code></div>
           ${this.mnemBox(p.word.id)}
@@ -465,7 +477,7 @@ export class PassView {
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
             <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.parentLine(p)}${this.hintLine(p.word)}${this.alsoLine(p)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, true)}${this.alsoLine(p)}
           ${this.showMnem
             ? this.mnemForm(p, false)
             : `<div class="btnrow" style="margin-top:8px">
@@ -476,7 +488,7 @@ export class PassView {
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
             <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>`}
           <h2 class="head">${esc(this.facit(p))}</h2>
-          ${this.parentLine(p)}${this.hintLine(p.word)}${this.alsoLine(p)}
+          ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, true)}${this.alsoLine(p)}
           <p class="mustnote">Skriv din egen minnesregel för att gå vidare</p>
           ${this.mnemForm(p, true)}`;
     }
