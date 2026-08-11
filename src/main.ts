@@ -220,7 +220,9 @@ async function boot(): Promise<void> {
 
   sync.onStatus = () => {
     if (currentTab === "idag") renderIdagTab();
-    pass.refreshIdle();
+    // passets omrendering togglar pass-live (tabbaren) utifrån SITT läge —
+    // får bara ske när passfliken faktiskt visas, annars flimrar navet i läsvyn
+    if (currentTab === "pass") pass.refreshIdle();
   };
 
   let syncedUser = "";
@@ -246,7 +248,7 @@ async function boot(): Promise<void> {
       sync.signedOut();
     }
     if (currentTab === "idag") renderIdagTab();
-    pass.refreshIdle();
+    if (currentTab === "pass") pass.refreshIdle();
   });
 
   tabButtons.forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab as TabId)));
