@@ -4,6 +4,7 @@ import { initViewportFit } from "./lib/viewport";
 import { requestPersistence } from "./lib/storage";
 import { createSupabase } from "./lib/supabase";
 import { parseLoginInput } from "./lib/logintoken";
+import { loadPass } from "./lib/passpaus";
 import { CloudSync } from "./lib/sync";
 import { Social } from "./lib/social";
 import { activityStats } from "./lib/streak";
@@ -143,6 +144,12 @@ async function boot(): Promise<void> {
     }
     // vänta in första synken — annars kan en andra enhet dubbla dagens nya ord
     if (sync.status === "syncing") return;
+    // en pausad övning fortsätts alltid först — inga nya ord förrän den är klar
+    const paused = loadPass();
+    if (paused && pass.resume(paused)) {
+      showTab("pass");
+      return;
+    }
     const baseline = store.dueSoonCount(); // före introduktionen — prognosen räknar de nya
     store.introduceForSession();
     const cards = store.dueCards();

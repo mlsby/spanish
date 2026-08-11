@@ -1,3 +1,4 @@
+import { loadPass } from "../lib/passpaus";
 import type { Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
 import { activityStats } from "../lib/streak";
@@ -136,9 +137,21 @@ function kontoHtml(cloud: CloudUi): string {
 /** Hero-kortet: nästa övning i KORT (samma tal som övningen visar), eller klart-läget. */
 function heroHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
-  const totalCards = s.due + s.nextNew * 2;
   const doneToday = store.data.days[dayKey()] ?? 0;
   const busy = cloud.status === "syncing";
+
+  // pausad övning? den fortsätts alltid först — där man slutade
+  const paused = loadPass();
+  if (paused && cloud.email) {
+    return `<div class="hero">
+      <p class="plabel">Övning pausad</p>
+      <div class="big">${paused.queue.length}<small> kort kvar</small></div>
+      <div class="cap">du fortsätter exakt där du slutade</div>
+      <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Fortsätt övningen"}</button>
+    </div>`;
+  }
+
+  const totalCards = s.due + s.nextNew * 2;
   const plabel = s.firstToday ? "Dagens övning" : "Öva mer";
   const cta = s.firstToday ? "Starta dagens övning" : "Öva mer";
 

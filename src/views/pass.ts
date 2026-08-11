@@ -1,5 +1,6 @@
 import { diffTarget } from "../lib/diff";
-import { Session, type Pending } from "../lib/session";
+import { clearPass, loadPass, savePass } from "../lib/passpaus";
+import { Session, type Pending, type SessionState } from "../lib/session";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
 import type { CardRec } from "../lib/types";
@@ -139,9 +140,26 @@ export class PassView {
       this.render();
       return;
     }
+    savePass(this.session.snapshot());
     this.state = "question";
     this.render();
     this.focusInput();
+  }
+
+  /** Fortsätt en avbruten övning. false = inget kvar att fortsätta (rensat). */
+  resume(state: SessionState): boolean {
+    this.clearTimer();
+    const s = Session.restore(this.store, state);
+    if (s.finished) {
+      clearPass();
+      return false;
+    }
+    this.session = s;
+    savePass(s.snapshot());
+    this.state = "question";
+    this.render();
+    this.focusInput();
+    return true;
   }
 
   get active(): boolean {
@@ -282,11 +300,13 @@ export class PassView {
     this.friendRules = [];
     s.commit();
     if (s.finished) {
+      clearPass(); // övningen slutförd — inget att återuppta
       this.state = "done";
       this.store.snapshotToday();
       this.render();
       return;
     }
+    savePass(s.snapshot()); // avbrott härifrån kan alltid fortsättas
     this.state = "question";
     this.render();
     this.focusInput();
@@ -405,13 +425,19 @@ export class PassView {
           </div></div>`;
       }
       const st = this.store.stats();
+      const paused = loadPass();
       const total = st.due + st.nextNew;
       const busy = this.syncBusy();
+      const label = busy ? "Synkar …"
+        : paused ? `Fortsätt övningen · ${paused.queue.length} kvar`
+        : st.firstToday ? "Starta dagens övning" : "Öva mer";
       return `<div class="tomt">
-        <div class="stor">Ingen övning igång</div>
-        <p>${st.due + st.nextNew * 2} kort väntar — ${st.due} repetitioner + ${st.nextNew} nya ord.</p>
+        <div class="stor">${paused ? "Övning pausad" : "Ingen övning igång"}</div>
+        <p>${paused
+          ? `${paused.queue.length} kort kvar — du fortsätter där du slutade.`
+          : `${st.due + st.nextNew * 2} kort väntar — ${st.due} repetitioner + ${st.nextNew} nya ord.`}</p>
         <div class="btnrow" style="max-width:250px">
-          <button class="btn" data-act="start" ${total === 0 || busy ? "disabled" : ""}>${busy ? "Synkar …" : st.firstToday ? "Starta dagens övning" : "Öva mer"}</button>
+          <button class="btn" data-act="start" ${(!paused && total === 0) || busy ? "disabled" : ""}>${label}</button>
         </div></div>`;
     }
     if (this.state === "done") {

@@ -2,6 +2,7 @@ import { gradeAnswer, normalize, type GradeResult } from "./grading";
 import { insertSpaced, spaceSiblings } from "./queue";
 import { applyReview, dueDate } from "./scheduler";
 import type { Store } from "./store";
+import { endOfToday } from "./time";
 import type { CardRec, Dir, Grade, Step, VerbForm, Word } from "./types";
 
 export interface Pending {
@@ -21,6 +22,14 @@ export interface Pending {
 }
 
 export interface SessionCounts { good: number; hard: number; again: number }
+
+/** Serialiserat pågående pass — så en avbruten övning kan fortsättas. */
+export interface SessionState {
+  queue: [string, Dir][];
+  done: number;
+  counts: SessionCounts;
+  baseline: number;
+}
 
 /** Kort som fastnar i korttidsinlärning visas igen inom samma pass om nästa due är nära. */
 const RELEARN_WINDOW_MS = 15 * 60 * 1000;
@@ -44,6 +53,35 @@ export class Session {
     this.queue = spaceSiblings(cards);
     // baslinjen tas helst FÖRE introduktionen — annars räknas dagens nya inte in
     this.dueSoonBaseline = opts?.dueSoonBaseline ?? this.store.dueSoonCount();
+  }
+
+  /** Ögonblicksbild av passet — det som behövs för att fortsätta senare. */
+  snapshot(): SessionState {
+    return {
+      queue: this.queue.map((c) => [c.wordId, c.dir]),
+      done: this.done,
+      counts: { ...this.counts },
+      baseline: this.dueSoonBaseline,
+    };
+  }
+
+  /**
+   * Återuppta ett avbrutet pass: kön byggs om från färska kort (FSRS-läget kan
+   * ha ändrats under pausen — t.ex. ✓-markerade ord som inte längre förfaller
+   * idag hoppar av), räknare och prognosbaslinje följer med.
+   */
+  static restore(store: Store, state: SessionState, now: Date = new Date()): Session {
+    const cutoff = endOfToday(now).getTime();
+    const cards: CardRec[] = [];
+    for (const [wordId, dir] of state.queue) {
+      const c = store.card(wordId, dir);
+      if (c && dueDate(c).getTime() <= cutoff) cards.push(c);
+    }
+    const s = new Session(store, [], { dueSoonBaseline: state.baseline });
+    s.queue = cards; // behåll passets ordning — den var redan syskonavståndad
+    s.done = state.done;
+    s.counts = { ...state.counts };
+    return s;
   }
 
   get current(): CardRec | null {

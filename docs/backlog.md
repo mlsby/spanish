@@ -2,6 +2,17 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "fortsätt övningen")
+
+- **Avbruten övning kan fortsättas:** passet sparas lokalt på enheten efter
+  varje besvarat kort (`glosa.pass.v1` — inte i molnsynken, ett halvfärdigt
+  pass hör till skärmen). Avsluta, stäng appen eller ladda om — knappen blir
+  "Fortsätt övningen · N kvar" (hero + passets viloläge) och återupptar med
+  samma kö, ordning, räknare och prognosbaslinje. Kort som ändrats under
+  pausen (t.ex. ✓-markerade till Kan det) hoppar av kön; sparningen gäller
+  bara samma kalenderdag; slutförd övning rensar den. Ingen ny introduktion
+  sker vid återupptagning.
+
 ## Klart (byggt 2026-08-11, släpp "exempelmeningar")
 
 - **Exempelmeningar (Tatoeba, CC BY 2.0 FR):** en kort äkta mening per
