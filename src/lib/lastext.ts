@@ -50,10 +50,22 @@ function bojningar(es: string, ok: Set<string>): void {
 }
 
 export interface UnderlagVal {
-  /** ord som quizzades i förra läsningen — undviks om poolen räcker */
+  /**
+   * Nyligen quizzade ord — utesluts HELT (kandidater, palett och vitlista)
+   * om kandidatpoolen räcker ändå. Annars skulle LLM:en kunna återanvända
+   * dem som palettord ändå ("Cada día …" i varenda text).
+   */
   exkludera?: Set<string>;
   /** injicerbar slump för testerna */
   rng?: () => number;
+}
+
+/**
+ * Rullande minne av quizzade ord: nyaste först, dubbletter bort, max `tak`.
+ * Vyn persisterar listan så variationen överlever omladdningar.
+ */
+export function minnsQuizzade(gamla: string[], nya: string[], tak: number): string[] {
+  return [...nya, ...gamla.filter((id) => !nya.includes(id))].slice(0, tak);
 }
 
 /**
@@ -85,9 +97,10 @@ export function byggUnderlag(
       return !!c && c.fsrs.reps > 0;
     })
     .sort((a, b) => (minS.get(a) ?? 0) - (minS.get(b) ?? 0));
+  let uteslut = new Set<string>(); // aktiv exkludering — gäller även paletten nedan
   if (val.exkludera?.size) {
     const utan = pool.filter((id) => !val.exkludera!.has(id));
-    if (utan.length >= antalKandidater) pool = utan;
+    if (utan.length >= antalKandidater) { pool = utan; uteslut = val.exkludera; }
   }
   // slumpa urvalet ur fönstret av de skörast — Fisher-Yates
   const fonster = pool.slice(0, antalKandidater * 2);
@@ -111,6 +124,7 @@ export function byggUnderlag(
   const ovriga: string[] = [];
   const vitlista = new Set<string>(SMAORD);
   for (const id of introducerade) {
+    if (uteslut.has(id)) continue; // borta ur palett + vitlista → kan inte dyka upp i texten
     const f = store.formById.get(id);
     if (f) {
       vitlista.add(f.es.toLowerCase());

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  byggQuiz, byggUnderlag, lasCommit, lasNiva, ordITexten,
+  byggQuiz, byggUnderlag, lasCommit, lasNiva, minnsQuizzade, ordITexten,
 } from "../src/lib/lastext";
 import { applyReview, newCardRec } from "../src/lib/scheduler";
 import { Store } from "../src/lib/store";
@@ -119,6 +119,21 @@ describe("byggUnderlag — slump och exkludering", () => {
     seedCard(store, "ser|v", "es2sv", 1); seedCard(store, "ser|v", "sv2es", 1);
     const u = byggUnderlag(store, 2, { exkludera: new Set(["ser|v"]), rng: () => 0 });
     expect(u.kandidater.map((k) => k.es)).toEqual(["ser"]);
+    expect(u.vitlista).toContain("ser"); // paletten rörs inte heller när exkluderingen är av
+  });
+
+  it("uteslutna ord försvinner även ur palett och vitlista", () => {
+    const store = fyraSkora();
+    const u = byggUnderlag(store, 2, { exkludera: new Set(["cada|determiner"]), rng: () => 0 });
+    expect(u.ovriga).not.toContain("cada");
+    expect(u.vitlista).not.toContain("cada");
+    expect(u.vitlista).toContain("casa"); // övriga palettord kvar
+  });
+
+  it("minnsQuizzade: nyaste först, dubbletter bort, taket håller", () => {
+    expect(minnsQuizzade(["a", "b", "c"], ["c", "d"], 4)).toEqual(["c", "d", "a", "b"]);
+    expect(minnsQuizzade(["a", "b", "c"], ["d", "e"], 4)).toEqual(["d", "e", "a", "b"]);
+    expect(minnsQuizzade([], ["x"], 4)).toEqual(["x"]);
   });
 });
 

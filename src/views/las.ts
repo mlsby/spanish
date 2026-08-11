@@ -1,7 +1,7 @@
 import { diffTarget } from "../lib/diff";
 import { gradeAnswer, type GradeResult } from "../lib/grading";
 import {
-  byggQuiz, byggUnderlag, hamtaText, lasCommit, type LasFraga, lasNiva,
+  byggQuiz, byggUnderlag, hamtaText, lasCommit, type LasFraga, lasNiva, minnsQuizzade,
 } from "../lib/lastext";
 import type { Store } from "../lib/store";
 import type { SupabaseClient } from "../lib/supabase";
@@ -13,6 +13,15 @@ const IC_OK = `<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>`;
 const IC_X = `<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
 type LasState = "laddar" | "fel" | "las" | "fraga" | "svar" | "klar";
+
+const SENASTE_KEY = "glosa.las.senaste.v1";
+
+function laddaSenaste(): string[] {
+  try {
+    const arr: unknown = JSON.parse(localStorage.getItem(SENASTE_KEY) ?? "[]");
+    return Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string") : [];
+  } catch { return []; }
+}
 
 /**
  * Läsförståelsen: en genererad minitext av användarens egna ord →
@@ -32,8 +41,8 @@ export class LasView {
   private ratt = 0;
   private pend: (GradeResult & { raw: string }) | null = null;
   private felText = "";
-  /** förra läsningens quizord — undviks i nästa urval så texterna varierar */
-  private senaste = new Set<string>();
+  /** nyligen quizzade ord (nyaste först) — bannlysta ur nästa texter, överlever omladdning */
+  private senaste = laddaSenaste();
 
   private card!: HTMLElement;
   private bar!: HTMLElement;
@@ -117,7 +126,7 @@ export class LasView {
     this.render();
     const p = lasNiva(this.store.stats().score);
     // 3× målet: gott om kandidater att välja bland ger naturligare scener (Lucas)
-    const underlag = byggUnderlag(this.store, p.anvand * 3, { exkludera: this.senaste });
+    const underlag = byggUnderlag(this.store, p.anvand * 3, { exkludera: new Set(this.senaste) });
     if (underlag.kandidater.length === 0) {
       this.felText = "Inga övningsord just nu — öva lite först, sen finns det något att läsa om.";
       this.state = "fel";
@@ -132,7 +141,9 @@ export class LasView {
       this.meningar = meningar.map((m) => m.es);
       this.quiz = byggQuiz(meningar, underlag.kandidater);
       if (!this.quiz.length) throw new Error("Texten saknade övningsord — prova igen.");
-      this.senaste = new Set(this.quiz.map((q) => q.kandidat.id));
+      // minns ~3 rundors quizord — de utesluts helt ur kommande texter
+      this.senaste = minnsQuizzade(this.senaste, this.quiz.map((q) => q.kandidat.id), p.anvand * 3);
+      try { localStorage.setItem(SENASTE_KEY, JSON.stringify(this.senaste)); } catch { /* privat läge */ }
       this.state = "las";
     } catch (e) {
       this.felText = e instanceof Error ? e.message : String(e);
