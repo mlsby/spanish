@@ -30,8 +30,11 @@ const json = (status: number, body: unknown) =>
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 
-// alltid tillåten bindväv — quizzas aldrig
-const SMAORD = ["el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no"];
+// alltid tillåten bindväv — quizzas aldrig (es/está/hay: utan dem blir det tarzanspanska)
+const SMAORD = [
+  "el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no",
+  "es", "son", "está", "están", "hay",
+];
 const MODELL = "claude-sonnet-5";
 
 interface Verb { inf: string; former: string[] }
@@ -76,7 +79,7 @@ REGLER:
 - Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
 - Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
 - Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
-- Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no.
+- Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no — och verben es, son, está, están, hay.
 - Använd exakt ${b.anvand} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
 - Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
 

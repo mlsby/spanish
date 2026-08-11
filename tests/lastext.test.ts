@@ -30,6 +30,10 @@ function makeStore(): Store {
   store.byId = new Map(WORDS.map((w) => [w.id, w]));
   store.forms = FORMS;
   store.formById = new Map(FORMS.map((f) => [f.id, f]));
+  store.formsByParent = new Map();
+  for (const f of FORMS) {
+    store.formsByParent.set(f.parent, [...(store.formsByParent.get(f.parent) ?? []), f]);
+  }
   store.data = emptyData();
   return store;
 }
@@ -63,7 +67,9 @@ describe("byggUnderlag", () => {
     const u = byggUnderlag(store, 4);
     expect(u.kandidater.map((k) => k.es).sort()).toEqual(["cada", "feliz"]); // de sköra, ej kan-orden
     expect(u.ovriga).toContain("la casa");
-    expect(u.verb).toContainEqual({ inf: "ser", former: [] });
+    // mött verb ⇒ alla presensformer ur datasetet får läsas, även omötta
+    expect(u.verb).toContainEqual({ inf: "ser", former: ["es"] });
+    expect(u.vitlista).toContain("es");
   });
 
   it("verbformer grupperas under moderverbet och quizzas som former", () => {
@@ -76,13 +82,14 @@ describe("byggUnderlag", () => {
     expect(u.vitlista).toContain("es");
   });
 
-  it("vitlistan expanderar plural, femininum och glue-småord", () => {
+  it("vitlistan expanderar plural, femininum, glue-småord och verbglue", () => {
     const store = makeStore();
     seedCard(store, "casa|n", "es2sv", 30); seedCard(store, "casa|n", "sv2es", 30);
     seedCard(store, "otro|determiner", "es2sv", 30); seedCard(store, "otro|determiner", "sv2es", 30);
     seedCard(store, "feliz|adj", "es2sv", 30); seedCard(store, "feliz|adj", "sv2es", 30);
     const u = byggUnderlag(store, 2);
-    for (const t of ["casas", "otra", "otros", "felices", "a", "al", "del", "no", "la"]) {
+    for (const t of ["casas", "otra", "otros", "felices", "a", "al", "del", "no", "la",
+      "es", "son", "está", "están", "hay"]) {
       expect(u.vitlista, t).toContain(t);
     }
   });

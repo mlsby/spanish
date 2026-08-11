@@ -68,8 +68,18 @@ const ovningsKandidater = introducerade
 const kandidater = ovningsKandidater.slice(0, N_OVNING * 3);
 
 // ---------- ytformer ----------
-// alltid tillåten glue: artiklar + a/al/del/no — quizzas aldrig, bara bindväv
-const SMAORD = ["el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no"];
+// alltid tillåten glue: artiklar + a/al/del/no + es/está/hay — quizzas aldrig, bara bindväv
+const SMAORD = [
+  "el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no",
+  "es", "son", "está", "están", "hay",
+];
+// mött verb ⇒ alla dess presensformer får läsas (samma expansion som i appen)
+const formsByParent = new Map();
+for (const f of forms) {
+  const list = formsByParent.get(f.parent) ?? [];
+  list.push(f);
+  formsByParent.set(f.parent, list);
+}
 
 function ytform(id) {
   return formById.get(id)?.es ?? wordById.get(id)?.es ?? null;
@@ -90,14 +100,18 @@ function visning(id) {
 const BOJBARA = new Set(["n", "adj", "determiner", "pron", "num"]);
 function byggVitlista() {
   const ok = new Set(SMAORD);
+  const verbIds = new Set();
   for (const id of introducerade) {
     const f = formById.get(id);
     if (f) {
-      ok.add(f.es.toLowerCase()); // böjd verbform: exakt den mötta ytan
+      ok.add(f.es.toLowerCase());
+      ok.add((wordById.get(f.parent)?.es ?? "").toLowerCase());
+      verbIds.add(f.parent);
       continue;
     }
     const w = wordById.get(id);
     if (!w) continue;
+    if (w.pos === "v") verbIds.add(id);
     for (const tok of w.es.toLowerCase().split(/\s+/)) ok.add(tok);
     if (BOJBARA.has(w.pos)) {
       const es = w.es.toLowerCase();
@@ -110,6 +124,10 @@ function byggVitlista() {
       }
     }
   }
+  for (const id of verbIds) {
+    for (const f of formsByParent.get(id) ?? []) ok.add(f.es.toLowerCase());
+  }
+  ok.delete("");
   return ok;
 }
 
@@ -138,7 +156,7 @@ REGLER:
 - Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
 - Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
 - Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
-- Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no.
+- Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no — och verben es, son, está, están, hay.
 - Använd exakt ${N_OVNING} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
 - Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
 
@@ -146,28 +164,24 @@ Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ov
 }
 
 function userPrompt() {
-  // verben grupperade med sina tillåtna ytformer — tydligare karta än ordsoppa
-  const verbFormer = new Map(); // lemma-id → [ytformer]
+  // verben grupperade med ALLA sina presensformer — mött verb får läsas böjt
+  const verbIds = new Set();
   const ovriga = [];
   for (const id of introducerade) {
     const f = formById.get(id);
     if (f) {
-      const list = verbFormer.get(f.parent) ?? [];
-      list.push(f.es);
-      verbFormer.set(f.parent, list);
+      verbIds.add(f.parent);
       continue;
     }
     const w = wordById.get(id);
     if (!w) continue;
-    if (w.pos === "v") {
-      if (!verbFormer.has(id)) verbFormer.set(id, []);
-    } else {
-      ovriga.push(visning(id));
-    }
+    if (w.pos === "v") verbIds.add(id);
+    else ovriga.push(visning(id));
   }
-  const verb = [...verbFormer.entries()]
-    .map(([id, former]) => {
+  const verb = [...verbIds]
+    .map((id) => {
       const inf = wordById.get(id)?.es ?? id;
+      const former = (formsByParent.get(id) ?? []).map((f) => f.es);
       return former.length ? `${inf}: ${inf}, ${former.join(", ")}` : inf;
     })
     .join(" · ");

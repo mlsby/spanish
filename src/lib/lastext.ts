@@ -36,6 +36,8 @@ export interface LasFraga { kandidat: LasKandidat; mening: string }
 
 // alltid tillåten bindväv — quizzas aldrig (samma lista som i Edge Functionen)
 const SMAORD = ["el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no"];
+// ser/estar/hay i presens är också bindväv — utan dem blir varje text tarzanspanska
+const VERBGLUE = ["es", "son", "está", "están", "hay"];
 const BOJBARA = new Set(["n", "adj", "determiner", "pron", "num"]);
 
 /** Regelbunden plural + femininum in i vitlistan (perro→perros, feliz→felices). */
@@ -120,9 +122,9 @@ export function byggUnderlag(
     }
   }
 
-  const verbFormer = new Map<string, string[]>();
+  const verbIds = new Set<string>();
   const ovriga: string[] = [];
-  const vitlista = new Set<string>(SMAORD);
+  const vitlista = new Set<string>([...SMAORD, ...VERBGLUE]);
   for (const id of introducerade) {
     if (uteslut.has(id)) continue; // borta ur palett + vitlista → kan inte dyka upp i texten
     const f = store.formById.get(id);
@@ -131,9 +133,7 @@ export function byggUnderlag(
       // moderverbets infinitiv följer med — formen är omöjlig att lista utan den
       const parent = store.byId.get(f.parent);
       if (parent) vitlista.add(parent.es.toLowerCase());
-      const list = verbFormer.get(f.parent) ?? [];
-      if (!list.includes(f.es)) list.push(f.es);
-      verbFormer.set(f.parent, list);
+      verbIds.add(f.parent);
       continue;
     }
     const w = store.byId.get(id);
@@ -141,16 +141,23 @@ export function byggUnderlag(
     const es = w.es.toLowerCase();
     for (const tok of es.split(/\s+/)) vitlista.add(tok);
     if (w.pos === "v") {
-      if (!verbFormer.has(id)) verbFormer.set(id, []);
+      verbIds.add(id);
       continue;
     }
     ovriga.push(w.art ? `${w.art} ${w.es}` : w.es);
     if (BOJBARA.has(w.pos)) bojningar(es, vitlista);
   }
-  const verb: LasVerb[] = [...verbFormer.entries()].map(([id, former]) => ({
-    inf: store.byId.get(id)?.es ?? id,
-    former,
-  }));
+  // mött verb ⇒ ALLA dess presensformer får läsas i texten (quizzas aldrig) —
+  // med bara de mötta formerna tvingades modellen till "yo querer hablar"
+  const verb: LasVerb[] = [...verbIds].map((id) => {
+    const former: string[] = [];
+    for (const f of store.formsByParent.get(id) ?? []) {
+      if (uteslut.has(f.id) || former.includes(f.es)) continue;
+      former.push(f.es);
+      vitlista.add(f.es.toLowerCase());
+    }
+    return { inf: store.byId.get(id)?.es ?? id, former };
+  });
   return { verb, ovriga, kandidater, vitlista: [...vitlista] };
 }
 
