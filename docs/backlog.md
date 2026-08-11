@@ -4,6 +4,10 @@ Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
 ## Klart (byggt 2026-08-11, släpp "nivåresan")
 
+- **Repetera alltid tillgänglig (Lucas):** knappen visas i alla hjältelägen
+  (även pausad övning och "klart för idag"). Förfallna sedda kort först;
+  finns inga körs förhandsrepetition — de 20 kort som förfaller närmast.
+  Bara helt nya konton (inga besvarade kort) får den nedtonad.
 - **Nivåtrappan i Din resa (Lucas):** panelen är tryckbar — utfälld visar
   den alla 10 nivåerna som lodrät trappa (klarade = grön bock, nuvarande =
   accentprick + "du är här · 185/200", kommande dämpade med trösklar).

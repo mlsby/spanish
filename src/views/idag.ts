@@ -159,6 +159,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
       ${nivBadge(store)}
       <div class="cap">du fortsätter exakt där du slutade</div>
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Fortsätt övningen"}</button>
+      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button></div>
     </div>`;
   }
 
@@ -181,6 +182,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
       ${nivBadge(store)}
       <div class="klartxt">✓ Klart för idag</div>
       <div class="cap">${doneToday > 0 ? `<b>${doneToday}</b> kort idag — streaken säkrad` : "inget förfallet just nu"}</div>
+      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button></div>
     </div>`;
   }
 
@@ -188,9 +190,7 @@ function heroHtml(store: Store, cloud: CloudUi): string {
     <p class="plabel">${plabel}</p>
     ${nivBadge(store)}
     <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : cta}</button>
-    ${s.due > 0
-      ? `<div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy ? "disabled" : ""}>Repetera</button></div>`
-      : ""}
+    <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button></div>
   </div>`;
 }
 

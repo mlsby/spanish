@@ -157,7 +157,7 @@ async function boot(): Promise<void> {
     showTab("pass");
   }
 
-  /** Bara repetitioner — inga nya ord. Pausad övning fortsätts även här. */
+  /** Bara repetitioner — inga nya ord. Förfallna först, annars de närmast förfallande. */
   function startRep(): void {
     if (!sync.session) {
       showTab("idag");
@@ -165,13 +165,7 @@ async function boot(): Promise<void> {
       return;
     }
     if (sync.status === "syncing") return;
-    const paused = loadPass();
-    if (paused && pass.resume(paused)) {
-      showTab("pass");
-      return;
-    }
-    // bara redan mötta kort — introducerade-men-osedda väntar på nästa riktiga övning
-    const cards = store.dueCards().filter((c) => c.fsrs.reps > 0);
+    const cards = store.repCards();
     if (!cards.length) return;
     pass.start(cards, store.dueSoonCount());
     showTab("pass");

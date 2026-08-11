@@ -441,7 +441,7 @@ export class PassView {
         ${paused ? `<p>Du fortsätter där du slutade.</p>` : ""}
         <div class="btnrow" style="max-width:250px">
           <button class="btn" data-act="start" ${(!paused && total === 0) || busy ? "disabled" : ""}>${label}</button>
-          ${!paused && st.due > 0 ? `<button class="btn ghost" data-act="rep" ${busy ? "disabled" : ""}>Repetera</button>` : ""}
+          <button class="btn ghost" data-act="rep" ${busy || !st.repAvailable ? "disabled" : ""}>Repetera</button>
         </div></div>`;
     }
     if (this.state === "done") {

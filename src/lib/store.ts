@@ -341,6 +341,18 @@ export class Store {
     return this.introduceUnits(room, now);
   }
 
+  /**
+   * Repetitionskort ("Repetera"-knappen): förfallna sedda kort först; finns
+   * inga förfallna tas de som förfaller närmast (förhandsrepetition, max cap).
+   */
+  repCards(now: Date = new Date(), cap = 20): CardRec[] {
+    const seen = Object.values(this.data.cards)
+      .filter((c) => c.fsrs.reps > 0)
+      .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime());
+    const due = seen.filter((c) => dueDate(c).getTime() <= endOfToday(now).getTime());
+    return due.length ? due : seen.slice(0, cap);
+  }
+
   /** Budgetåterbäring vid fast-track: en extra enhet, utanför övningsmålet. */
   introduceExtra(now: Date = new Date()): CardRec[] {
     return this.introduceUnits(1, now);
@@ -443,6 +455,7 @@ export class Store {
       due: dueReps,
       nextNew: unseen + fresh, // nya enheter nästa övning innehåller (ärvda + påfyllda)
       firstToday,
+      repAvailable: this.repCards(now).length > 0,
     };
   }
 
