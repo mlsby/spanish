@@ -2,6 +2,19 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "ordlistan: sortera, filtrera, kompisregler")
+
+- **Sortera & filtrera (Lucas):** två tysta ikonknappar i sökraden (⇅ + tratt)
+  som öppnar bottenblad. Sortering: Vanligast · Nyast (senast introducerad,
+  omötta sist, datum på raden) · Krångligast (flest fel, felantal på raden) ·
+  A–Ö. Filter: Nivå, Regler (💡 kompisregel/egen/saknar) och Ordklass — OR
+  inom grupp, AND mellan. Tunn statusrad under sök med valen + antal + rensa;
+  valen sparas i localStorage (glosa.lista.v1). Ren logik i lib/listning.ts.
+- **💡-chip på raden:** kompisarnas regelinitialer via en klumpfråga
+  (social.ruleMarks, cache 5 min); kompisfiltret ignoreras/döljs utloggad.
+- **Oändlig lista:** "Visa fler"-knappen ersatt av IntersectionObserver
+  (100 rader/sida, förladdning 600 px innan slutet, "N ord" som slutrad).
+
 ## Klart (byggt 2026-08-11, släpp "synkfix — regelkopior")
 
 - **Buggfix (Lucas SQL-fynd):** efter migration 0002 (kompisregler läsbara

@@ -22,6 +22,8 @@ export interface FriendRule {
 export class Social {
   private nameCache: Map<string, string> | null = null;
   private nameCacheAt = 0;
+  private marksCache: Map<string, string[]> | null = null;
+  private marksCacheAt = 0;
 
   constructor(private sb: SupabaseClient, private uid: () => string | null) {}
 
@@ -87,6 +89,37 @@ export class Social {
       user_id: uid, streak: s.streak, total_days: s.totalDays,
       score: s.score, updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
+  }
+
+  /**
+   * Alla ord där någon kompis skrivit en minnesregel: ord-id → namn.
+   * En klumpfråga för ordlistans 💡-chippar (cache ~5 min). Tom map
+   * utloggad eller vid fel — listan ska aldrig störas av det sociala.
+   */
+  async ruleMarks(): Promise<Map<string, string[]>> {
+    const uid = this.uid();
+    if (!uid) return new Map();
+    if (this.marksCache && Date.now() - this.marksCacheAt < 300_000) return this.marksCache;
+    try {
+      const { data, error } = await this.sb
+        .from("user_words").select("word_id,user_id")
+        .neq("mnem", "").neq("user_id", uid);
+      if (error) return new Map();
+      const names = await this.allProfiles();
+      const map = new Map<string, string[]>();
+      for (const r of data ?? []) {
+        const name = names.get(r.user_id as string) ?? "okänd";
+        const list = map.get(r.word_id as string) ?? [];
+        if (!list.includes(name)) list.push(name);
+        map.set(r.word_id as string, list);
+      }
+      for (const list of map.values()) list.sort();
+      this.marksCache = map;
+      this.marksCacheAt = Date.now();
+      return map;
+    } catch {
+      return new Map();
+    }
   }
 
   /** Kompisarnas minnesregler för ett ord (kräver inloggning + migration 0002). */

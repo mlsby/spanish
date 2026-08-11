@@ -3,6 +3,10 @@ import type { Store, WordStatus } from "../lib/store";
 import { isKnown } from "../lib/scheduler";
 import type { CardRec, Level } from "../lib/types";
 import { LEVEL_SV, POS_LABEL } from "../lib/types";
+import {
+  antalFilter, dagEtikett, felAntal, filtreraLista, introAt, type ListFilter,
+  type PosGrupp, type RegelFilter, SORT_SV, sorteraLista, type SortKey,
+} from "../lib/listning";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -19,6 +23,26 @@ const MOVED_MSG: Record<Level, string> = {
   kan: "Kan det — kollas om 21 dagar.",
 };
 
+const LISTA_KEY = "glosa.lista.v1";
+
+interface ListaVal { sort: SortKey; niva: Level[]; regler: RegelFilter[]; pos: PosGrupp[] }
+
+function loadVal(): ListaVal {
+  try {
+    const raw = localStorage.getItem(LISTA_KEY);
+    if (raw) {
+      const v = JSON.parse(raw);
+      return { sort: v.sort ?? "vanligast", niva: v.niva ?? [], regler: v.regler ?? [], pos: v.pos ?? [] };
+    }
+  } catch { /* börja från standardläget */ }
+  return { sort: "vanligast", niva: [], regler: [], pos: [] };
+}
+
+const IKON_SORT = `<svg viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M8 5v14M8 19l-3.5-4M8 19l3.5-4M16 19V5M16 5l-3.5 4M16 5l3.5 4"/></svg>`;
+const IKON_FILTER = `<svg viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M4 5h16l-6.5 7.5v5L10.5 20v-7.5L4 5z"/></svg>`;
+
 export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): void {
   let query = "";
   let shown = PAGE;
@@ -26,7 +50,20 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
   let moved: { id: string; text: string } | null = null;
   /** senaste snabbmarkeringen — bär ögonblicksbilden som ångra återställer */
   let undo: { id: string; snap: (CardRec | null)[]; timer: number } | null = null;
+  const val = loadVal();
+  let sheet: "sort" | "filter" | null = null;
+  /** ord-id → kompisarnas namn (fylls i bakgrunden efter en klumpfråga) */
+  let marks = new Map<string, string[]>();
+  let lastTotal = 0;
 
+  function saveVal(): void {
+    try { localStorage.setItem(LISTA_KEY, JSON.stringify(val)); } catch { /* oväsentligt */ }
+  }
+  function filt(): ListFilter {
+    // kompis-filtret är meningslöst utan data (utloggad / inga kompisregler) — ignorera det då
+    const regler = marks.size ? val.regler : val.regler.filter((r) => r !== "kompis");
+    return { niva: val.niva, regler, pos: val.pos };
+  }
   function dropUndo(): void {
     if (undo) window.clearTimeout(undo.timer);
     undo = null;
@@ -34,17 +71,31 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
 
   el.innerHTML = `
     <div class="lista">
-      <label class="search">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="searchInput" type="search" placeholder="Sök bland ${store.words.length} ord …" aria-label="Sök ord">
-      </label>
+      <div class="searchrow">
+        <label class="search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="searchInput" type="search" placeholder="Sök bland ${store.words.length} ord …" aria-label="Sök ord">
+        </label>
+        <button type="button" class="icobtn" id="sortBtn" aria-label="Sortera">${IKON_SORT}</button>
+        <button type="button" class="icobtn" id="filtBtn" aria-label="Filtrera">${IKON_FILTER}<span class="bdot" hidden></span></button>
+      </div>
+      <div class="listastatus" id="statusRad" hidden></div>
       <div class="rows" id="rows"></div>
-      <button class="btn ghost visafler" id="moreBtn" hidden>Visa fler</button>
+      <div class="sentinel" id="sentinel" aria-hidden="true"></div>
+      <p class="slutrad" id="slutRad" hidden></p>
+      <div class="dimmer" id="dimmer" hidden></div>
+      <div class="blad" id="blad" hidden></div>
     </div>`;
 
   const rowsEl = el.querySelector<HTMLElement>("#rows")!;
-  const moreBtn = el.querySelector<HTMLButtonElement>("#moreBtn")!;
   const searchEl = el.querySelector<HTMLInputElement>("#searchInput")!;
+  const sortBtn = el.querySelector<HTMLButtonElement>("#sortBtn")!;
+  const filtBtn = el.querySelector<HTMLButtonElement>("#filtBtn")!;
+  const statusRad = el.querySelector<HTMLElement>("#statusRad")!;
+  const sentinel = el.querySelector<HTMLElement>("#sentinel")!;
+  const slutRad = el.querySelector<HTMLElement>("#slutRad")!;
+  const dimmer = el.querySelector<HTMLElement>("#dimmer")!;
+  const blad = el.querySelector<HTMLElement>("#blad")!;
 
   function matching(): WordStatus[] {
     const q = query.toLowerCase();
@@ -53,7 +104,9 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       if (q && !w.es.toLowerCase().includes(q) && !w.sv.toLowerCase().includes(q)) continue;
       out.push(store.wordStatus(w));
     }
-    return out;
+    const filtered = filtreraLista(out, filt(),
+      (id) => marks.has(id), (id) => !!store.userWord(id).mnem);
+    return sorteraLista(filtered, val.sort);
   }
 
   /** Exempelmening (Tatoeba) med ev. svensk översättning. */
@@ -85,6 +138,29 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       : ws.level === "pagang" ? 3 : 4;
     const dots = LEVELS.map((_, i) => `<i class="${i < fill ? `f-${ws.level}` : ""}"></i>`).join("");
     return `<span class="lpath" aria-label="nivå: ${LEVEL_SV[ws.level]}">${dots}</span>`;
+  }
+
+  /** 💡-chippen: vilka kompisar har en regel för ordet. */
+  function kompisChip(wordId: string): string {
+    const names = marks.get(wordId);
+    if (!names?.length) return "";
+    const label = names.length > 2
+      ? String(names.length)
+      : names.map((n) => (n[0] ?? "?").toUpperCase()).join(" ");
+    return `<span class="chip-kompis" title="${esc(names.join(", "))}">💡 ${esc(label)}</span>`;
+  }
+
+  /** Liten radnotis: datum i nyast-läget, felantal i krångligast-läget. */
+  function radNotis(ws: WordStatus): string {
+    if (val.sort === "nyast") {
+      const at = introAt(ws);
+      return at ? `<span class="datemeta">${esc(dagEtikett(at))}</span>` : "";
+    }
+    if (val.sort === "kranglig") {
+      const fel = felAntal(ws);
+      return fel > 0 ? `<span class="datemeta">${fel} fel</span>` : "";
+    }
+    return "";
   }
 
   /** Den tryckbara stegen i expansionen — tryck på ett steg för att flytta ordet. */
@@ -119,6 +195,8 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
             <span class="es">${esc(es)}</span><span class="sv">${esc(word.sv)}</span>
             <span class="meta">
               ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
+              ${kompisChip(word.id)}
+              ${radNotis(ws)}
               ${pathHtml(ws)}
             </span>
           </button>
@@ -147,21 +225,153 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       </div>`;
   }
 
+  const REGEL_SV: Record<RegelFilter, string> = {
+    kompis: "💡 Kompisregler", egen: "Egen regel", saknar: "Saknar regel",
+  };
+  const POSG_SV: Record<PosGrupp, string> = {
+    n: "Substantiv", v: "Verb", adj: "Adjektiv", ovrig: "Övrigt",
+  };
+
+  function renderStatus(total: number): void {
+    const f = filt();
+    const aktiva = antalFilter(f);
+    const parts: string[] = [];
+    if (val.sort !== "vanligast") parts.push(`<b>${SORT_SV[val.sort]}</b>`);
+    for (const n of f.niva) parts.push(`<b>${LEVEL_SV[n]}</b>`);
+    for (const r of f.regler) parts.push(`<b>${REGEL_SV[r]}</b>`);
+    for (const p of f.pos) parts.push(`<b>${POSG_SV[p]}</b>`);
+    statusRad.hidden = parts.length === 0;
+    if (parts.length) {
+      statusRad.innerHTML = `${parts.join("<span class=\"skilj\">·</span>")}
+        <span class="antal">${total} ord</span>
+        ${aktiva ? `<button type="button" class="rensa" data-rensa>rensa</button>` : ""}`;
+    }
+    sortBtn.classList.toggle("set", val.sort !== "vanligast");
+    filtBtn.classList.toggle("on", aktiva > 0);
+    filtBtn.querySelector<HTMLElement>(".bdot")!.hidden = aktiva === 0;
+  }
+
   function renderRows(): void {
     const list = matching();
+    lastTotal = list.length;
     rowsEl.innerHTML = list.slice(0, shown).map(rowHtml).join("");
-    moreBtn.hidden = list.length <= shown;
-    moreBtn.textContent = `Visa fler (${Math.max(0, list.length - shown)} kvar)`;
+    renderStatus(list.length);
+    const klar = list.length <= shown;
+    sentinel.hidden = klar;
+    slutRad.hidden = !klar;
+    slutRad.textContent = list.length === store.words.length
+      ? `${list.length} ord` : `${list.length} ord matchar`;
+    // väck observern så nästa sida laddas direkt om slutet redan syns
+    io.unobserve(sentinel);
+    if (!klar) io.observe(sentinel);
   }
+
+  // oändlig lista: ladda nästa sida när slut-vakten närmar sig skärmen
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting) && shown < lastTotal) {
+      shown += PAGE;
+      renderRows();
+    }
+  }, { rootMargin: "600px 0px" });
+
+  // ---------- bottenblad ----------
+  function sortBladHtml(): string {
+    const opt = (key: SortKey, sub: string) => `
+      <button type="button" class="sopt${val.sort === key ? " on" : ""}" data-sort="${key}">
+        <i></i>${SORT_SV[key]}<small>${sub}</small></button>`;
+    return `<div class="grip"></div><div class="bladt">Sortera</div>
+      ${opt("vanligast", "frekvens i spanskan")}
+      ${opt("nyast", "senast introducerad")}
+      ${opt("kranglig", "flest fel")}
+      ${opt("alfa", "alfabetiskt")}`;
+  }
+
+  function filterBladHtml(): string {
+    const tag = (grupp: string, key: string, label: string, on: boolean, varm = false) =>
+      `<button type="button" class="tagg${on ? " on" : ""}${varm ? " varm" : ""}"
+        data-tag="${grupp}" data-key="${key}">${label}</button>`;
+    const nivaTags = LEVELS.map((l) => tag("niva", l, LEVEL_SV[l], val.niva.includes(l))).join("");
+    const regelTags = [
+      marks.size ? tag("regler", "kompis", REGEL_SV.kompis, val.regler.includes("kompis"), true) : "",
+      tag("regler", "egen", REGEL_SV.egen, val.regler.includes("egen")),
+      tag("regler", "saknar", REGEL_SV.saknar, val.regler.includes("saknar")),
+    ].join("");
+    const posTags = (Object.keys(POSG_SV) as PosGrupp[])
+      .map((p) => tag("pos", p, POSG_SV[p], val.pos.includes(p))).join("");
+    return `<div class="grip"></div>
+      <div class="bladt">Nivå</div><div class="taggrp">${nivaTags}</div>
+      <div class="bladt">Regler</div><div class="taggrp">${regelTags}</div>
+      <div class="bladt">Ordklass</div><div class="taggrp">${posTags}</div>
+      <div class="bladbtns">
+        <button type="button" class="btn ghost" data-rensa>Rensa</button>
+        <button type="button" class="btn" data-stang>Visa ${lastTotal} ord</button>
+      </div>`;
+  }
+
+  function openSheet(which: "sort" | "filter"): void {
+    sheet = which;
+    dimmer.hidden = false;
+    blad.hidden = false;
+    blad.innerHTML = which === "sort" ? sortBladHtml() : filterBladHtml();
+  }
+  function closeSheet(): void {
+    sheet = null;
+    dimmer.hidden = true;
+    blad.hidden = true;
+  }
+
+  sortBtn.addEventListener("click", () => openSheet("sort"));
+  filtBtn.addEventListener("click", () => openSheet("filter"));
+  dimmer.addEventListener("click", closeSheet);
+
+  blad.addEventListener("click", (e) => {
+    const t = e.target as HTMLElement;
+    const sopt = t.closest<HTMLElement>("[data-sort]");
+    if (sopt) {
+      val.sort = sopt.dataset.sort as SortKey;
+      saveVal();
+      shown = PAGE;
+      renderRows();
+      closeSheet();
+      return;
+    }
+    const tagg = t.closest<HTMLElement>("[data-tag]");
+    if (tagg) {
+      const grupp = tagg.dataset.tag as "niva" | "regler" | "pos";
+      const key = tagg.dataset.key!;
+      const list = val[grupp] as string[];
+      const i = list.indexOf(key);
+      if (i >= 0) list.splice(i, 1); else list.push(key);
+      saveVal();
+      shown = PAGE;
+      renderRows();
+      if (sheet === "filter") blad.innerHTML = filterBladHtml();
+      return;
+    }
+    if (t.closest("[data-rensa]")) {
+      val.niva = []; val.regler = []; val.pos = [];
+      saveVal();
+      shown = PAGE;
+      renderRows();
+      if (sheet === "filter") blad.innerHTML = filterBladHtml();
+      return;
+    }
+    if (t.closest("[data-stang]")) closeSheet();
+  });
+
+  statusRad.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("[data-rensa]")) {
+      val.niva = []; val.regler = []; val.pos = [];
+      saveVal();
+      shown = PAGE;
+      renderRows();
+    }
+  });
 
   searchEl.addEventListener("input", () => {
     query = searchEl.value.trim();
     shown = PAGE;
     moved = null;
-    renderRows();
-  });
-  moreBtn.addEventListener("click", () => {
-    shown += PAGE;
     renderRows();
   });
 
@@ -252,4 +462,16 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
   });
 
   renderRows();
+
+  // 💡-markeringarna fylls på i bakgrunden — rita om när de landat
+  if (social) {
+    void social.ruleMarks().then((m) => {
+      if (!m.size || !el.contains(rowsEl)) return;
+      marks = m;
+      const a = document.activeElement;
+      if (a && rowsEl.contains(a) && a.matches("input,textarea")) return;
+      renderRows();
+      if (sheet === "filter") blad.innerHTML = filterBladHtml();
+    });
+  }
 }
