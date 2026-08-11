@@ -105,7 +105,6 @@ export class LasView {
       if (act === "retry") void this.start();
       if (act === "ord") { this.state = "fraga"; this.render(); this.input.focus(); }
       if (act === "giveup") this.svara("");
-      if (act === "next") this.nasta();
     });
     // knappar får aldrig sno fokus från textfältet — annars fälls mobiltangentbordet ihop
     el.addEventListener("pointerdown", (e) => {
@@ -183,6 +182,7 @@ export class LasView {
     } else {
       this.store.snapshotToday();
       this.state = "klar";
+      this.input.blur(); // svarsfältet göms — fäll ihop tangentbordet så hela texten syns
       this.render();
     }
   }
@@ -273,16 +273,13 @@ export class LasView {
       <p class="fine">Enter för nästa</p>` };
   }
 
-  /** Knappraden under kortet (bara i lägen utan svarsfält, plus facit-läget). */
+  /** Knappraden under kortet — bara i lägen utan svarsfält (facit går vidare med Enter/→). */
   private knappHtml(): string {
     if (this.state === "fel") {
       return `<button type="button" class="btn" data-act="retry">Försök igen</button>`;
     }
     if (this.state === "las") {
       return `<button type="button" class="btn" data-act="ord">Vidare till orden</button>`;
-    }
-    if (this.state === "svar") {
-      return `<button type="button" class="btn" data-act="next">${this.idx + 1 < this.quiz.length ? "Nästa ord" : "Se texten igen"}</button>`;
     }
     if (this.state === "klar") {
       return `<button type="button" class="btn ghost" data-act="retry">Läs en ny text</button>
