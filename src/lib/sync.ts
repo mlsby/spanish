@@ -88,6 +88,28 @@ export function mergeCloudIntoLocal(data: AppData, cloud: CloudRows): number {
   return adopted;
 }
 
+/**
+ * Rensar lokala regler som inte längre finns bland användarens egna molnrader.
+ * Skyddar rader som väntar på push (dirty) och rader ändrade efter senaste synk
+ * (offline-ändringar). Krävs för att serverstädning inte ska ångras av gamla
+ * lokala kopior vid nästa pushEverything.
+ */
+export function reconcileUserWords(
+  data: AppData,
+  cloudWordIds: Set<string>,
+  dirty: Set<string>,
+  lastSyncAt: string,
+): number {
+  let dropped = 0;
+  for (const wordId of Object.keys(data.userWords)) {
+    if (cloudWordIds.has(wordId) || dirty.has(wordId)) continue;
+    if (newerThan(data.userWords[wordId].updatedAt, lastSyncAt)) continue;
+    delete data.userWords[wordId];
+    dropped++;
+  }
+  return dropped;
+}
+
 interface SyncMeta { reviewsSynced: number; lastSyncAt?: string }
 const META_KEY = "glosa.sync.v1";
 
@@ -155,6 +177,17 @@ export class CloudSync {
     try {
       const cloud = await this.pullAll();
       mergeCloudIntoLocal(this.store.data, cloud);
+      // Har enheten synkat förut? Då ska regler som raderats i molnet inte
+      // återuppstå ur gamla lokala kopior. Första synken hoppar över detta
+      // så att offline-skapade regler bevaras och pushas.
+      if (this.meta.lastSyncAt) {
+        reconcileUserWords(
+          this.store.data,
+          new Set(cloud.userWords.map((r) => r.word_id)),
+          this.dirtyWords,
+          this.meta.lastSyncAt,
+        );
+      }
       this.store.save();
       await this.pushEverything();
       this.meta.lastSyncAt = new Date().toISOString();
@@ -185,15 +218,21 @@ export class CloudSync {
   }
 
   private async pullAll(): Promise<CloudRows> {
+    // user_words är läsbar för alla inloggade (kompisregler) sedan 0002 —
+    // egna pulls MÅSTE därför filtrera på user_id, annars adopteras andras
+    // regler och sprids vidare vid nästa push. Övriga tabeller filtreras
+    // likadant som skydd även om RLS redan begränsar dem.
+    const uid = this.uid();
+    const own = (q: any) => q.eq("user_id", uid);
     const since = new Date(Date.now() - 120 * 24 * 3600 * 1000).toISOString();
     const [cards, userWords, snapshots, reviewRows] = await Promise.all([
-      this.pageAll<CardRow>("cards", "word_id,dir,fsrs,fail_count,introduced_at,updated_at"),
-      this.pageAll<UserWordRow>("user_words", "word_id,syn,mnem,updated_at"),
-      this.pageAll<SnapshotRow>("snapshots", "day,kan,lar"),
-      this.pageAll<{ ts: string }>("reviews", "ts", (q) => q.gte("ts", since)),
+      this.pageAll<CardRow>("cards", "word_id,dir,fsrs,fail_count,introduced_at,updated_at", own),
+      this.pageAll<UserWordRow>("user_words", "word_id,syn,mnem,updated_at", own),
+      this.pageAll<SnapshotRow>("snapshots", "day,kan,lar", own),
+      this.pageAll<{ ts: string }>("reviews", "ts", (q) => own(q).gte("ts", since)),
     ]);
     const { data: settings, error } = await this.sb
-      .from("settings").select("new_per_day,updated_at").maybeSingle();
+      .from("settings").select("new_per_day,updated_at").eq("user_id", uid).maybeSingle();
     if (error) throw new Error(`settings: ${error.message}`);
     return { cards, userWords, snapshots, settings, reviewTs: reviewRows.map((r) => r.ts) };
   }

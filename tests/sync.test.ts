@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cardStamp, mergeCloudIntoLocal, newerThan, type CloudRows } from "../src/lib/sync";
+import { cardStamp, mergeCloudIntoLocal, newerThan, reconcileUserWords, type CloudRows } from "../src/lib/sync";
 import { emptyData } from "../src/lib/storage";
 import { newCardRec } from "../src/lib/scheduler";
 import { dayKey } from "../src/lib/time";
@@ -93,7 +93,44 @@ describe("mergeCloudIntoLocal", () => {
     expect(data.snapshots["2026-01-15"]).toEqual({ kan: 2, lar: 3 });
   });
 
-  it("cardStamp faller tillbaka på last_review och introducedAt", () => {
+});
+
+describe("reconcileUserWords (städar bort molnraderade kopior)", () => {
+  const SYNC = "2026-08-10T00:00:00Z";
+  const uw = (mnem: string, updatedAt: string) => ({ syn: [], mnem, updatedAt });
+
+  it("släpper lokal regel som saknas i egna molnrader", () => {
+    const data = emptyData();
+    data.userWords["quedar|v"] = uw("kopia från annan användare", "2026-08-01T00:00:00Z");
+    const n = reconcileUserWords(data, new Set(), new Set(), SYNC);
+    expect(n).toBe(1);
+    expect(data.userWords["quedar|v"]).toBeUndefined();
+  });
+
+  it("behåller regel som finns i molnet", () => {
+    const data = emptyData();
+    data.userWords["quedar|v"] = uw("min egen", "2026-08-01T00:00:00Z");
+    reconcileUserWords(data, new Set(["quedar|v"]), new Set(), SYNC);
+    expect(data.userWords["quedar|v"]).toBeDefined();
+  });
+
+  it("behåller dirty-regel som väntar på push", () => {
+    const data = emptyData();
+    data.userWords["quedar|v"] = uw("nyss skriven", "2026-08-01T00:00:00Z");
+    reconcileUserWords(data, new Set(), new Set(["quedar|v"]), SYNC);
+    expect(data.userWords["quedar|v"]).toBeDefined();
+  });
+
+  it("behåller regel ändrad efter senaste synk (offline-ändring)", () => {
+    const data = emptyData();
+    data.userWords["quedar|v"] = uw("offline-ändrad", "2026-08-11T00:00:00Z");
+    reconcileUserWords(data, new Set(), new Set(), SYNC);
+    expect(data.userWords["quedar|v"]).toBeDefined();
+  });
+});
+
+describe("cardStamp", () => {
+  it("faller tillbaka på last_review och introducedAt", () => {
     const rec = newCardRec("x|n", "es2sv", new Date("2026-03-01"));
     delete rec.fsrs.last_review;
     expect(cardStamp(rec)).toBe(rec.updatedAt ?? rec.introducedAt);
