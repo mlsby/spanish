@@ -1,0 +1,277 @@
+<title>Glosa · Ordlistan — sortering & kompisregler</title>
+<style>
+  :root{
+    --bg:#F4F4F2; --ink:#1E2126; --muted:#6A7078; --line:#DFE0DC; --card:#FFFFFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --ink:#E9EAEC; --muted:#9AA0A8; --line:#2E3238; --card:#1D2025;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  h1{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:clamp(30px,4.6vw,42px);margin:0;line-height:1.08;text-wrap:balance}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.55;max-width:70ch;margin:12px 0 0}
+  .sub b{color:var(--ink)}
+  section{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}
+  section h2{font-family:ui-serif,Georgia,serif;font-size:25px;margin:0 0 4px}
+  .blurb{color:var(--muted);font-size:14.5px;line-height:1.6;max-width:74ch;margin:4px 0 16px}
+  .blurb b{color:var(--ink)}
+  .minirow{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+  .minicol{flex:0 0 262px;display:flex;flex-direction:column}
+  .mini{width:262px;min-height:400px;scroll-snap-align:start;
+        background:var(--m-app);color:var(--m-ink);border:1px solid var(--m-line);
+        border-radius:22px;padding:14px 12px 12px;display:flex;flex-direction:column;gap:7px;
+        box-shadow:0 10px 26px rgba(30,24,16,.12)}
+  .mini,.mini *{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .mlabel{text-align:center;font-family:ui-monospace,Menlo,monospace !important;
+          font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+
+  .mini{
+    --m-app:#F7F3EB; --m-card:#FFFDF8; --m-ink:#2B241E; --m-muted:#79695A; --m-line:#E6DCCB; --m-rule:#F0EADD;
+    --m-accent:#59452F; --m-on:#FFF9EF; --m-soft:#EFE6D6;
+    --m-good:#54683A; --m-goodbg:#EEF1E1; --m-goodline:#D8DFC2;
+    --m-warn:#96660F; --m-warnbg:#F8EFD9; --m-warnline:#E9D6A8;
+    --m-brons:#9A7F5B; --m-bronsbg:#EFE4D2;
+  }
+  .m-mono{font-family:ui-monospace,Menlo,Consolas,monospace !important}
+  .m-search{background:var(--m-card);border:1px solid var(--m-line);border-radius:9px;padding:6px 9px;
+            font-size:9px;color:var(--m-muted)}
+  .m-row{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;overflow:hidden}
+  .m-rowtop{display:flex;align-items:center;gap:6px;padding:7px 9px}
+  .m-rowtop .es{font-weight:600;font-size:10.5px;flex:none}
+  .m-rowtop .sv{color:var(--m-muted);font-size:8.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .m-rowx{border-top:1px solid var(--m-line);padding:8px 9px;display:flex;flex-direction:column;gap:7px;text-align:left}
+  .m-xl{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-muted)}
+
+  .m-path{display:flex;align-items:center;gap:3px;flex:none}
+  .m-path i{width:5px;height:5px;border-radius:50%;background:var(--m-rule);border:1px solid var(--m-line)}
+  .m-path i.fill-ovar{background:var(--m-warn);border-color:var(--m-warn)}
+  .m-path i.fill-pagang{background:var(--m-brons);border-color:var(--m-brons)}
+  .m-path i.fill-kan{background:var(--m-good);border-color:var(--m-good)}
+
+  /* verktygsraden (A) */
+  .m-tools{display:flex;gap:5px;align-items:center}
+  .m-seg{display:flex;border:1px solid var(--m-line);border-radius:8px;overflow:hidden;background:var(--m-card)}
+  .m-seg span{font-size:8px;padding:4px 9px;color:var(--m-muted)}
+  .m-seg span.on{background:var(--m-accent);color:var(--m-on);font-weight:600}
+  .m-fchip{font-size:8px;border:1px solid var(--m-line);border-radius:99px;padding:4px 8px;
+           color:var(--m-muted);background:var(--m-card);margin-left:auto}
+  .m-fchip.on{background:var(--m-warnbg);border-color:var(--m-warnline);color:var(--m-warn);font-weight:600}
+
+  /* chipsraden (B) */
+  .m-chips{display:flex;gap:4px}
+  .m-chips .c{font-size:8px;border:1px solid var(--m-line);border-radius:99px;padding:4px 9px;
+              color:var(--m-muted);background:var(--m-card);white-space:nowrap}
+  .m-chips .c.on{background:var(--m-accent);color:var(--m-on);border-color:var(--m-accent);font-weight:600}
+  .m-chips .c.filt.on{background:var(--m-warnbg);color:var(--m-warn);border-color:var(--m-warnline)}
+
+  /* indikatorer */
+  .m-kchip{font-size:7px;font-weight:700;border-radius:99px;padding:2px 5px;flex:none;
+           background:var(--m-warnbg);color:var(--m-warn);border:1px solid var(--m-warnline)}
+  .m-regel{font-size:6.5px;text-transform:uppercase;letter-spacing:.05em;border-radius:99px;
+           padding:2px 5px;flex:none;background:var(--m-soft);color:var(--m-accent)}
+  .m-kdot{width:5px;height:5px;border-radius:50%;flex:none;background:#DFA83C;
+          box-shadow:0 0 4px rgba(223,168,60,.8)}
+  .m-date{font-size:7px;color:var(--m-muted);flex:none}
+  .m-countline{font-size:7.5px;color:var(--m-muted);text-align:center;margin-top:1px}
+
+  /* expansionen: kompisarnas regler */
+  .m-frt{font-size:6.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--m-warn)}
+  .m-frq{display:flex;gap:4px;align-items:baseline;font-size:8.5px}
+  .m-frq .who{font-weight:700;flex:none;color:var(--m-warn)}
+  .m-frq .q{font-style:italic}
+  .m-snobtn{font-size:7.5px;color:var(--m-accent);text-decoration:underline}
+  .m-mnem{font-size:8.5px;font-style:italic;background:var(--m-soft);border-radius:7px;padding:5px 7px}
+
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:14.5px;line-height:1.65;max-width:74ch}
+  footer b{color:var(--ink)}
+</style>
+
+<div class="page" lang="sv">
+  <p class="eyebrow">Sand · ordlistan · sortering & kompisregler · inget byggt än</p>
+  <h1>Ordlistan: nyast först, och kompisarnas regler syns</h1>
+  <p class="sub">Tre nyheter i samma vy: <b>sortera på nyast</b> (senast introducerade överst — ord du
+  inte mött än hamnar sist), en <b>indikator på raden</b> när en kompis skrivit en regel för ordet,
+  och ett <b>filter</b> som visar bara de orden. Regeltexterna ligger som idag i expansionen under
+  "Kompisarnas regler" — med sno-knappen.</p>
+
+  <!-- ============ A ============ -->
+  <section>
+    <h2>A · Verktygsraden + namnchip</h2>
+    <div class="blurb">Under sökrutan: en <b>segmentknapp</b> för sortering (Vanligast / Nyast) och en
+    <b>💡-knapp</b> till höger som filtrerar fram kompisregel-orden. På raden syns en varm chip med
+    kompisens initial — <b>💡 V</b> betyder att Viljamito har en regel. I Nyast-läget visar raden även
+    <b>när ordet kom in</b> (idag / igår / datum). Tydligast: man ser direkt vem, och sorteringen får
+    en tidslinjekänsla.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-tools">
+            <div class="m-seg"><span class="on">Vanligast</span><span>Nyast</span></div>
+            <span class="m-fchip">💡 Kompisregler</span>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">ser</span><span class="sv">vara</span>
+            <span class="m-kchip">💡 E</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">estar</span><span class="sv">vara, må</span>
+            <span class="m-kchip">💡 E</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">haber</span><span class="sv">ha (hjälpverb)</span>
+            <span class="m-kchip">💡 E</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span>
+            <span class="m-regel">regel</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">ir</span><span class="sv">gå, åka</span>
+            <span class="m-kchip">💡 V</span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">A · vanligast — chip visar vem</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-tools">
+            <div class="m-seg"><span>Vanligast</span><span class="on">Nyast</span></div>
+            <span class="m-fchip">💡 Kompisregler</span>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la cosa</span><span class="sv">sak</span>
+            <span class="m-date m-mono">idag</span>
+            <span class="m-path"><i class="fill-ovar"></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">porque</span><span class="sv">eftersom</span>
+            <span class="m-date m-mono">idag</span>
+            <span class="m-path"><i class="fill-ovar"></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el acuerdo</span><span class="sv">överenskommelse</span>
+            <span class="m-regel">regel</span><span class="m-date m-mono">igår</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">necesitar</span><span class="sv">behöva</span>
+            <span class="m-date m-mono">igår</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">seguir</span><span class="sv">följa, fortsätta</span>
+            <span class="m-date m-mono">8 aug</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">estar</span><span class="sv">vara, må</span>
+            <span class="m-kchip">💡 E</span><span class="m-date m-mono">6 aug</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-countline">ord du inte mött än ligger sist, i frekvensordning</div>
+        </div>
+        <div class="mlabel">A · nyast — med datum</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-tools">
+            <div class="m-seg"><span class="on">Vanligast</span><span>Nyast</span></div>
+            <span class="m-fchip on">💡 Kompisregler · 7</span>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">y</span><span class="sv">och</span>
+            <span class="m-kchip">💡 E</span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">ser</span><span class="sv">vara</span>
+            <span class="m-kchip">💡 E</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row">
+            <div class="m-rowtop"><span class="es">ir</span><span class="sv">gå, åka</span><span class="m-kchip">💡 V</span></div>
+            <div class="m-rowx">
+              <div><div class="m-xl">verb</div></div>
+              <div>
+                <div class="m-frt">Kompisarnas regler</div>
+                <div class="m-frq"><span class="who">Viljamito</span><span class="q">"gå ir väg"</span></div>
+                <span class="m-snobtn">sno regeln →</span>
+              </div>
+              <div><div class="m-xl">Minnesregel — din egen</div>
+                <div class="m-mnem" style="font-style:normal;color:var(--m-muted)">Skriv något som får ordet att fastna …</div></div>
+            </div>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">estar</span><span class="sv">vara, må</span>
+            <span class="m-kchip">💡 E</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">A · filtret på — bara kompisregler</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section>
+    <h2>B · Chipsraden + glödprick</h2>
+    <div class="blurb">Allt bor i <b>en chiprad</b>: två sorteringschips och filterchipet sida vid sida —
+    lättare att bygga ut senare (fler filter, t.ex. nivå). Indikatorn är <b>diskretare</b>: en liten
+    bärnstensglöd före nivåprickarna, utan namn — vem det är ser man först i expansionen. Lugnare rader,
+    men du måste öppna ordet för att se vems regeln är, och pricken är lätt att missa.</div>
+    <div class="minirow">
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-chips"><span class="c on">Vanligast</span><span class="c">Nyast</span><span class="c filt">💡 Kompisregler</span></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">ser</span><span class="sv">vara</span>
+            <span class="m-kdot"></span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">estar</span><span class="sv">vara, må</span>
+            <span class="m-kdot"></span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">quedar</span><span class="sv">bli kvar</span>
+            <span class="m-regel">regel</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">ir</span><span class="sv">gå, åka</span>
+            <span class="m-kdot"></span>
+            <span class="m-path"><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i><i class="fill-kan"></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">el desarrollo</span><span class="sv">utveckling</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">la orilla</span><span class="sv">strand</span>
+            <span class="m-path"><i></i><i></i><i></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">B · listan — glödprick</div>
+      </div>
+      <div class="minicol">
+        <div class="mini">
+          <div class="m-search">🔍 Sök bland 5 000 ord …</div>
+          <div class="m-chips"><span class="c">Vanligast</span><span class="c on">Nyast</span><span class="c filt on">💡 · 7</span></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">estar</span><span class="sv">vara, må</span>
+            <span class="m-kdot"></span><span class="m-date m-mono">6 aug</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row">
+            <div class="m-rowtop"><span class="es">se</span><span class="sv">sig</span><span class="m-kdot"></span><span class="m-date m-mono">6 aug</span></div>
+            <div class="m-rowx">
+              <div><div class="m-xl">pronomen</div></div>
+              <div>
+                <div class="m-frt">Kompisarnas regler</div>
+                <div class="m-frq"><span class="who">Ebbonito</span><span class="q">"se sig"</span></div>
+                <span class="m-snobtn">sno regeln →</span>
+              </div>
+            </div>
+          </div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">haber</span><span class="sv">ha (hjälpverb)</span>
+            <span class="m-kdot"></span><span class="m-date m-mono">5 aug</span>
+            <span class="m-path"><i class="fill-ovar"></i><i class="fill-ovar"></i><i></i><i></i></span></div></div>
+          <div class="m-row"><div class="m-rowtop"><span class="es">por</span><span class="sv">för, genom</span>
+            <span class="m-kdot"></span><span class="m-date m-mono">4 aug</span>
+            <span class="m-path"><i class="fill-pagang"></i><i class="fill-pagang"></i><i class="fill-pagang"></i><i></i></span></div></div>
+        </div>
+        <div class="mlabel">B · nyast + filter på</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Under huven (samma för båda):</b> kompisarnas regler hämtas i <b>en</b> klumpfråga när ordlistan
+    öppnas (bara ord-id + namn, cachas några minuter) — inte en fråga per ord. "Nyast" sorterar på när
+    ordet introducerades för dig; ord utan kort ligger sist i frekvensordning. Filtret och sorteringen
+    minns senaste valet. Utloggad: ingen chip/prick, filtret döljs.<br><br>
+    <b>Vilken kör vi — A eller B?</b> Min lutning: A. Initialen gör att man direkt ser vems regel det
+    är (och vill trycka), och 💡-knappen är lätt att hitta. B är snyggast i raden men gömmer poängen.
+  </footer>
+</div>
