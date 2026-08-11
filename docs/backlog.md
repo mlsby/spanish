@@ -2,6 +2,16 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "synkfix — regelkopior")
+
+- **Buggfix (Lucas SQL-fynd):** efter migration 0002 (kompisregler läsbara
+  för alla inloggade) pullade synken user_words ofiltrerat — alla adopterade
+  allas regler och pushade dem vidare under eget user_id (identiska
+  tidsstämplar avslöjade det; rule_adoptions var tom). Nu filtrerar pullAll
+  alla tabeller på egen user_id, och initialSync städar lokala regler som
+  raderats ur egna molnrader (dirty + offline-ändringar skyddas) så att
+  serverstädningen inte ångras. Städ-SQL körs separat av Lucas.
+
 ## Klart (byggt 2026-08-11, släpp "nivåresan")
 
 - **Repetera alltid tillgänglig (Lucas):** knappen visas i alla hjältelägen
