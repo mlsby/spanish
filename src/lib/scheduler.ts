@@ -7,7 +7,9 @@ import type { CardRec, Dir, Grade, StoredFsrs } from "./types";
 /** FSRS med default-parametrar och retention-mål 0,90 enligt kravspec §4. */
 const scheduler = fsrs(generatorParameters({ request_retention: 0.9 }));
 
-export const KNOWN_STABILITY_DAYS = 30;
+// Anki-mature-konventionen: tredje lyckade repetitionen (~25 d stabilitet)
+// ska räcka — se docs/research-troskel.md
+export const KNOWN_STABILITY_DAYS = 21;
 
 function toStored(c: FsrsCard): StoredFsrs {
   return {

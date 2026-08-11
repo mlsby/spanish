@@ -1,7 +1,7 @@
 import type { AppData, CardRec, Dir, DirtyKind, Level, ReviewRec, UserWord, VerbForm, Word } from "./types";
 import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
 import { svBestamd } from "./grading";
-import { dueDate, isKnown, levelCardRec, newCardRec } from "./scheduler";
+import { dueDate, isKnown, KNOWN_STABILITY_DAYS, levelCardRec, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
 import { dayKey, endOfToday } from "./time";
 
@@ -411,19 +411,21 @@ export class Store {
           },
         });
       } else {
-        this.putCard(levelCardRec(cur, wordId, dir, level === "kan" ? 30 : 14, now));
+        this.putCard(levelCardRec(cur, wordId, dir, level === "kan" ? KNOWN_STABILITY_DAYS : 14, now));
       }
     }
     this.save();
   }
 
   stats(now: Date = new Date()) {
+    // poängen räknas på NIVÅN: ny = inget svar än; lar = på väg (minst ett svar);
+    // kan = sitter. Introducerade men obesvarade ord ger ingen poäng.
     let ny = 0, lar = 0, kan = 0;
     for (const w of this.words) {
-      const s = this.wordStatus(w).status;
-      if (s === "ny") ny++;
-      else if (s === "lar") lar++;
-      else kan++;
+      const lvl = this.wordStatus(w).level;
+      if (lvl === "ny") ny++;
+      else if (lvl === "kan") kan++;
+      else lar++;
     }
     // repetitioner = förfallna kort som mötts minst en gång; osedda räknas som "nya"
     const dueReps = this.dueCards(now).filter((c) => c.fsrs.reps > 0).length;
@@ -434,6 +436,7 @@ export class Store {
     const fresh = room > 0 ? this.nextIntroUnits(room, now).length : 0;
     return {
       ny, lar, kan,
+      score: kan + lar, // nivåresans poäng — orden man kan + orden på väg
       started: lar + kan,
       total: this.words.length,
       goal: 5000,

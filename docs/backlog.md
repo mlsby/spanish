@@ -4,6 +4,14 @@ Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
 ## Klart (byggt 2026-08-11, släpp "nivåresan")
 
+- **21-dagarsgränsen + optimistisk poäng (Lucas):** "kan det" = stabilitet
+  ≥ 21 d (Anki-mature; research i docs/research-troskel.md — tredje lyckade
+  repetitionen ~25 d ska räcka, 30 missade den med en hårsmån). Banden nu
+  <7 / 7–21 / ≥21; ✓/stegen sätter 21. Nivåresans POÄNG = kan det + "på väg"
+  (ord med minst ett svar, ljusgrönt i baren) — ny användare låser upp
+  Curioso redan i första passet. Poängen kan bara minska via nollställning.
+  Grafen och topplistan står kvar på strikta kan det-talet.
+
 - **Startsidan städad (Lucas):** korträkningen och nedbrytningen borta ur
   hjälten. Kvar: nivåmärket (🏅 Turista · 133 ord), primärknappen (Starta
   dagens övning / Öva mer / Fortsätt övningen) och en ghost-knapp

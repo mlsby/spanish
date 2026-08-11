@@ -39,7 +39,7 @@ describe("nivåstegen: beräknad nivå", () => {
     expect(store.wordStatus(WORDS[0]).level).not.toBe("ny");
   });
 
-  it("banden: <7 övar · 7–30 på gång · ≥30 båda håll kan det", () => {
+  it("banden: <7 övar · 7–21 på gång · ≥21 båda håll kan det", () => {
     store.setLevel("hola|interj", "kan");
     expect(store.wordStatus(WORDS[0]).level).toBe("kan");
     store.setLevel("hola|interj", "pagang");
@@ -60,15 +60,15 @@ describe("nivåstegen: flytta för hand", () => {
   let store: Store;
   beforeEach(() => { store = makeStore(); });
 
-  it("'kan det' på ett orört ord: ~30 d stabilitet, kollas om ~30 dagar", () => {
+  it("'kan det' på ett orört ord: ~21 d stabilitet, kollas om ~21 dagar", () => {
     const now = new Date();
     store.setLevel("hola|interj", "kan", now);
     for (const dir of ["es2sv", "sv2es"] as const) {
       const c = store.card("hola|interj", dir)!;
-      expect(c.fsrs.stability).toBe(30);
+      expect(c.fsrs.stability).toBe(21);
       const days = (new Date(c.fsrs.due).getTime() - now.getTime()) / 86400e3;
-      expect(days).toBeGreaterThan(29);
-      expect(days).toBeLessThan(31);
+      expect(days).toBeGreaterThan(20);
+      expect(days).toBeLessThan(22);
     }
     // räknas i statistiken som "kan det"
     expect(store.stats().kan).toBe(1);
@@ -101,7 +101,7 @@ describe("nivåstegen: flytta för hand", () => {
 
   it("markeringen är ärlig: fel vid nästa rep sänker stabiliteten rejält", () => {
     store.setLevel("hola|interj", "kan");
-    const later = new Date(Date.now() + 30 * 86400e3);
+    const later = new Date(Date.now() + 21 * 86400e3);
     const failed = applyReview(store.card("hola|interj", "es2sv")!, "again", later);
     expect(failed.fsrs.stability).toBeLessThan(7); // tillbaka i inlärning
   });
@@ -145,7 +145,7 @@ describe("snabbmarkering: ✓ + ångra", () => {
     const before = store.card("hola|interj", "es2sv")!;
     const snap = store.cardSnapshot("hola|interj");
     store.setLevel("hola|interj", "kan");
-    expect(store.card("hola|interj", "es2sv")!.fsrs.stability).toBe(30);
+    expect(store.card("hola|interj", "es2sv")!.fsrs.stability).toBe(21);
     store.restoreCards("hola|interj", snap);
     const after = store.card("hola|interj", "es2sv")!;
     expect(after.fsrs.stability).toBe(before.fsrs.stability);

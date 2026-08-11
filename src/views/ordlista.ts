@@ -1,5 +1,6 @@
 import type { Social } from "../lib/social";
 import type { Store, WordStatus } from "../lib/store";
+import { isKnown } from "../lib/scheduler";
 import type { CardRec, Level } from "../lib/types";
 import { LEVEL_SV, POS_LABEL } from "../lib/types";
 
@@ -15,7 +16,7 @@ const MOVED_MSG: Record<Level, string> = {
   ny: "Ordet börjar om — kommer som nytt i passet.",
   ovar: "Läggs i dagens pass.",
   pagang: "På gång — kollas om 14 dagar.",
-  kan: "Kan det — kollas om 30 dagar.",
+  kan: "Kan det — kollas om 21 dagar.",
 };
 
 export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): void {
@@ -71,7 +72,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const chips = [...forms].sort((a, b) => a.r - b.r).map((f) => {
       const a = store.card(f.id, "es2sv");
       const b = store.card(f.id, "sv2es");
-      const cls = a && b && [a, b].every((c) => c.fsrs.stability >= 30) ? "kan" : a || b ? "lar" : "ny";
+      const cls = a && b && [a, b].every(isKnown) ? "kan" : a || b ? "lar" : "ny";
       return `<span class="syn formchip" title="${esc(f.svPres)}"><i class="dot ${cls}"></i>${esc(f.es)}</span>`;
     }).join("");
     return `<div><div class="xl">Böjningar · presens</div><div class="syns">${chips}</div></div>`;
@@ -125,7 +126,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
             aria-pressed="${known}" aria-label="${known ? "Markerad: kan det" : "Markera: kan det"}">✓</button>
         </div>
         ${undo?.id === word.id
-          ? `<div class="qstrip">Kan det — kollas om 30 dagar ·
+          ? `<div class="qstrip">Kan det — kollas om 21 dagar ·
               <button type="button" data-qundo>ångra</button></div>` : ""}
         <div class="rowx">
           ${stegeHtml(ws)}

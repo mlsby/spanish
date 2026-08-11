@@ -140,8 +140,9 @@ function kontoHtml(cloud: CloudUi): string {
 /** Hero-kortet: nästa övning i KORT (samma tal som övningen visar), eller klart-läget. */
 /** Nivåmärket i hjälten: 🏅 Turista · 133 ord. */
 function nivBadge(store: Store): string {
-  const r = resaFor(store.stats().kan);
-  return `<div class="nivbadge">🏅 <b>${r.titel.name}</b><span class="nivsub"> · ${store.stats().kan} ord</span></div>`;
+  const s = store.stats();
+  const r = resaFor(s.score);
+  return `<div class="nivbadge">🏅 <b>${r.titel.name}</b><span class="nivsub"> · ${s.score} ord</span></div>`;
 }
 
 function heroHtml(store: Store, cloud: CloudUi): string {
@@ -203,9 +204,9 @@ function streakRowHtml(store: Store): string {
 }
 
 /** Nivåresan: färgad bar mot NÄSTA tröskel — grönt = kan, gult = lär mig. */
-function resaPanelHtml(s: { kan: number; lar: number }): string {
-  const r = resaFor(s.kan);
-  const scale = r.next ? r.next.min : Math.max(s.kan, TITLAR[TITLAR.length - 1].min);
+function resaPanelHtml(s: { kan: number; lar: number; score: number }): string {
+  const r = resaFor(s.score);
+  const scale = r.next ? r.next.min : Math.max(s.score, TITLAR[TITLAR.length - 1].min);
   const kanPct = Math.min(100, (s.kan / scale) * 100);
   const larPct = Math.min(100 - kanPct, (s.lar / scale) * 100);
   return `
@@ -217,7 +218,7 @@ function resaPanelHtml(s: { kan: number; lar: number }): string {
       </div>
       <div class="resaleg">
         <span><i class="dot kan"></i><b>${s.kan}</b> kan det</span>
-        <span><i class="dot lar"></i><b>${s.lar}</b> lär mig</span>
+        <span><i class="dot pavag"></i><b>${s.lar}</b> på väg</span>
         ${r.next
           ? `<span class="tillnasta"><b>${r.kvar}</b> kvar till ${r.next.name}</span>`
           : `<span class="tillnasta">toppen nådd — ¡Maestro!</span>`}

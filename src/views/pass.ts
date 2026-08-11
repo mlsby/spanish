@@ -31,7 +31,7 @@ export class PassView {
   private gaveUp = false;            // "vet inte" — fel-flödet utan "du skrev"-rad
   private showMnem = false;          // ✎-utfällt minnesregelfält i fel-läget
   private friendRules: FriendRule[] = [];
-  private kanBefore = 0;         // kan det-antal vid passtart — för nivåfirandet
+  private kanBefore = 0;         // resapoäng vid passtart — för nivåfirandet
   private pendingSno: string | null = null; // regelägare som får poäng om snodd regel sparas
 
   private card: HTMLElement;
@@ -136,7 +136,7 @@ export class PassView {
 
   start(cards: CardRec[], dueSoonBaseline?: number): void {
     this.clearTimer();
-    this.kanBefore = this.store.stats().kan;
+    this.kanBefore = this.store.stats().score;
     this.session = new Session(this.store, cards, { dueSoonBaseline });
     if (this.session.finished) {
       this.state = "done";
@@ -152,7 +152,7 @@ export class PassView {
   /** Fortsätt en avbruten övning. false = inget kvar att fortsätta (rensat). */
   resume(state: SessionState): boolean {
     this.clearTimer();
-    this.kanBefore = this.store.stats().kan;
+    this.kanBefore = this.store.stats().score;
     const s = Session.restore(this.store, state);
     if (s.finished) {
       clearPass();
@@ -450,7 +450,7 @@ export class PassView {
       const st = this.store.stats();
       const more = st.due + st.nextNew > 0;
       const forecast = s.forecastAdded();
-      const r = resaFor(st.kan);
+      const r = resaFor(st.score);
       const uppflytt = resaFor(this.kanBefore).nr < r.nr;
       return `${uppflytt ? `<p class="nivupp">🏅 ¡Felicidades! Ny nivå: <b>${r.titel.name}</b> — ${r.titel.sub}</p>` : ""}
         <p class="verdict v-good">${IC_OK}Övningen klar</p>

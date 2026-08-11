@@ -199,10 +199,12 @@ describe("session: betygsmappning och tvåfelsregeln", () => {
 });
 
 describe("Kan det-etiketten", () => {
-  it("kräver stabilitet ≥ 30 dagar", () => {
+  it("kräver stabilitet ≥ 21 dagar (Anki-mature)", () => {
     const rec = newCardRec("empezar|v", "es2sv", new Date());
     expect(isKnown(rec)).toBe(false);
-    rec.fsrs.stability = 31;
+    rec.fsrs.stability = 20.9;
+    expect(isKnown(rec)).toBe(false);
+    rec.fsrs.stability = 21;
     expect(isKnown(rec)).toBe(true);
   });
 });
