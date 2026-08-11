@@ -98,6 +98,28 @@ describe("övningsmodellen: dagens övning + öva mer", () => {
   });
 });
 
+describe("repetera-knappen", () => {
+  it("ger alltid ett lagom pass: förfallna först, påfyllt med närmast förfallande, max 20", () => {
+    const store = makeStore();
+    const now = Date.now();
+    // ett förfallet + två kommande sedda kort
+    const mk = (id: string, dir: "es2sv" | "sv2es", dueMs: number) => {
+      const c = newCardRec(id, dir, new Date());
+      c.fsrs.reps = 1;
+      c.fsrs.due = new Date(dueMs).toISOString();
+      store.data.cards[`${id}:${dir}`] = c;
+    };
+    mk("empezar|v", "es2sv", now - 3600e3);        // förfallet
+    mk("ciudad|n", "es2sv", now + 5 * 86400e3);    // om 5 dagar
+    mk("feliz|adj", "es2sv", now + 2 * 86400e3);   // om 2 dagar
+    const cards = store.repCards();
+    expect(cards).toHaveLength(3); // inte bara det förfallna
+    expect(cards[0].wordId).toBe("empezar|v");     // mest brådskande först
+    expect(cards[1].wordId).toBe("feliz|adj");
+    expect(cards.length).toBeLessThanOrEqual(20);
+  });
+});
+
 describe("session: betygsmappning och tvåfelsregeln", () => {
   let store: Store;
   beforeEach(() => {

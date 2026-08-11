@@ -342,15 +342,15 @@ export class Store {
   }
 
   /**
-   * Repetitionskort ("Repetera"-knappen): förfallna sedda kort först; finns
-   * inga förfallna tas de som förfaller närmast (förhandsrepetition, max cap).
+   * Repetitionskort ("Repetera"-knappen): alltid ett lagom pass om ~cap kort,
+   * mest brådskande först — förfallna (äldst först), sen de som förfaller
+   * närmast (förhandsrepetition). Aldrig nya ord.
    */
-  repCards(now: Date = new Date(), cap = 20): CardRec[] {
-    const seen = Object.values(this.data.cards)
+  repCards(_now: Date = new Date(), cap = 20): CardRec[] {
+    return Object.values(this.data.cards)
       .filter((c) => c.fsrs.reps > 0)
-      .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime());
-    const due = seen.filter((c) => dueDate(c).getTime() <= endOfToday(now).getTime());
-    return due.length ? due : seen.slice(0, cap);
+      .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime())
+      .slice(0, cap);
   }
 
   /** Budgetåterbäring vid fast-track: en extra enhet, utanför övningsmålet. */
