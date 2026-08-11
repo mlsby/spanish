@@ -1,5 +1,6 @@
 import { diffTarget } from "../lib/diff";
 import { clearPass, loadPass, savePass } from "../lib/passpaus";
+import { resaFor } from "../lib/resa";
 import { Session, type Pending, type SessionState } from "../lib/session";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
@@ -30,6 +31,7 @@ export class PassView {
   private gaveUp = false;            // "vet inte" — fel-flödet utan "du skrev"-rad
   private showMnem = false;          // ✎-utfällt minnesregelfält i fel-läget
   private friendRules: FriendRule[] = [];
+  private kanBefore = 0;         // kan det-antal vid passtart — för nivåfirandet
   private pendingSno: string | null = null; // regelägare som får poäng om snodd regel sparas
 
   private card: HTMLElement;
@@ -43,7 +45,7 @@ export class PassView {
     private el: HTMLElement,
     private store: Store,
     private onDone: () => void,
-    private onStartRequest: () => void,
+    private onStartRequest: (repOnly?: boolean) => void,
     private loggedIn: () => boolean = () => true,
     private syncBusy: () => boolean = () => false,
     private social?: Social
@@ -134,6 +136,7 @@ export class PassView {
 
   start(cards: CardRec[], dueSoonBaseline?: number): void {
     this.clearTimer();
+    this.kanBefore = this.store.stats().kan;
     this.session = new Session(this.store, cards, { dueSoonBaseline });
     if (this.session.finished) {
       this.state = "done";
@@ -149,6 +152,7 @@ export class PassView {
   /** Fortsätt en avbruten övning. false = inget kvar att fortsätta (rensat). */
   resume(state: SessionState): boolean {
     this.clearTimer();
+    this.kanBefore = this.store.stats().kan;
     const s = Session.restore(this.store, state);
     if (s.finished) {
       clearPass();
@@ -233,6 +237,7 @@ export class PassView {
   private onAction(act: string): void {
     // start-/navigeringsknappar funkar utan aktiv session (vilo- och klart-lägena)
     if (act === "start" || act === "gologin") { this.onStartRequest(); return; }
+    if (act === "rep") { this.onStartRequest(true); return; }
     if (act === "restart") { this.onDone(); return; }
     const s = this.session;
     if (!s) return;
@@ -429,15 +434,14 @@ export class PassView {
       const total = st.due + st.nextNew;
       const busy = this.syncBusy();
       const label = busy ? "Synkar …"
-        : paused ? `Fortsätt övningen · ${paused.queue.length} kvar`
+        : paused ? "Fortsätt övningen"
         : st.firstToday ? "Starta dagens övning" : "Öva mer";
       return `<div class="tomt">
         <div class="stor">${paused ? "Övning pausad" : "Ingen övning igång"}</div>
-        <p>${paused
-          ? `${paused.queue.length} kort kvar — du fortsätter där du slutade.`
-          : `${st.due + st.nextNew * 2} kort väntar — ${st.due} repetitioner + ${st.nextNew} nya ord.`}</p>
+        ${paused ? `<p>Du fortsätter där du slutade.</p>` : ""}
         <div class="btnrow" style="max-width:250px">
           <button class="btn" data-act="start" ${(!paused && total === 0) || busy ? "disabled" : ""}>${label}</button>
+          ${!paused && st.due > 0 ? `<button class="btn ghost" data-act="rep" ${busy ? "disabled" : ""}>Repetera</button>` : ""}
         </div></div>`;
     }
     if (this.state === "done") {
@@ -446,7 +450,10 @@ export class PassView {
       const st = this.store.stats();
       const more = st.due + st.nextNew > 0;
       const forecast = s.forecastAdded();
-      return `<p class="verdict v-good">${IC_OK}Övningen klar</p>
+      const r = resaFor(st.kan);
+      const uppflytt = resaFor(this.kanBefore).nr < r.nr;
+      return `${uppflytt ? `<p class="nivupp">🏅 ¡Felicidades! Ny nivå: <b>${r.titel.name}</b> — ${r.titel.sub}</p>` : ""}
+        <p class="verdict v-good">${IC_OK}Övningen klar</p>
         <h2 class="head">${c.good + c.hard} av ${answered}</h2>
         <p class="also">rätt <b>${c.good}</b> · med hjälp <b>${c.hard}</b> · fel <b>${c.again}</b></p>
         ${forecast > 0 ? `<p class="fine">~${forecast} repetitioner läggs på kommande vecka.</p>` : ""}

@@ -157,6 +157,26 @@ async function boot(): Promise<void> {
     showTab("pass");
   }
 
+  /** Bara repetitioner — inga nya ord. Pausad övning fortsätts även här. */
+  function startRep(): void {
+    if (!sync.session) {
+      showTab("idag");
+      flashKonto();
+      return;
+    }
+    if (sync.status === "syncing") return;
+    const paused = loadPass();
+    if (paused && pass.resume(paused)) {
+      showTab("pass");
+      return;
+    }
+    // bara redan mötta kort — introducerade-men-osedda väntar på nästa riktiga övning
+    const cards = store.dueCards().filter((c) => c.fsrs.reps > 0);
+    if (!cards.length) return;
+    pass.start(cards, store.dueSoonCount());
+    showTab("pass");
+  }
+
   const social = new Social(sb, () => sync.session?.user.id ?? null);
 
   /** Ladda upp mina topplistesiffror (streak, dagar, kan det-ord). */
@@ -172,7 +192,7 @@ async function boot(): Promise<void> {
     screens.pass,
     store,
     () => { pushMyStats(); showTab("idag"); },
-    () => startPass(),
+    (repOnly) => (repOnly ? startRep() : startPass()),
     () => sync.session !== null,
     () => sync.status === "syncing",
     social
@@ -180,7 +200,7 @@ async function boot(): Promise<void> {
   pass.render();
 
   function renderIdagTab(): void {
-    renderIdag(screens.idag, store, { startPass }, cloud);
+    renderIdag(screens.idag, store, { startPass, startRep }, cloud);
   }
 
   sync.onStatus = () => {

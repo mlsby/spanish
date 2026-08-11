@@ -2,6 +2,21 @@
 
 Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
+## Klart (byggt 2026-08-11, släpp "nivåresan")
+
+- **Startsidan städad (Lucas):** korträkningen och nedbrytningen borta ur
+  hjälten. Kvar: nivåmärket (🏅 Turista · 133 ord), primärknappen (Starta
+  dagens övning / Öva mer / Fortsätt övningen) och en ghost-knapp
+  **Repetera** — bara förfallna, redan mötta kort, inga nya ord (syns när
+  repetitioner finns). Passets viloskärm speglar samma knappar.
+- **Nivåresan:** 10 nivåer på antal KAN-ord — Hola 0 · Curioso 10 ·
+  Estudiante 50 · Turista 100 · Viajero 200 · Amigo 500 · Vecino 1000 ·
+  Madrileño 2000 · Casi nativo 3000 · Maestro 5000 (trösklar 10/50 på
+  Lucas begäran för snabba klirr i början). "Din resa"-panelen: färgad
+  stapel mot NÄSTA tröskel (grönt = kan det, gult = lär mig), "N kvar till
+  <nivå>". 5000-målet och "påbörjade/nya"-raderna borta. Klart-skärmen
+  firar uppflytt: "¡Felicidades! Ny nivå: Viajero". Modul: src/lib/resa.ts.
+
 ## Klart (byggt 2026-08-11, släpp "exempelmeningar v2 — svensk brygga")
 
 - **Mjuka bromsen borttagen (Lucas):** notisen "Många nya på raken …" i

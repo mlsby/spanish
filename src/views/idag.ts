@@ -1,4 +1,5 @@
 import { loadPass } from "../lib/passpaus";
+import { resaFor, TITLAR } from "../lib/resa";
 import type { Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
 import { activityStats } from "../lib/streak";
@@ -7,6 +8,8 @@ import type { SyncStatus } from "../lib/sync";
 
 export interface IdagCallbacks {
   startPass(): void;
+  /** bara repetitioner — inga nya ord (flyktvägen för trötta dagar) */
+  startRep(): void;
 }
 
 export interface CloudUi {
@@ -135,6 +138,12 @@ function kontoHtml(cloud: CloudUi): string {
 }
 
 /** Hero-kortet: nästa övning i KORT (samma tal som övningen visar), eller klart-läget. */
+/** Nivåmärket i hjälten: 🏅 Turista · 133 ord. */
+function nivBadge(store: Store): string {
+  const r = resaFor(store.stats().kan);
+  return `<div class="nivbadge">🏅 <b>${r.titel.name}</b><span class="nivsub"> · ${store.stats().kan} ord</span></div>`;
+}
+
 function heroHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
   const doneToday = store.data.days[dayKey()] ?? 0;
@@ -145,42 +154,41 @@ function heroHtml(store: Store, cloud: CloudUi): string {
   if (paused && cloud.email) {
     return `<div class="hero">
       <p class="plabel">Övning pausad</p>
-      <div class="big">${paused.queue.length}<small> kort kvar</small></div>
+      ${nivBadge(store)}
       <div class="cap">du fortsätter exakt där du slutade</div>
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Fortsätt övningen"}</button>
     </div>`;
   }
 
-  const totalCards = s.due + s.nextNew * 2;
+  const total = s.due + s.nextNew;
   const plabel = s.firstToday ? "Dagens övning" : "Öva mer";
   const cta = s.firstToday ? "Starta dagens övning" : "Öva mer";
 
   if (!cloud.email) {
     return `<div class="hero">
       <p class="plabel">${plabel}</p>
-      <div class="big">${totalCards}<small> kort</small></div>
-      <div class="cap"><b>${s.due}</b> repetitioner + <b>${s.nextNew}</b> nya <span class="capfine">(2 kort/st)</span></div>
+      ${nivBadge(store)}
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
       <p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>
     </div>`;
   }
 
-  if (totalCards === 0) {
+  if (total === 0) {
     return `<div class="hero klar">
       <p class="plabel">Dagens övning</p>
+      ${nivBadge(store)}
       <div class="klartxt">✓ Klart för idag</div>
       <div class="cap">${doneToday > 0 ? `<b>${doneToday}</b> kort idag — streaken säkrad` : "inget förfallet just nu"}</div>
     </div>`;
   }
 
-  const capParts: string[] = [];
-  if (s.due > 0) capParts.push(`<b>${s.due}</b> repetitioner`);
-  if (s.nextNew > 0) capParts.push(`<b>${s.nextNew}</b> nya <span class="capfine">(2 kort/st)</span>`);
   return `<div class="hero">
     <p class="plabel">${plabel}</p>
-    <div class="big">${totalCards}<small> kort</small></div>
-    <div class="cap">${capParts.join(" + ")}</div>
+    ${nivBadge(store)}
     <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : cta}</button>
+    ${s.due > 0
+      ? `<div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy ? "disabled" : ""}>Repetera</button></div>`
+      : ""}
   </div>`;
 }
 
@@ -194,6 +202,29 @@ function streakRowHtml(store: Store): string {
   return `<div class="streakrow">🔥 <b>${label}</b><span class="sep">·</span><span>${hint}</span></div>`;
 }
 
+/** Nivåresan: färgad bar mot NÄSTA tröskel — grönt = kan, gult = lär mig. */
+function resaPanelHtml(s: { kan: number; lar: number }): string {
+  const r = resaFor(s.kan);
+  const scale = r.next ? r.next.min : Math.max(s.kan, TITLAR[TITLAR.length - 1].min);
+  const kanPct = Math.min(100, (s.kan / scale) * 100);
+  const larPct = Math.min(100 - kanPct, (s.lar / scale) * 100);
+  return `
+    <div class="panel">
+      <p class="plabel">Din resa · nivå ${r.nr} av ${TITLAR.length}</p>
+      <div class="nivrow">🏅 <b>${r.titel.name}</b><span class="nivsub">${r.titel.sub}</span></div>
+      <div class="meter resa">
+        <i class="seg kan" style="width:${kanPct.toFixed(1)}%"></i><i class="seg lar" style="width:${larPct.toFixed(1)}%"></i>
+      </div>
+      <div class="resaleg">
+        <span><i class="dot kan"></i><b>${s.kan}</b> kan det</span>
+        <span><i class="dot lar"></i><b>${s.lar}</b> lär mig</span>
+        ${r.next
+          ? `<span class="tillnasta"><b>${r.kvar}</b> kvar till ${r.next.name}</span>`
+          : `<span class="tillnasta">toppen nådd — ¡Maestro!</span>`}
+      </div>
+    </div>`;
+}
+
 function dashboardHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
   return `
@@ -203,16 +234,7 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
       <p class="plabel">Konto &amp; molnsynk</p>
       ${kontoHtml(cloud)}
     </div>`}
-    <div class="panel">
-      <p class="plabel">Din resa · mål ${s.goal.toLocaleString("sv-SE")} ord</p>
-      <div class="meter"><i style="width:${Math.min(100, (s.started / s.total) * 100).toFixed(1)}%"></i></div>
-      <div class="metercap"><span><b>${s.started}</b> påbörjade</span><span>${s.total.toLocaleString("sv-SE")} i basen</span></div>
-      <div class="resaleg">
-        <span><i class="dot ny"></i><b>${s.ny}</b> nya</span>
-        <span><i class="dot lar"></i><b>${s.lar}</b> lär mig</span>
-        <span><i class="dot kan"></i><b>${s.kan}</b> kan det</span>
-      </div>
-    </div>
+    ${resaPanelHtml(s)}
     <div class="panel">
       <p class="plabel">Övningskalender · 15 veckor</p>
       ${heatmapHtml(store.data.days)}
@@ -289,6 +311,7 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
     rerender();
   };
   el.querySelector<HTMLButtonElement>("#startBtn")?.addEventListener("click", () => cb.startPass());
+  el.querySelector<HTMLButtonElement>("#repBtn")?.addEventListener("click", () => cb.startRep());
 
   const bumpFirst = (d: number) => {
     store.setNewFirst(Math.max(0, Math.min(50, store.data.settings.newFirst + d)));
