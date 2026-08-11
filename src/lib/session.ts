@@ -43,8 +43,6 @@ export class Session {
   done = 0;
   counts: SessionCounts = { good: 0, hard: 0, again: 0 };
   pending: Pending | null = null;
-  /** utfall (exakt rätt?) för passets första-möten — driver mjuka bromsen */
-  private firstOutcomes: boolean[] = [];
   /** kort med due inom 7 dagar vid sessionsstart — för prognosraden */
   private dueSoonBaseline = 0;
 
@@ -166,10 +164,6 @@ export class Session {
     });
     this.queue.shift();
     this.done++;
-    if (p.firstExposure && p.card.dir === "es2sv") {
-      this.firstOutcomes.push(p.easy);
-      if (this.firstOutcomes.length > 20) this.firstOutcomes.shift();
-    }
     const nextDue = dueDate(updated).getTime() - now.getTime();
     if (p.grade === "again") {
       insertSpaced(this.queue, updated, 3);
@@ -207,13 +201,6 @@ export class Session {
     const cap = this.store.data.settings.newFirst * REFUND_CAP_FACTOR;
     if (this.store.introducedToday(now) >= cap) return;
     this.store.introduceExtra(now); // hamnar i nästa pass — inte mitt i pågående kö
-  }
-
-  /** Mjuka bromsen: föreslå paus när exakt-träffen på nya ord sjunkit — då gissar man mer än man kan. */
-  get brake(): boolean {
-    if (this.firstOutcomes.length < 10) return false;
-    const hits = this.firstOutcomes.filter(Boolean).length;
-    return hits / this.firstOutcomes.length < 0.6;
   }
 
   /** Ungefär så här många repetitioner har övningen lagt på kommande vecka. */

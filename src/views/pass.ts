@@ -467,9 +467,7 @@ export class PassView {
       const posLabel = form ? "verb · presens" : (POS_LABEL[w.pos] ?? w.pos);
       // ledtråden särskiljer svenska dubbletter — visas bara åt sv→es-hållet
       const hint = card.dir === "sv2es" ? this.hintLine(w) : "";
-      const brake = s.brake
-        ? `<p class="brakenote">Många nya på raken — vanlig takt imorgon är också fint.</p>` : "";
-      return `<p class="pos">${esc(posLabel)}</p><h2 class="head">${esc(prompt)}</h2>${hint}${brake}`;
+      return `<p class="pos">${esc(posLabel)}</p><h2 class="head">${esc(prompt)}</h2>${hint}`;
     }
     if (!p) return "";
     switch (this.state) {

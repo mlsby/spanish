@@ -4,6 +4,9 @@ Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
 ## Klart (byggt 2026-08-11, släpp "exempelmeningar v2 — svensk brygga")
 
+- **Mjuka bromsen borttagen (Lucas):** notisen "Många nya på raken …" i
+  frågeläget är borta, inklusive utfallsspårningen bakom den. Prognosraden
+  på klart-skärmen finns kvar.
 - **Bestämd form räknas som rätt (Lucas: "la verdad → sanningen blev stavfel"):**
   för substantiv åt es→sv-hållet accepteras svenska bestämda former som
   fullvärdiga svar — genereras för båda deklinationerna (hunden/huset/

@@ -216,7 +216,6 @@ details.om summary{cursor:pointer;font-size:13.5px;font-weight:600;padding:2px 0
 /* böjningskortens stödrad: moderverbet alltid med i facit */
 .parentline{font-size:13px;color:var(--muted);margin:2px 0 0}
 .parentline b{color:var(--ink);font-weight:600}
-.brakenote{font-size:11.5px;color:var(--warn);margin:8px 0 0}
 .formchip{display:inline-flex;align-items:center;gap:5px}
 .formchip .dot{width:6px;height:6px}
 .linkbtn{background:none;border:0;color:var(--accent);font-size:13px;text-decoration:underline;padding:4px}
