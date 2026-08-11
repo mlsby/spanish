@@ -5795,5 +5795,14 @@
   "votante|n": {
     "sv": "väljare",
     "art": "el"
+  },
+  "antes|adv": {
+    "sv": "innan",
+    "syn": [
+      "före",
+      "förut",
+      "förr",
+      "snarare"
+    ]
   }
 }
