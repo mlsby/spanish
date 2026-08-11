@@ -32,6 +32,8 @@ export class LasView {
   private ratt = 0;
   private pend: (GradeResult & { raw: string }) | null = null;
   private felText = "";
+  /** förra läsningens quizord — undviks i nästa urval så texterna varierar */
+  private senaste = new Set<string>();
 
   private card!: HTMLElement;
   private bar!: HTMLElement;
@@ -115,7 +117,7 @@ export class LasView {
     this.render();
     const p = lasNiva(this.store.stats().score);
     // 3× målet: gott om kandidater att välja bland ger naturligare scener (Lucas)
-    const underlag = byggUnderlag(this.store, p.anvand * 3);
+    const underlag = byggUnderlag(this.store, p.anvand * 3, { exkludera: this.senaste });
     if (underlag.kandidater.length === 0) {
       this.felText = "Inga övningsord just nu — öva lite först, sen finns det något att läsa om.";
       this.state = "fel";
@@ -130,6 +132,7 @@ export class LasView {
       this.meningar = meningar.map((m) => m.es);
       this.quiz = byggQuiz(meningar, underlag.kandidater);
       if (!this.quiz.length) throw new Error("Texten saknade övningsord — prova igen.");
+      this.senaste = new Set(this.quiz.map((q) => q.kandidat.id));
       this.state = "las";
     } catch (e) {
       this.felText = e instanceof Error ? e.message : String(e);

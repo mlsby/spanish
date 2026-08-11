@@ -49,12 +49,24 @@ function bojningar(es: string, ok: Set<string>): void {
   }
 }
 
+export interface UnderlagVal {
+  /** ord som quizzades i förra läsningen — undviks om poolen räcker */
+  exkludera?: Set<string>;
+  /** injicerbar slump för testerna */
+  rng?: () => number;
+}
+
 /**
- * Palett + kandidater ur kortdatan. Kandidater = mötta enheter (ord eller
- * verbformer) som inte sitter än, med lägst stabilitet först — läsningen
- * blir riktad repetition av det som är närmast att glömmas.
+ * Palett + kandidater ur kortdatan. Kandidatpoolen är FSRS-viktad (lägst
+ * stabilitet först) men själva urvalet slumpas ur ett fönster av de 2×
+ * skörast — annars blir det exakt samma ord varje läsning, eftersom ett
+ * rätt svar bara höjer stabiliteten marginellt.
  */
-export function byggUnderlag(store: Store, antalKandidater: number): LasUnderlag {
+export function byggUnderlag(
+  store: Store,
+  antalKandidater: number,
+  val: UnderlagVal = {},
+): LasUnderlag {
   const minS = new Map<string, number>();
   const dirs = new Map<string, number>();
   for (const rec of Object.values(store.data.cards)) {
@@ -66,15 +78,26 @@ export function byggUnderlag(store: Store, antalKandidater: number): LasUnderlag
   const kan = (id: string) =>
     (dirs.get(id) ?? 0) >= 2 && (minS.get(id) ?? 0) >= KNOWN_STABILITY_DAYS;
 
-  const kandidater: LasKandidat[] = [];
-  const pool = introducerade
+  let pool = introducerade
     .filter((id) => !kan(id))
     .filter((id) => {
       const c = store.card(id, "es2sv");
       return !!c && c.fsrs.reps > 0;
     })
     .sort((a, b) => (minS.get(a) ?? 0) - (minS.get(b) ?? 0));
-  for (const id of pool) {
+  if (val.exkludera?.size) {
+    const utan = pool.filter((id) => !val.exkludera!.has(id));
+    if (utan.length >= antalKandidater) pool = utan;
+  }
+  // slumpa urvalet ur fönstret av de skörast — Fisher-Yates
+  const fonster = pool.slice(0, antalKandidater * 2);
+  const rng = val.rng ?? Math.random;
+  for (let i = fonster.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [fonster[i], fonster[j]] = [fonster[j], fonster[i]];
+  }
+  const kandidater: LasKandidat[] = [];
+  for (const id of fonster) {
     if (kandidater.length >= antalKandidater) break;
     const f = store.formById.get(id);
     if (f) kandidater.push({ id, es: f.es, sv: f.svPres });

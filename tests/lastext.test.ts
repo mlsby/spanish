@@ -61,7 +61,7 @@ describe("byggUnderlag", () => {
     seedCard(store, "cada|determiner", "es2sv", 0.3); seedCard(store, "cada|determiner", "sv2es", 8);
     seedCard(store, "feliz|adj", "es2sv", 2); seedCard(store, "feliz|adj", "sv2es", 21);
     const u = byggUnderlag(store, 4);
-    expect(u.kandidater.map((k) => k.es)).toEqual(["cada", "feliz"]); // skörast först
+    expect(u.kandidater.map((k) => k.es).sort()).toEqual(["cada", "feliz"]); // de sköra, ej kan-orden
     expect(u.ovriga).toContain("la casa");
     expect(u.verb).toContainEqual({ inf: "ser", former: [] });
   });
@@ -85,6 +85,40 @@ describe("byggUnderlag", () => {
     for (const t of ["casas", "otra", "otros", "felices", "a", "al", "del", "no", "la"]) {
       expect(u.vitlista, t).toContain(t);
     }
+  });
+});
+
+describe("byggUnderlag — slump och exkludering", () => {
+  function fyraSkora(): Store {
+    const store = makeStore();
+    seedCard(store, "ser|v", "es2sv", 1); seedCard(store, "ser|v", "sv2es", 1);
+    seedCard(store, "casa|n", "es2sv", 2); seedCard(store, "casa|n", "sv2es", 2);
+    seedCard(store, "otro|determiner", "es2sv", 3); seedCard(store, "otro|determiner", "sv2es", 3);
+    seedCard(store, "cada|determiner", "es2sv", 4); seedCard(store, "cada|determiner", "sv2es", 4);
+    return store;
+  }
+
+  it("urvalet slumpas ur fönstret — olika rng ger olika kandidater", () => {
+    const store = fyraSkora();
+    const a = byggUnderlag(store, 2, { rng: () => 0 }).kandidater.map((k) => k.es).sort();
+    const b = byggUnderlag(store, 2, { rng: () => 0.99 }).kandidater.map((k) => k.es).sort();
+    expect(a).not.toEqual(b);
+  });
+
+  it("förra läsningens ord undviks när poolen räcker", () => {
+    const store = fyraSkora();
+    const u = byggUnderlag(store, 2, {
+      exkludera: new Set(["ser|v", "casa|n"]),
+      rng: () => 0,
+    });
+    for (const k of u.kandidater) expect(["otro", "cada"]).toContain(k.es);
+  });
+
+  it("exkludering ignoreras om poolen inte räcker", () => {
+    const store = makeStore();
+    seedCard(store, "ser|v", "es2sv", 1); seedCard(store, "ser|v", "sv2es", 1);
+    const u = byggUnderlag(store, 2, { exkludera: new Set(["ser|v"]), rng: () => 0 });
+    expect(u.kandidater.map((k) => k.es)).toEqual(["ser"]);
   });
 });
 
