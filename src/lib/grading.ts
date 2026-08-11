@@ -51,6 +51,29 @@ export interface GradeResult {
 }
 
 /**
+ * Svenska bestämda former av ett substantiv — "la verdad" i prompten lockar
+ * naturligt fram "sanningen", och det ska räknas som rätt, inte som stavfel.
+ * Vi känner inte till genus, så båda deklinationernas kandidater genereras;
+ * de används bara för rättning (visas aldrig), så övergenerering är ofarlig.
+ */
+export function svBestamd(t: string): string[] {
+  if (t.includes(" ") || t.length < 2) return [];
+  const out = new Set<string>();
+  if (/[aeiouyåäö]$/.test(t)) {
+    out.add(t + "n"); // flicka→flickan, pojke→pojken
+    out.add(t + "t"); // äpple→äpplet
+  } else {
+    out.add(t + "en"); // hund→hunden, sanning→sanningen
+    out.add(t + "et"); // hus→huset
+    if (/e[lrn]$/.test(t)) {
+      out.add(t + "n"); // fågel→fågeln, syster→systern
+      out.add(t.replace(/e([lrn])$/, "$1") + "et"); // fönster→fönstret, vatten→vattnet
+    }
+  }
+  return [...out];
+}
+
+/**
  * Ett facit med snedstreck ("han/hon är") är egentligen flera svar —
  * varje variant godkänns för sig. Originalet behålls också (om någon
  * faktiskt skriver snedstrecket). Kartesisk produkt per ord, med tak.

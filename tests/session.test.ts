@@ -135,6 +135,14 @@ describe("session: betygsmappning och tvåfelsregeln", () => {
     expect(s2.answer("la ciudad").grade).toBe("good");
   });
 
+  it("es→sv: bestämd form räknas som rätt för substantiv — 'la ciudad' → 'staden'", () => {
+    const s = new Session(store, [newCardRec("ciudad|n", "es2sv", new Date())]);
+    expect(s.answer("staden").grade).toBe("good");
+    // men inte för verb: böjda svenska verbformer är fortfarande inte facit
+    const s2 = new Session(store, [newCardRec("empezar|v", "es2sv", new Date())]);
+    expect(s2.answer("började").grade).not.toBe("good");
+  });
+
   it("sv→es: alternativa spanska svar (alt) godkänns som synonym", () => {
     const s = new Session(store, [newCardRec("empezar|v", "sv2es", new Date())]);
     expect(s.answer("comenzar")).toMatchObject({ grade: "good", step: "syn" });

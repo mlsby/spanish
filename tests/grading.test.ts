@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dl, gradeAnswer, normalize, slashVariants } from "../src/lib/grading";
+import { dl, gradeAnswer, normalize, slashVariants, svBestamd } from "../src/lib/grading";
 
 describe("normalisering (kravspec §3 steg 1)", () => {
   it("spanska: accentokänslig men ñ behålls", () => {
@@ -50,6 +50,23 @@ describe("gradeAnswer (steg 1–2)", () => {
   it("tomt eller långt ifrån → again", () => {
     expect(gradeAnswer("", ["stad"], "sv").grade).toBe("again");
     expect(gradeAnswer("häst", ["stad"], "sv").grade).toBe("again");
+  });
+});
+
+describe("svenska bestämda former", () => {
+  it("genererar båda deklinationernas kandidater", () => {
+    expect(svBestamd("sanning")).toContain("sanningen");
+    expect(svBestamd("hus")).toContain("huset");
+    expect(svBestamd("flicka")).toContain("flickan");
+    expect(svBestamd("pojke")).toContain("pojken");
+    expect(svBestamd("äpple")).toContain("äpplet");
+    expect(svBestamd("fågel")).toContain("fågeln");
+    expect(svBestamd("syster")).toContain("systern");
+    expect(svBestamd("fönster")).toContain("fönstret"); // synkope: -er → -ret
+    expect(svBestamd("vatten")).toContain("vattnet");   // synkope: -en → -net
+  });
+  it("flerordsuttryck böjs inte", () => {
+    expect(svBestamd("god natt")).toEqual([]);
   });
 });
 

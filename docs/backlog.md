@@ -4,6 +4,12 @@ Lucas anteckningar. Överst det öppna; längst ner det som redan byggts.
 
 ## Klart (byggt 2026-08-11, släpp "exempelmeningar v2 — svensk brygga")
 
+- **Bestämd form räknas som rätt (Lucas: "la verdad → sanningen blev stavfel"):**
+  för substantiv åt es→sv-hållet accepteras svenska bestämda former som
+  fullvärdiga svar — genereras för båda deklinationerna (hunden/huset/
+  flickan/äpplet) inklusive synkope (fönstret, vattnet). Bara för rättning,
+  visas aldrig; facit är fortfarande grundformen. Verb böjs INTE (började ≠
+  börja — tempus är del av kunskapen).
 - **Fler svenska översättningar (Lucas: "fick aldrig se svenskan"):** utöver
   de 3 623 direkta spanska↔svenska paren används nu det engelska originalet
   som LÄNKBRYGGA (spa→eng→swe via Tatoebas länkfiler) — båda meningarna är

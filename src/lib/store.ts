@@ -1,5 +1,6 @@
 import type { AppData, CardRec, Dir, DirtyKind, Level, ReviewRec, UserWord, VerbForm, Word } from "./types";
 import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
+import { svBestamd } from "./grading";
 import { dueDate, isKnown, levelCardRec, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
 import { dayKey, endOfToday } from "./time";
@@ -166,7 +167,13 @@ export class Store {
   /** Facit + synonymer i svarsriktningen (huvudöversättning först). */
   targets(word: Word, dir: Dir): string[] {
     const uw = this.userWord(word.id);
-    if (dir === "es2sv") return [word.sv, ...word.syn, ...uw.syn];
+    if (dir === "es2sv") {
+      const base = [word.sv, ...word.syn, ...uw.syn];
+      // substantiv: "la verdad" i prompten lockar fram "sanningen" —
+      // bestämda former accepteras (aldrig visade, bara godkända)
+      if (word.pos === "n") return [...base, ...base.flatMap(svBestamd)];
+      return base;
+    }
     // sv→es: det spanska ordet + äkta synonymer (empezar/comenzar) + egna tillägg;
     // artiklar och accenter sköts av normaliseringen
     return [word.es, ...(word.alt ?? []), ...uw.syn];
