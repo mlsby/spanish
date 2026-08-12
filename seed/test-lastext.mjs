@@ -66,6 +66,17 @@ const ovningsKandidater = introducerade
   .filter((id) => !kanIds.includes(id))
   .sort((a, b) => perId.get(a).minS - perId.get(b).minS);
 const kandidater = ovningsKandidater.slice(0, N_OVNING * 3);
+const kandSet = new Set(kandidater);
+// tre nivåer i prompten: KAN (sitter), NÄSTAN KAN (mött men vinglar), KANDIDATER
+const kanSet = new Set(kanIds);
+const blanda = (a) => {
+  const x = [...a];
+  for (let i = x.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [x[i], x[j]] = [x[j], x[i]];
+  }
+  return x;
+};
 
 // ---------- ytformer ----------
 // alltid tillåten glue: artiklar + a/al/del/no + es/está/hay — quizzas aldrig, bara bindväv
@@ -150,45 +161,40 @@ function validera(meningar) {
 
 // ---------- prompten ----------
 function systemPrompt() {
-  return `Du skriver en pytteliten sammanhängande scen på enkel spanska (presens) för svenska nybörjare — ungefär ${N_MENINGAR} meningar som hör ihop.
+  return `Du skriver en liten sammanhängande scen på enkel spanska, ungefär ${N_MENINGAR} meningar, till en svensk som lär sig språket.
 
-REGLER:
-- Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
-- Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
-- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
-- Alltid tillåtna småord: el, la, los, las, un, una, a, al, del, no — och verben es, son, está, están, hay.
-- Använd exakt ${N_OVNING} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
-- Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
+Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att scenen ska bli naturlig. Ett ord utanför listorna och hen tappar meningen; småorden el, la, los, las, un, una, a, al, del, no samt es, son, está, están, hay är alltid ok, liksom regelbunden plural och femininum.
 
-Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (övningsordet som används i meningen, eller "" om inget).`;
+Väv in exakt ${N_OVNING} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
+
+Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet i meningen, eller "" om inget).`;
 }
 
 function userPrompt() {
-  // verben grupperade med ALLA sina presensformer — mött verb får läsas böjt
-  const verbIds = new Set();
-  const ovriga = [];
+  // varje ord i sin nivå; verb tar med sina presensformer i parentes
+  const niva = { kan: [], nastan: [] };
   for (const id of introducerade) {
+    if (kandSet.has(id)) continue;              // kandidaterna har egen lista
     const f = formById.get(id);
-    if (f) {
-      verbIds.add(f.parent);
-      continue;
-    }
-    const w = wordById.get(id);
+    const lemmaId = f ? f.parent : id;
+    const w = wordById.get(lemmaId);
     if (!w) continue;
-    if (w.pos === "v") verbIds.add(id);
-    else ovriga.push(visning(id));
+    const box = kanSet.has(lemmaId) ? niva.kan : niva.nastan;
+    if (w.pos === "v") {
+      const former = (formsByParent.get(lemmaId) ?? []).map((x) => x.es);
+      const rad = former.length ? `${w.es} (${former.join(", ")})` : w.es;
+      if (!box.includes(rad)) box.push(rad);
+    } else {
+      const rad = w.art ? `${w.art} ${w.es}` : w.es;
+      if (!box.includes(rad)) box.push(rad);
+    }
   }
-  const verb = [...verbIds]
-    .map((id) => {
-      const inf = wordById.get(id)?.es ?? id;
-      const former = (formsByParent.get(id) ?? []).map((f) => f.es);
-      return former.length ? `${inf}: ${inf}, ${former.join(", ")}` : inf;
-    })
-    .join(" · ");
-  const kand = kandidater
-    .map((id) => `${ytform(id)} (${gloss(id)})`)
-    .join("\n");
-  return `VERB — endast dessa former är tillåtna:\n${verb}\n\nÖVRIGA TILLÅTNA ORD:\n${ovriga.join(", ")}\n\nKANDIDATORD (välj ${N_OVNING} st, exakt dessa former):\n${kand}`;
+  const kand = kandidater.map((id) => `${ytform(id)} (${gloss(id)})`).join("\n");
+  return `KAN (sitter säkert):\n${blanda(niva.kan).join(", ")}
+
+NÄSTAN KAN (om du behöver):\n${blanda(niva.nastan).join(", ")}
+
+KANDIDATORD — övas nu (väv in exakt ${N_OVNING}):\n${kand}`;
 }
 
 // ---------- körning ----------
