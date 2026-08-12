@@ -52,9 +52,10 @@ describe("Mexiko-prognosen", () => {
     expect(taktPerDag([kort("casa|n", 1)], NU)).toBeNull();
   });
 
-  it("prognosen cappar vid ordbasens tak", () => {
+  it("prognosen cappar vid basens tak — ord + former", () => {
     const takt = { perDag: 100, nyaIFonstret: 3000, dagar: 30 };
-    expect(prognosOrd(500, takt, NU)).toBe(5000);
+    expect(prognosOrd(500, takt, NU)).toBe(7843);
+    expect(prognosOrd(500, takt, NU, 5000)).toBe(5000); // explicit tak vinner
     expect(prognosOrd(500, { ...takt, perDag: 1 }, NU)).toBe(500 + dagarKvar(NU));
   });
 });
