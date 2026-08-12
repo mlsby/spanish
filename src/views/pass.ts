@@ -12,8 +12,6 @@ type UiState =
   | "wrong" | "forced" | "done";
 
 const AUTO_STATES: UiState[] = ["good", "hard", "override"];
-// stavfel/override visas längre — tiden ska räcka till att SE vad som blev fel
-const AUTO_MS: Record<string, number> = { good: 1500, hard: 4000, override: 4000 };
 // tvekar man på ett spanskt ord tonas exempelmeningen fram — kontext, inte facit
 const TIPS_MS = 4500;
 
@@ -208,8 +206,8 @@ export class PassView {
     this.showMnem = false;
     this.friendRules = [];
     this.pendingSno = null;
-    if (p.grade === "good") { this.state = "good"; this.render(); this.startAuto(AUTO_MS.good); }
-    else if (p.grade === "hard") { this.state = "hard"; this.render(); this.startAuto(AUTO_MS.hard); }
+    if (p.grade === "good") { this.state = "good"; this.render(); this.startFacit("good"); }
+    else if (p.grade === "hard") { this.state = "hard"; this.render(); this.startFacit("hard"); }
     else {
       this.state = p.forcedMnem ? "forced" : "wrong";
       this.render();
@@ -286,7 +284,7 @@ export class PassView {
       s.override();
       this.state = "override";
       this.render();
-      this.startAuto(AUTO_MS.override);
+      this.startFacit("override");
     }
   }
 
@@ -321,6 +319,12 @@ export class PassView {
   }
 
   // ---------- timer ----------
+  /** Facittempo ur inställningarna: rätt = vald tid, stavfel/ändrat = minst 4 s. */
+  private startFacit(state: "good" | "hard" | "override"): void {
+    if (!this.store.data.settings.autoNext) return; // manuellt läge — Enter går vidare
+    const ms = this.store.data.settings.autoMs;
+    this.startAuto(state === "good" ? ms : Math.max(4000, ms));
+  }
   private clearTimer(): void {
     if (this.timer !== null) { window.clearTimeout(this.timer); this.timer = null; }
     this.paused = false;
@@ -335,7 +339,7 @@ export class PassView {
     if (bar) bar.style.animationDuration = `${ms}ms`;
   }
   private holdPause(on: boolean): void {
-    if (!AUTO_STATES.includes(this.state)) return;
+    if (!AUTO_STATES.includes(this.state) || !this.store.data.settings.autoNext) return;
     const note = this.card.querySelector<HTMLElement>("#tapnote");
     if (on && !this.paused) {
       if (this.timer !== null) { window.clearTimeout(this.timer); this.timer = null; }
@@ -418,6 +422,15 @@ export class PassView {
     const ytor = [form?.es, w?.es].filter((s): s is string => !!s);
     return `<div class="extips" id="exTips" hidden>
       <p class="exline lasmening">${this.markeradEs(ex.es, ytor)}</p></div>`;
+  }
+  /** Nedräkningsbaren överst på facit — bara i automatiska läget. */
+  private cdHtml(farg: string): string {
+    if (!this.store.data.settings.autoNext) return "";
+    return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:${farg}"></i></div>`;
+  }
+  private tapHtml(): string {
+    return `<p class="tapnote" id="tapnote">${this.store.data.settings.autoNext
+      ? "håll för paus · Enter för nästa" : "Enter för nästa"}</p>`;
   }
   private mnemBox(wordId: string): string {
     const m = this.store.userWord(wordId).mnem;
@@ -520,14 +533,12 @@ export class PassView {
     if (!p) return "";
     switch (this.state) {
       case "good":
-        return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--good)"></i></div>
-          <p class="verdict v-good">${IC_OK}Rätt</p>
+        return `${this.cdHtml("var(--good)")}          <p class="verdict v-good">${IC_OK}Rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, false)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
-          <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
+          ${this.tapHtml()}`;
       case "hard":
-        return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
-          <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
+        return `${this.cdHtml("var(--warn)")}          <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, false)}
           <div class="cmp"><span class="cl">du skrev</span><code>${esc(p.raw)}</code>
@@ -538,15 +549,14 @@ export class PassView {
             : p.card.dir === "es2sv"
               ? `<p class="fine">Svenskt stavfel — räknas som rätt.</p>`
               : `<p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>`}
-          <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
+          ${this.tapHtml()}`;
       case "override":
-        return `<div class="cd"><i class="cdbar" id="cdbar" style="--cdc:var(--warn)"></i></div>
-          <p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
+        return `${this.cdHtml("var(--warn)")}          <p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
           ${this.promptLine(p)}
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}
           <p class="also">»<b>${esc(p.raw)}</b>« sparas som synonym — nästa gång rättas den direkt.</p>
-          <p class="tapnote" id="tapnote">håll för paus · Enter för nästa</p>`;
+          ${this.tapHtml()}`;
       case "wrong":
         return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"}</p>
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>

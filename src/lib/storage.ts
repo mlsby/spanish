@@ -12,7 +12,7 @@ export interface StorageAdapter {
 export function emptyData(): AppData {
   return {
     version: 1,
-    settings: { newFirst: 10, newMore: 5 },
+    settings: { newFirst: 10, newMore: 5, autoNext: true, autoMs: 3000 },
     userWords: {},
     cards: {},
     reviews: [],
@@ -27,6 +27,9 @@ function normSettings(s: Partial<Settings> & { newPerDay?: number } = {}): Setti
   return {
     newFirst: s.newFirst ?? s.newPerDay ?? 10,
     newMore: s.newMore ?? 5,
+    // gamla sparfiler saknar fälten — defaulta i stället för att migrera
+    autoNext: s.autoNext ?? true,
+    autoMs: Math.max(1000, Math.min(10_000, s.autoMs ?? 3000)),
     updatedAt: s.updatedAt,
   };
 }

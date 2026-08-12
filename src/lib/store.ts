@@ -170,6 +170,17 @@ export class Store {
     this.dirty("settings");
   }
 
+  /** Facittempo — lokala inställningar (ingen molnkolumn, ingen migrering). */
+  setAutoNext(on: boolean): void {
+    this.data.settings.autoNext = on;
+    this.save();
+  }
+
+  setAutoMs(ms: number): void {
+    this.data.settings.autoMs = Math.max(1000, Math.min(10_000, ms));
+    this.save();
+  }
+
   /** Facit + synonymer i svarsriktningen (huvudöversättning först). */
   targets(word: Word, dir: Dir): string[] {
     const uw = this.userWord(word.id);

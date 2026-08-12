@@ -88,6 +88,10 @@ export interface Settings {
   newFirst: number;
   /** nya ord per "Öva mer"-omgång (lokal inställning tills en molnkolumn finns) */
   newMore: number;
+  /** facit vid rätt: gå vidare automatiskt? (lokal, synkas inte) */
+  autoNext: boolean;
+  /** hur länge facit visas vid rätt, ms (lokal, synkas inte) */
+  autoMs: number;
   updatedAt?: string; // för last-write-wins vid molnsynk
 }
 

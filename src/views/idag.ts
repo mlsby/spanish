@@ -318,6 +318,19 @@ function settingsHtml(store: Store, cloud: CloudUi): string {
         <button type="button" aria-label="Fler nya ord per extra övning" id="moreUp">+</button>
       </span>
     </div>
+    <div class="panel setting">
+      <span class="t">Facit — gå vidare automatiskt</span>
+      <button type="button" class="tagg${store.data.settings.autoNext ? " on" : ""}" id="autoNextTgl"
+        aria-pressed="${store.data.settings.autoNext}">${store.data.settings.autoNext ? "På" : "Av"}</button>
+    </div>
+    ${store.data.settings.autoNext ? `<div class="panel setting">
+      <span class="t">Facit visas — sekunder</span>
+      <span class="stepper">
+        <button type="button" aria-label="Kortare facittid" id="autoDown">−</button>
+        <span class="v">${(store.data.settings.autoMs / 1000).toLocaleString("sv-SE")}</span>
+        <button type="button" aria-label="Längre facittid" id="autoUp">+</button>
+      </span>
+    </div>` : ""}
     <div class="panel" id="kontoPanel">
       <p class="plabel">Konto &amp; molnsynk</p>
       ${kontoHtml(cloud)}
@@ -385,6 +398,16 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
   el.querySelector<HTMLButtonElement>("#firstUp")?.addEventListener("click", () => bumpFirst(1));
   el.querySelector<HTMLButtonElement>("#moreDown")?.addEventListener("click", () => bumpMore(-1));
   el.querySelector<HTMLButtonElement>("#moreUp")?.addEventListener("click", () => bumpMore(1));
+  el.querySelector<HTMLButtonElement>("#autoNextTgl")?.addEventListener("click", () => {
+    store.setAutoNext(!store.data.settings.autoNext);
+    rerender();
+  });
+  const bumpAuto = (d: number) => {
+    store.setAutoMs(store.data.settings.autoMs + d * 500); // halvsekundssteg, 1–10 s
+    rerender();
+  };
+  el.querySelector<HTMLButtonElement>("#autoDown")?.addEventListener("click", () => bumpAuto(-1));
+  el.querySelector<HTMLButtonElement>("#autoUp")?.addEventListener("click", () => bumpAuto(1));
 
   el.querySelector<HTMLButtonElement>("#exportBtn")?.addEventListener("click", () => {
     const url = URL.createObjectURL(exportBlob(store.data));
