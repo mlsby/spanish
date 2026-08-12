@@ -25,6 +25,8 @@ export class Store {
   /** exempelmeningar (Tatoeba): ord-/form-id → [spansk mening, ev. svensk översättning] */
   examples = new Map<string, string[]>();
   formsByParent = new Map<string, VerbForm[]>();
+  /** verb-id → alla presensformer (läsning: får förekomma i texter, blir aldrig kort) */
+  lasFormer = new Map<string, string[]>();
   data: AppData = emptyData();
   attribution: string[] = [];
   /** Anropas när lokal data ändras — synken använder den för att veta vad som ska skickas upp. */
@@ -79,6 +81,7 @@ export class Store {
     const json = await res.json();
     this.forms = json.forms as VerbForm[];
     this.formById = new Map(this.forms.map((f) => [f.id, f]));
+    this.lasFormer = new Map(Object.entries((json.las ?? {}) as Record<string, string[]>));
     this.formsByParent = new Map();
     const byEs = new Map<string, VerbForm[]>();
     for (const f of this.forms) {

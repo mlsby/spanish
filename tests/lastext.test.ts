@@ -68,20 +68,36 @@ describe("byggUnderlag", () => {
     seedCard(store, "feliz|adj", "es2sv", 2); seedCard(store, "feliz|adj", "sv2es", 21);
     const u = byggUnderlag(store, 4);
     expect(u.kandidater.map((k) => k.es).sort()).toEqual(["cada", "feliz"]); // de sköra, ej kan-orden
-    expect(u.ovriga).toContain("la casa");
-    // mött verb ⇒ alla presensformer ur datasetet får läsas, även omötta
-    expect(u.verb).toContainEqual({ inf: "ser", former: ["es"] });
+    expect(u.kan).toContain("la casa");
+    // mött verb ⇒ hela presensparadigmet får läsas, även omötta former
+    expect(u.kan).toContain("ser (es)");
     expect(u.vitlista).toContain("es");
   });
 
-  it("verbformer grupperas under moderverbet och quizzas som former", () => {
+  it("böjningsformer blir aldrig kandidater — bara grundord", () => {
     const store = makeStore();
     seedCard(store, "ser|v", "es2sv", 30); seedCard(store, "ser|v", "sv2es", 30);
-    seedCard(store, "ser|v#pres.3s", "es2sv", 0.5);
+    seedCard(store, "ser|v#pres.3s", "es2sv", 0.5); // skör form — får inte bli kandidat
+    seedCard(store, "cada|determiner", "es2sv", 1); seedCard(store, "cada|determiner", "sv2es", 1);
     const u = byggUnderlag(store, 2);
-    expect(u.verb).toContainEqual({ inf: "ser", former: ["es"] });
-    expect(u.kandidater[0]).toMatchObject({ es: "es", sv: "är" });
+    expect(u.kandidater.map((k) => k.es)).toEqual(["cada"]);
+    expect(u.kan).toContain("ser (es)"); // verbet ligger kvar i listan med sina former
     expect(u.vitlista).toContain("es");
+  });
+
+  it("nivåerna delas: kan-ord och nästan-ord i skilda listor", () => {
+    const store = makeStore();
+    seedCard(store, "casa|n", "es2sv", 30); seedCard(store, "casa|n", "sv2es", 30);
+    seedCard(store, "otro|determiner", "es2sv", 9); seedCard(store, "otro|determiner", "sv2es", 9);
+    seedCard(store, "cada|determiner", "es2sv", 1); seedCard(store, "cada|determiner", "sv2es", 1);
+    const u = byggUnderlag(store, 1, { rng: () => 0.99 }); // rng-valet landar på cada
+    expect(u.kan).toContain("la casa");
+    expect(u.nastan).toContain("otro");
+    expect(u.kan).not.toContain("otro");
+    // kandidaten står bara i kandidatlistan, inte i nivålistorna
+    expect(u.kandidater.map((k) => k.es)).toEqual(["cada"]);
+    expect([...u.kan, ...u.nastan]).not.toContain("cada");
+    expect(u.vitlista).toContain("cada"); // men den måste få förekomma i texten
   });
 
   it("vitlistan expanderar plural, femininum, glue-småord och verbglue", () => {
@@ -89,7 +105,7 @@ describe("byggUnderlag", () => {
     seedCard(store, "casa|n", "es2sv", 30); seedCard(store, "casa|n", "sv2es", 30);
     seedCard(store, "otro|determiner", "es2sv", 30); seedCard(store, "otro|determiner", "sv2es", 30);
     seedCard(store, "feliz|adj", "es2sv", 30); seedCard(store, "feliz|adj", "sv2es", 30);
-    const u = byggUnderlag(store, 2);
+    const u = byggUnderlag(store, 1, { rng: () => 0 });
     for (const t of ["casas", "otra", "otros", "felices", "a", "al", "del", "no", "la",
       "es", "son", "está", "están", "hay"]) {
       expect(u.vitlista, t).toContain(t);
@@ -134,7 +150,7 @@ describe("byggUnderlag — slump och exkludering", () => {
   it("uteslutna ord försvinner även ur palett och vitlista", () => {
     const store = fyraSkora();
     const u = byggUnderlag(store, 2, { exkludera: new Set(["cada|determiner"]), rng: () => 0 });
-    expect(u.ovriga).not.toContain("cada");
+    expect([...u.kan, ...u.nastan]).not.toContain("cada");
     expect(u.vitlista).not.toContain("cada");
     expect(u.vitlista).toContain("casa"); // övriga palettord kvar
   });
@@ -186,8 +202,8 @@ describe("byggQuiz + ordITexten", () => {
 
 describe("valideraText + hamtaText (klienten äger regler och omförsök)", () => {
   const underlag = {
-    verb: [],
-    ovriga: ["la casa"],
+    kan: ["la casa"],
+    nastan: [],
     kandidater: [{ id: "cada|determiner", es: "cada", sv: "varje" }],
     vitlista: ["cada", "casa", "la", "es", "el", "hombre"],
   };
@@ -205,7 +221,7 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
   it("systemprompten bär nivåvärdena och verbgluet", () => {
     const s = lasSystemPrompt({ meningar: 5, anvand: 4 });
     expect(s).toContain("ungefär 5 meningar");
-    expect(s).toContain("exakt 4 av KANDIDATORDEN");
+    expect(s).toContain("exakt 4 kandidatord");
     expect(s).toContain("es, son, está, están, hay");
   });
 

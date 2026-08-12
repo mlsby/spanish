@@ -195,6 +195,7 @@ for (const [inf, pres] of Object.entries(SV_PRES_MANUAL)) svPresByInf.set(inf, p
 const PRONOUN = { "1s": "jag", "2s": "du", "3s": "han/hon", "1p": "vi", "3p": "de" };
 const byForm = new Map(); // esForm → [kandidater] för ambiguitetskoll
 const candidates = [];
+const lasFormer = {}; // verb-id → alla presensformer (läsning, aldrig kort)
 let noJehle = 0, noSvPres = [];
 for (const v of verbs) {
   const paradigm = jehle.get(v.es) ?? regularPresent(v.es);
@@ -203,6 +204,18 @@ for (const v of verbs) {
   if (!fromJehle) noJehle++;
   const svPres = svPresByInf.get(v.sv);
   if (!svPres) { noSvPres.push(`${v.id} (${v.sv})`); continue; }
+  // läsformer: hela presensparadigmet, oavsett korpusrank och topp-4-taket.
+  // De blir aldrig kort — de finns bara så att läsförståelsetexterna får böja
+  // verb användaren mött. Jehle är auktoritativ; genererade former måste finnas
+  // i korpusen (en felgenererad form av ett oregelbundet verb gör det sällan).
+  const las = [];
+  for (const p of PERSONS) {
+    const e = (paradigm[p] || "").trim();
+    if (!e || e.includes(" ")) continue;
+    if (!fromJehle && !esRank.has(e)) continue;
+    if (!las.includes(e)) las.push(e);
+  }
+  if (las.length) lasFormer[v.id] = las;
   for (const p of PERSONS) {
     const es = (paradigm[p] || "").trim();
     if (!es || es.includes(" ")) continue;
@@ -269,6 +282,8 @@ const out = {
     "Svensk presens: Lexins svensk-spanska lexikon, Isof (CC BY 4.0)",
   ],
   forms: forms.map(({ id, parent, es, person, svPres, r, slot }) => ({ id, parent, es, person, svPres, r, slot })),
+  // läsformer per verb — används av läsförståelsen, aldrig som kort
+  las: lasFormer,
 };
 writeFileSync(join(dataDir, "verbforms.json"), JSON.stringify(out));
 
@@ -286,4 +301,5 @@ for (const v of verbByRank) {
 }
 writeFileSync(join(ROOT, "seed", "report-forms.md"), rep);
 console.log(`${forms.length} former, ${byParent.size} verb → public/data/verbforms.json + seed/report-forms.md`);
+console.log(`läsformer: ${Object.values(lasFormer).reduce((n, a) => n + a.length, 0)} för ${Object.keys(lasFormer).length} verb`);
 console.log(`utan sv-presens: ${noSvPres.length} · ambiguösa: ${ambiguous.size} · sv-krockar: ${svClashes.length}`);

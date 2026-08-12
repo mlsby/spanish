@@ -24,10 +24,11 @@ export function lasNiva(score: number): LasParametrar {
 }
 
 export interface LasKandidat { id: string; es: string; sv: string }
-export interface LasVerb { inf: string; former: string[] }
 export interface LasUnderlag {
-  verb: LasVerb[];
-  ovriga: string[];
+  /** ord som sitter — verb med sina former i parentes ("hablar (hablo, hablas …)") */
+  kan: string[];
+  /** mötta men vingliga ord — reserv när scenen behöver dem */
+  nastan: string[];
   kandidater: LasKandidat[];
   vitlista: string[];
 }
@@ -92,73 +93,82 @@ export function byggUnderlag(
   const kan = (id: string) =>
     (dirs.get(id) ?? 0) >= 2 && (minS.get(id) ?? 0) >= KNOWN_STABILITY_DAYS;
 
+  // kandidater väljs bara bland grundord (icke-verb + verbens infinitiv) —
+  // böjningsformerna quizzas i passet och ska inte äta kandidatplatserna
   let pool = introducerade
+    .filter((id) => !store.formById.has(id))
     .filter((id) => !kan(id))
     .filter((id) => {
       const c = store.card(id, "es2sv");
       return !!c && c.fsrs.reps > 0;
     })
     .sort((a, b) => (minS.get(a) ?? 0) - (minS.get(b) ?? 0));
-  let uteslut = new Set<string>(); // aktiv exkludering — gäller även paletten nedan
+  let uteslut = new Set<string>(); // aktiv exkludering — gäller även listorna nedan
   if (val.exkludera?.size) {
     const utan = pool.filter((id) => !val.exkludera!.has(id));
     if (utan.length >= antalKandidater) { pool = utan; uteslut = val.exkludera; }
   }
-  // slumpa urvalet ur fönstret av de skörast — Fisher-Yates
-  const fonster = pool.slice(0, antalKandidater * 2);
   const rng = val.rng ?? Math.random;
-  for (let i = fonster.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [fonster[i], fonster[j]] = [fonster[j], fonster[i]];
-  }
-  const kandidater: LasKandidat[] = [];
-  for (const id of fonster) {
-    if (kandidater.length >= antalKandidater) break;
-    const f = store.formById.get(id);
-    if (f) kandidater.push({ id, es: f.es, sv: f.svPres });
-    else {
-      const w = store.byId.get(id);
-      if (w) kandidater.push({ id, es: w.es, sv: w.sv });
+  const blanda = <T>(a: T[]): T[] => {
+    const x = [...a];
+    for (let i = x.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [x[i], x[j]] = [x[j], x[i]];
     }
+    return x;
+  };
+  // slumpa urvalet ur fönstret av de skörast — annars samma ord varje läsning
+  const kandidater: LasKandidat[] = [];
+  for (const id of blanda(pool.slice(0, antalKandidater * 2))) {
+    if (kandidater.length >= antalKandidater) break;
+    const w = store.byId.get(id);
+    if (w) kandidater.push({ id, es: w.es, sv: w.sv });
   }
+  const kandSet = new Set(kandidater.map((k) => k.id));
 
-  const verbIds = new Set<string>();
-  const ovriga: string[] = [];
+  // ---- listorna: varje ord i sin nivå, kandidaterna har egen lista ----
+  const kanRader: string[] = [];
+  const nastanRader: string[] = [];
   const vitlista = new Set<string>([...SMAORD, ...VERBGLUE]);
+  const verbKlara = new Set<string>();
   for (const id of introducerade) {
-    if (uteslut.has(id)) continue; // borta ur palett + vitlista → kan inte dyka upp i texten
-    const f = store.formById.get(id);
-    if (f) {
-      vitlista.add(f.es.toLowerCase());
-      // moderverbets infinitiv följer med — formen är omöjlig att lista utan den
-      const parent = store.byId.get(f.parent);
-      if (parent) vitlista.add(parent.es.toLowerCase());
-      verbIds.add(f.parent);
+    if (uteslut.has(id)) continue; // borta ur listor + vitlista → kan inte dyka upp
+    const form = store.formById.get(id);
+    const lemmaId = form ? form.parent : id;
+    if (uteslut.has(lemmaId) || kandSet.has(lemmaId)) continue;
+    const w = store.byId.get(lemmaId);
+    if (!w) continue;
+    const rader = kan(lemmaId) ? kanRader : nastanRader;
+    if (w.pos === "v") {
+      if (verbKlara.has(lemmaId)) continue;
+      verbKlara.add(lemmaId);
+      // mött verb ⇒ hela presensparadigmet får läsas (quizzas aldrig) — annars
+      // tvingas modellen till infinitivsoppa: "yo querer hablar"
+      const former = store.lasFormer.get(lemmaId)
+        ?? (store.formsByParent.get(lemmaId) ?? []).map((f) => f.es);
+      vitlista.add(w.es.toLowerCase());
+      for (const f of former) vitlista.add(f.toLowerCase());
+      rader.push(former.length ? `${w.es} (${former.join(", ")})` : w.es);
       continue;
     }
-    const w = store.byId.get(id);
-    if (!w) continue;
     const es = w.es.toLowerCase();
     for (const tok of es.split(/\s+/)) vitlista.add(tok);
-    if (w.pos === "v") {
-      verbIds.add(id);
-      continue;
-    }
-    ovriga.push(w.art ? `${w.art} ${w.es}` : w.es);
     if (BOJBARA.has(w.pos)) bojningar(es, vitlista);
+    rader.push(w.art ? `${w.art} ${w.es}` : w.es);
   }
-  // mött verb ⇒ ALLA dess presensformer får läsas i texten (quizzas aldrig) —
-  // med bara de mötta formerna tvingades modellen till "yo querer hablar"
-  const verb: LasVerb[] = [...verbIds].map((id) => {
-    const former: string[] = [];
-    for (const f of store.formsByParent.get(id) ?? []) {
-      if (uteslut.has(f.id) || former.includes(f.es)) continue;
-      former.push(f.es);
-      vitlista.add(f.es.toLowerCase());
-    }
-    return { inf: store.byId.get(id)?.es ?? id, former };
-  });
-  return { verb, ovriga, kandidater, vitlista: [...vitlista] };
+  // kandidaterna själva måste förstås också vara tillåtna i texten
+  for (const k of kandidater) {
+    const es = k.es.toLowerCase();
+    for (const tok of es.split(/\s+/)) vitlista.add(tok);
+    const w = store.byId.get(k.id);
+    if (w && BOJBARA.has(w.pos)) bojningar(es, vitlista);
+  }
+  return {
+    kan: blanda(kanRader),
+    nastan: blanda(nastanRader),
+    kandidater,
+    vitlista: [...vitlista],
+  };
 }
 
 /** Finns ordet (hel yta, inte delsträng) i texten? */
@@ -201,25 +211,25 @@ const LAS_SCHEMA = {
 };
 
 export function lasSystemPrompt(p: LasParametrar): string {
-  return `Du skriver en pytteliten sammanhängande scen på enkel spanska (presens) för svenska nybörjare — ungefär ${p.meningar} meningar som hör ihop.
+  return `Du skriver en liten sammanhängande scen på enkel spanska, ungefär ${p.meningar} meningar, till en svensk som lär sig språket.
 
-REGLER:
-- Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
-- Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
-- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
-- Alltid tillåtna småord: ${SMAORD.filter((s) => !["unos", "unas"].includes(s)).join(", ")} — och verben ${VERBGLUE.join(", ")}.
-- Använd exakt ${p.anvand} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
-- Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
+Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att scenen ska bli naturlig. Ett ord utanför listorna och hen tappar meningen; småorden ${SMAORD.filter((x) => !["unos", "unas"].includes(x)).join(", ")} samt ${VERBGLUE.join(", ")} är alltid ok, liksom regelbunden plural och femininum.
+
+Väv in exakt ${p.anvand} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
 
 Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet i meningen, eller "" om inget).`;
 }
 
 export function lasUserPrompt(u: LasUnderlag, anvand: number): string {
-  const verb = u.verb
-    .map((v) => (v.former.length ? `${v.inf}: ${v.inf}, ${v.former.join(", ")}` : v.inf))
-    .join(" · ");
   const kand = u.kandidater.map((k) => `${k.es} (${k.sv})`).join("\n");
-  return `VERB — endast dessa former är tillåtna:\n${verb}\n\nÖVRIGA TILLÅTNA ORD:\n${u.ovriga.join(", ")}\n\nKANDIDATORD (välj ${anvand} st, exakt dessa former):\n${kand}`;
+  return `KAN (sitter säkert — verb med de former du får använda i parentes):
+${u.kan.join(", ")}
+
+NÄSTAN KAN (om du behöver dem):
+${u.nastan.join(", ")}
+
+KANDIDATORD — övas nu, använd exakt dessa former (väv in exakt ${anvand}):
+${kand}`;
 }
 
 function tokenisera(text: string): string[] {

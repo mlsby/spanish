@@ -29,6 +29,7 @@ const words = index.batches.flatMap(
 const wordById = new Map(words.map((w) => [w.id, w]));
 const forms = JSON.parse(readFileSync(new URL("verbforms.json", DATA))).forms;
 const formById = new Map(forms.map((f) => [f.id, f]));
+const lasFormer = new Map(Object.entries(JSON.parse(readFileSync(new URL("verbforms.json", DATA))).las ?? {}));
 
 // ---------- profil: riktiga kort eller simulering ----------
 function laddaKort() {
@@ -63,6 +64,7 @@ const kanIds = introducerade.filter((id) => {
 // Lucas idé: ge modellen dubbelt så många kandidater som målet och låt den
 // välja de N som ger naturligast text — slacket köper flyt.
 const ovningsKandidater = introducerade
+  .filter((id) => !formById.has(id)) // böjningsformer quizzas i passet, inte här
   .filter((id) => !kanIds.includes(id))
   .sort((a, b) => perId.get(a).minS - perId.get(b).minS);
 const kandidater = ovningsKandidater.slice(0, N_OVNING * 3);
@@ -136,7 +138,8 @@ function byggVitlista() {
     }
   }
   for (const id of verbIds) {
-    for (const f of formsByParent.get(id) ?? []) ok.add(f.es.toLowerCase());
+    const las = lasFormer.get(id) ?? (formsByParent.get(id) ?? []).map((f) => f.es);
+    for (const e of las) ok.add(e.toLowerCase());
   }
   ok.delete("");
   return ok;
@@ -181,7 +184,7 @@ function userPrompt() {
     if (!w) continue;
     const box = kanSet.has(lemmaId) ? niva.kan : niva.nastan;
     if (w.pos === "v") {
-      const former = (formsByParent.get(lemmaId) ?? []).map((x) => x.es);
+      const former = lasFormer.get(lemmaId) ?? (formsByParent.get(lemmaId) ?? []).map((x) => x.es);
       const rad = former.length ? `${w.es} (${former.join(", ")})` : w.es;
       if (!box.includes(rad)) box.push(rad);
     } else {
@@ -190,11 +193,11 @@ function userPrompt() {
     }
   }
   const kand = kandidater.map((id) => `${ytform(id)} (${gloss(id)})`).join("\n");
-  return `KAN (sitter säkert):\n${blanda(niva.kan).join(", ")}
+  return `KAN (sitter säkert — verb med de former du får använda i parentes):\n${blanda(niva.kan).join(", ")}
 
-NÄSTAN KAN (om du behöver):\n${blanda(niva.nastan).join(", ")}
+NÄSTAN KAN (om du behöver dem):\n${blanda(niva.nastan).join(", ")}
 
-KANDIDATORD — övas nu (väv in exakt ${N_OVNING}):\n${kand}`;
+KANDIDATORD — övas nu, använd exakt dessa former (väv in exakt ${N_OVNING}):\n${kand}`;
 }
 
 // ---------- körning ----------
