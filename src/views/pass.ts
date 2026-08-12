@@ -556,8 +556,9 @@ export class PassView {
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, true)}${this.alsoLine(p)}
           ${this.showMnem
             ? this.mnemForm(p, false)
-            : `<div class="btnrow" style="margin-top:8px">
-                <button type="button" class="btn ghost" data-act="togglemnem">✎ Minnesregel</button>
+            : `${this.mnemBox(p.word.id) /* har man en regel visas den ALLTID vid fel */}
+              <div class="btnrow" style="margin-top:8px">
+                <button type="button" class="btn ghost" data-act="togglemnem">✎ ${this.store.userWord(p.word.id).mnem ? "Ändra regel" : "Minnesregel"}</button>
                 <button type="button" class="btn" data-act="next">Gå vidare</button></div>`}`;
       case "forced":
         return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"} — andra missen</p>
