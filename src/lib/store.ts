@@ -391,11 +391,23 @@ export class Store {
     if (cards.length === 0) return { word, cards, status: "ny", minStability: 0, level: "ny" };
     const minStability = Math.min(...cards.map((c) => c.fsrs.stability));
     const status = cards.length === 2 && cards.every(isKnown) ? "kan" : "lar";
-    // "ny" = inte mött än — gäller även introducerade men obesvarade (och nollställda) ord
-    const level: Level = cards.every((c) => c.fsrs.reps === 0) ? "ny"
-      : status === "kan" ? "kan"
-      : minStability >= 7 ? "pagang" : "ovar";
-    return { word, cards, status, minStability, level };
+    return { word, cards, status, minStability, level: this.levelFromCards(cards) };
+  }
+
+  /** Samma nivåregler för ord och böjningsformer — korten avgör. */
+  private levelFromCards(cards: CardRec[]): Level {
+    if (cards.length === 0) return "ny";
+    // "ny" = inte mött än — gäller även introducerade men obesvarade (och nollställda)
+    if (cards.every((c) => c.fsrs.reps === 0)) return "ny";
+    if (cards.length === 2 && cards.every(isKnown)) return "kan";
+    return Math.min(...cards.map((c) => c.fsrs.stability)) >= 7 ? "pagang" : "ovar";
+  }
+
+  /** Nivå för en böjningsform — formkorten räknas i poängen precis som ord. */
+  formLevel(f: VerbForm): Level {
+    return this.levelFromCards(
+      [this.card(f.id, "es2sv"), this.card(f.id, "sv2es")].filter((c): c is CardRec => !!c),
+    );
   }
 
   /** Ögonblicksbild av ordets båda kort (null = kortet finns inte) — för ångra. */
@@ -470,7 +482,7 @@ export class Store {
       ny, lar, kan,
       score: kan + lar, // nivåresans poäng — orden man kan + orden på väg
       started: lar + kan,
-      total: this.words.length,
+      total: this.words.length + this.forms.length,
       goal: 5000,
       due: dueReps,
       nextNew: unseen + fresh, // nya enheter nästa övning innehåller (ärvda + påfyllda)

@@ -27,13 +27,13 @@ describe("Mexiko-prognosen", () => {
     expect(t.perDag).toBeCloseTo(0.3);
   });
 
-  it("obesvarade introduktioner och böjningsformer räknas inte", () => {
+  it("obesvarade introduktioner räknas inte — böjningsformer räknas som ord", () => {
     const cards = [
       kort("ser|v", 5),
       kort("casa|n", 4, 0),          // introducerad men aldrig besvarad
-      kort("ser|v#pres.3s", 4),      // böjning — utanför poängen
+      kort("ser|v#pres.3s", 4),      // böjning — poäng sedan formbeslutet
     ];
-    expect(taktPerDag(cards, NU, 30)!.nyaIFonstret).toBe(1);
+    expect(taktPerDag(cards, NU, 30)!.nyaIFonstret).toBe(2);
   });
 
   it("en bulkdag kapas vid dagstaket — jämn inlärning berörs inte", () => {

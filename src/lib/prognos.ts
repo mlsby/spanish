@@ -10,7 +10,7 @@ import type { CardRec } from "./types";
  * ✓-markerade ord räknas alltså också — man kan lära sig spanska utanför
  * appen — men en enskild dag får bidra med max TAK_PER_DAG nya ord, så en
  * städdag där någon bockar av hela sitt gamla ordförråd inte blåser upp
- * prognosen. Böjningsformer ligger utanför poängen och räknas inte.
+ * prognosen. Böjningsformer räknas som ord — de är riktiga kort.
  */
 
 export const MEXIKO_ISO = "2026-12-26";
@@ -43,8 +43,7 @@ export function taktPerDag(
   // ordets inträdesdag = äldsta introducedAt bland kort med minst ett svar
   const intrade = new Map<string, string>();
   for (const c of cards) {
-    if (c.wordId.includes("#")) continue; // böjningar ligger utanför poängen
-    if (c.fsrs.reps <= 0) continue;       // obesvarat = ingen poäng = ingen takt
+    if (c.fsrs.reps <= 0) continue; // obesvarat = ingen poäng = ingen takt
     const prev = intrade.get(c.wordId);
     if (!prev || c.introducedAt < prev) intrade.set(c.wordId, c.introducedAt);
   }

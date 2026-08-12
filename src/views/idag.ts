@@ -96,7 +96,7 @@ function mexikoHtml(store: Store): string {
     return `<p class="omtext" style="margin:0">Du har <b>${score}</b> ord med dig.
       Prognosen ritas när du övat i ${MIN_DAGAR} dagar.</p>`;
   }
-  const prognos = prognosOrd(score, takt, now);
+  const prognos = prognosOrd(score, takt, now, store.words.length + store.forms.length);
   const niva = resaFor(prognos).titel.name;
   const serie = Object.entries(store.data.snapshots)
     .sort(([a], [b]) => (a < b ? -1 : 1)).slice(-60)
