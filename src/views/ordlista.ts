@@ -138,9 +138,10 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
   function exampleHtml(wordId: string): string {
     const ex = store.exampleFor(wordId);
     if (!ex) return "";
+    const overs = ex.sv ?? ex.en; // engelska som reserv när svensk länk saknas
     return `<div><div class="xl">Exempel</div>
       <p class="exline">${esc(ex.es)}</p>
-      ${ex.sv ? `<p class="exsv">${esc(ex.sv)}</p>` : ""}</div>`;
+      ${overs ? `<p class="exsv">${esc(overs)}</p>` : ""}</div>`;
   }
 
   /** Verbets böjningsformer med status-prick (grå = inte introducerad än). */

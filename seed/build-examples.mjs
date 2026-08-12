@@ -82,15 +82,34 @@ for (const line of readFileSync(join(DIR, "swe-eng_links.tsv"), "utf8").split("\
   if (!prev || t.length < prev.length) sweByEng.set(k, t);
 }
 const svPivot = new Map(); // spa-id → svensk mening via engelskt original
+const engLinks = [];       // [spa-id, eng-id] — återanvänds för engelska reserven
 for (const line of readFileSync(join(DIR, "spa-eng_links.tsv"), "utf8").split("\n")) {
   const [es, en] = line.split("\t");
   if (!es || !en) continue;
+  engLinks.push([es, en.trim()]);
   const t = sweByEng.get(en.trim());
   if (!t) continue;
   const prev = svPivot.get(es);
   if (!prev || t.length < prev.length) svPivot.set(es, t);
 }
 console.log(`nåbara via engelsk brygga: ${svPivot.size}`);
+
+// Engelska som RESERVÖVERSÄTTNING (fel-läget ska alltid kunna visa något):
+// bara meningstexter som faktiskt länkas från spanskan läses in i minnet
+const enIds = new Set(engLinks.map(([, en]) => en));
+const enById = new Map();
+for (const line of readFileSync(join(DIR, "eng_sentences.tsv"), "utf8").split("\n")) {
+  const [id, , text] = line.split("\t");
+  if (id && text && enIds.has(id)) enById.set(id, text);
+}
+const enDirect = new Map(); // spa-id → kortaste direktlänkade engelska meningen
+for (const [es, en] of engLinks) {
+  const t = enById.get(en);
+  if (!t) continue;
+  const prev = enDirect.get(es);
+  if (!prev || t.length < prev.length) enDirect.set(es, t);
+}
+console.log(`spanska↔engelska direktpar: ${enDirect.size}`);
 
 /** Svensk mening för en spansk: direktlänk före brygga, med längdrimlighetskoll. */
 const svFor = (sid, esText) => {
@@ -124,9 +143,12 @@ const push = (key, entry) => {
   let a = cands.get(key);
   if (!a) { a = []; cands.set(key, a); }
   if (a.length < 400) { a.push(entry); return; } // tak per mål
-  // fullt: en översatt mening får peta ut en oöversatt — svenskan är guld i fel-läget
+  // fullt: översatt petar ut oöversatt — svenska > engelska > ingen
   if (entry.sv) {
     const i = a.findIndex((e) => !e.sv);
+    if (i >= 0) a[i] = entry;
+  } else if (entry.en) {
+    const i = a.findIndex((e) => !e.sv && !e.en);
     if (i >= 0) a[i] = entry;
   }
 };
@@ -178,7 +200,7 @@ for (const line of lines) {
   if (unknown || names > 1) continue;
   scanned++;
 
-  const entry = { sid, text, toks, names, sv: svFor(sid, text) };
+  const entry = { sid, text, toks, names, sv: svFor(sid, text), en: enDirect.get(sid) ?? null };
   const seen = new Set();
   for (let i = 0; i < toks.length; i++) {
     const t = toks[i];
@@ -212,9 +234,13 @@ const score = (e, needle, pos) => {
   }
   // substantiv läses tryggast med artikel framför — belöna "la casa" över "paso casa"
   const nounBonus = pos === "n" && DET.has(e.prev) ? -800 : 0;
-  const svBonus = e.sv ? (e.sv.via === "direkt" ? 4000 : 2500) : 0;
-  return maxOther + 150 * Math.abs(e.toks.length - 5) + e.names * 700 - svBonus + nounBonus;
+  // direktlänkad svenska föredras framför bryggad — inom svensk-nivån
+  const direktBonus = e.sv?.via === "direkt" ? 1500 : 0;
+  return maxOther + 150 * Math.abs(e.toks.length - 5) + e.names * 700 - direktBonus + nounBonus;
 };
+// hård nivåordning: svensk översättning > engelsk reserv > ingen —
+// poängen får bara rangordna inom nivån, aldrig byta ner en översättning
+const niva = (e) => (e.sv ? 2 : e.en ? 1 : 0);
 
 /** ordgränsad förekomst av svensk glosa-stam i den svenska meningen */
 const svMatches = (svText, stems) => {
@@ -237,7 +263,7 @@ const QDET = new Set(["qué", "cuántas", "cuántos", "cuánta", "cuánto"]);
 const formEsSet = new Set(forms.map((f) => f.es.toLowerCase()));
 
 const ex = {};
-let nWords = 0, nForms = 0, nSv = 0, nBrygga = 0, nHintOk = 0, nHintSkipped = 0;
+let nWords = 0, nForms = 0, nSv = 0, nBrygga = 0, nEn = 0, nHintOk = 0, nHintSkipped = 0;
 const via = new Map();
 const pick = (id, hintStems, opts = {}) => {
   const tgt = targetOf.get(id);
@@ -294,10 +320,15 @@ const pick = (id, hintStems, opts = {}) => {
     nHintOk++;
   }
   if (!usable.length) return;
-  usable = [...usable].sort((a, b) => score(a, needle, opts.pos) - score(b, needle, opts.pos));
+  usable = [...usable].sort((a, b) =>
+    niva(b) - niva(a) || score(a, needle, opts.pos) - score(b, needle, opts.pos));
   const best = usable[0];
-  ex[id] = best.sv ? [best.text, best.sv.text] : [best.text];
+  // tupel [es, sv, en] — engelskan bara som reserv när svensk länk saknas
+  ex[id] = best.sv ? [best.text, best.sv.text]
+    : best.en ? [best.text, "", best.en]
+    : [best.text];
   if (best.sv) { nSv++; if (best.sv.via === "brygga") nBrygga++; via.set(id, best.sv.via); }
+  else if (best.en) { nEn++; via.set(id, "engelska"); }
 };
 
 const glosaStems = (w) => new Set([
@@ -334,15 +365,15 @@ const out = {
 writeFileSync(OUT, JSON.stringify(out));
 const hintWords = words.filter((w) => w.hint).length;
 console.log(`exempel: ${nWords}/${words.length} ord (varav ${nHintOk}/${hintWords} ledtrådsord; ${nHintSkipped} skippade för säkerhets skull)`);
-console.log(`         ${nForms}/${forms.length} former · ${nSv} med svensk översättning (${nSv - nBrygga} direkta + ${nBrygga} via bryggan)`);
+console.log(`         ${nForms}/${forms.length} former · ${nSv} med svensk översättning (${nSv - nBrygga} direkta + ${nBrygga} via bryggan) · ${nEn} med engelsk reserv`);
 console.log(`storlek: ${(JSON.stringify(out).length / 1024).toFixed(0)} kB → ${OUT}`);
 
 // ---------- rapport för ögongranskning ----------
 const sample = (ids, n) => ids.filter((id) => ex[id]).filter((_, i, a) => i % Math.max(1, Math.floor(a.length / n)) === 0).slice(0, n);
 let md = `# Exempelmeningar — stickprov (${out.generated})\n\n| mål | mening | svensk | via |\n|---|---|---|---|\n`;
 const row = (id, label) => {
-  const [es, sv] = ex[id];
-  md += `| ${label} | ${es} | ${sv ?? "—"} | ${via.get(id) ?? "—"} |\n`;
+  const [es, sv, en] = ex[id];
+  md += `| ${label} | ${es} | ${sv || en || "—"} | ${via.get(id) ?? "—"} |\n`;
 };
 for (const id of sample(words.map((w) => w.id), 40)) row(id, id.split("|")[0]);
 md += "\n## Former\n\n| mål | mening | svensk | via |\n|---|---|---|---|\n";

@@ -14,6 +14,8 @@ type UiState =
 const AUTO_STATES: UiState[] = ["good", "hard", "override"];
 // stavfel/override visas längre — tiden ska räcka till att SE vad som blev fel
 const AUTO_MS: Record<string, number> = { good: 1500, hard: 4000, override: 4000 };
+// tvekar man på ett spanskt ord tonas exempelmeningen fram — kontext, inte facit
+const TIPS_MS = 4500;
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -25,6 +27,7 @@ export class PassView {
   private session: Session | null = null;
   private state: UiState = "idle";
   private timer: number | null = null;
+  private tipsTimer: number | null = null; // fördröjda exempeltipset i frågan
   private tRemain = 0;
   private tStart = 0;
   private paused = false;
@@ -383,8 +386,38 @@ export class PassView {
     const ex = this.store.exampleFor(p.card.wordId);
     if (!ex) return "";
     let h = `<p class="exline">${esc(ex.es)}</p>`;
-    if (withSv && ex.sv) h += `<p class="exsv">${esc(ex.sv)}</p>`;
+    // svensk översättning först — engelskan är reserv så man iaf ser något vid fel
+    const overs = ex.sv ?? ex.en;
+    if (withSv && overs) h += `<p class="exsv">${esc(overs)}</p>`;
     return h;
+  }
+
+  /** Ordet varmt markerat i exempelmeningen — samma stil som läsningen. */
+  private markeradEs(mening: string, ytor: string[]): string {
+    for (const es of ytor) {
+      const safe = es.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const m = mening.match(new RegExp(`(^|[^a-záéíóúñüA-ZÁÉÍÓÚÑÜ])(${safe})(?=[^a-záéíóúñüA-ZÁÉÍÓÚÑÜ]|$)`, "i"));
+      if (m && m.index !== undefined) {
+        const start = m.index + m[1].length;
+        return `${esc(mening.slice(0, start))}<mark>${esc(mening.slice(start, start + es.length))}</mark>${esc(mening.slice(start + es.length))}`;
+      }
+    }
+    return esc(mening);
+  }
+
+  /**
+   * Fördröjt lästips i frågan (bara es→sv): efter några sekunder tonas
+   * exempelmeningen fram — enbart spanskan, kontext i stället för facit.
+   */
+  private exTipsHtml(card: CardRec): string {
+    if (card.dir !== "es2sv") return "";
+    const ex = this.store.exampleFor(card.wordId);
+    if (!ex) return "";
+    const form = this.store.formFor(card);
+    const w = this.session?.word(card);
+    const ytor = [form?.es, w?.es].filter((s): s is string => !!s);
+    return `<div class="extips" id="exTips" hidden>
+      <p class="exline lasmening">${this.markeradEs(ex.es, ytor)}</p></div>`;
   }
   private mnemBox(wordId: string): string {
     const m = this.store.userWord(wordId).mnem;
@@ -482,7 +515,7 @@ export class PassView {
       const posLabel = form ? "verb · presens" : (POS_LABEL[w.pos] ?? w.pos);
       // ledtråden särskiljer svenska dubbletter — visas bara åt sv→es-hållet
       const hint = card.dir === "sv2es" ? this.hintLine(w) : "";
-      return `<p class="pos">${esc(posLabel)}</p><h2 class="head">${esc(prompt)}</h2>${hint}`;
+      return `<p class="pos">${esc(posLabel)}</p><h2 class="head">${esc(prompt)}</h2>${hint}${this.exTipsHtml(card)}`;
     }
     if (!p) return "";
     switch (this.state) {
@@ -548,6 +581,16 @@ export class PassView {
     const s = this.session;
     this.card.className = `card st-${this.state}`;
     this.card.innerHTML = this.template();
+    // lästipset armeras om för varje ny fråga — omrendering dödar gamla timern
+    if (this.tipsTimer !== null) { window.clearTimeout(this.tipsTimer); this.tipsTimer = null; }
+    if (this.state === "question" && this.card.querySelector("#exTips")) {
+      this.tipsTimer = window.setTimeout(() => {
+        const el = this.card.querySelector<HTMLElement>("#exTips");
+        if (!el || this.state !== "question") return;
+        el.hidden = false;
+        requestAnimationFrame(() => el.classList.add("fram")); // tona in mjukt
+      }, TIPS_MS);
+    }
     this.el.querySelector<HTMLButtonElement>("#passExit")!.hidden = !this.live;
     this.el.querySelector<HTMLElement>("#vetInte")!.hidden = this.state !== "question";
     document.getElementById("app")?.classList.toggle("pass-live", this.live);

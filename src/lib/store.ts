@@ -61,10 +61,16 @@ export class Store {
     this.examples = new Map(Object.entries(json.ex as Record<string, string[]>));
   }
 
-  /** Exempelmening för ett ord eller en böjningsform (Tatoeba). */
-  exampleFor(wordId: string): { es: string; sv?: string } | null {
-    const e = this.examples.get(wordId);
-    return e ? { es: e[0], sv: e[1] } : null;
+  /**
+   * Exempelmening för ett ord eller en böjningsform (Tatoeba).
+   * Tupeln är [es, sv?, en?] — engelskan är reservöversättning där svensk
+   * länk saknas. Böjningar utan egen mening ärver moderverbets.
+   */
+  exampleFor(wordId: string): { es: string; sv?: string; en?: string } | null {
+    const e = this.examples.get(wordId)
+      ?? this.examples.get(this.formById.get(wordId)?.parent ?? "");
+    if (!e) return null;
+    return { es: e[0], sv: e[1] || undefined, en: e[2] || undefined };
   }
 
   private async loadForms(baseUrl: string): Promise<void> {

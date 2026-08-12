@@ -378,6 +378,14 @@ html.kbd .vetinte button{padding:3px 14px}
 .rowx .mini{align-self:flex-end;border:0;background:var(--accent-soft);color:var(--accent);font-weight:600;
             font-size:12.5px;border-radius:9px;padding:7px 14px}
 
+/* fördröjt lästips i frågan: exempelmeningen tonas fram efter några sekunder */
+.extips{opacity:0;transition:opacity .7s ease;margin-top:2px}
+.extips.fram{opacity:1}
+.extips .exline{color:var(--muted);font-size:15px}
+.extips mark{background:var(--warn-bg);color:var(--warn);border-radius:4px;padding:0 3px;
+             font-style:normal;font-weight:600}
+html.kbd .extips .exline{font-size:13.5px}
+
 /* ---------- exempelmeningar (Tatoeba) ---------- */
 .qline{margin:2px 0 0;color:var(--muted);font-size:15px;font-family:var(--serif)}
 .exline{margin:6px 0 0;font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.4}

@@ -1,77 +1,77 @@
-# Exempelmeningar — stickprov (2026-08-11)
+# Exempelmeningar — stickprov (2026-08-12)
 
 | mål | mening | svensk | via |
 |---|---|---|---|
 | de | Estoy mal de dinero. | Jag har ont om pengar. | direkt |
 | seguir | ¿Vas a seguir? | Tänker du följa med? | brygga |
 | mayor | Él es tres años mayor que ella. | Han är tre år äldre än hon. | brygga |
-| existir | Gracias por existir en este mundo. | — | — |
+| existir | ¿Puede existir una ilusión? | Kan en illusion existera? | brygga |
 | música | La música es vida. | Musik är liv. | direkt |
 | profesor | Él es mi profesor. | Han är min lärare. | direkt |
 | maravilloso | Ellos pasaron un tiempo maravilloso juntos. | De tillbringade en underbar tid tillsammans. | direkt |
-| despedir | No quiero despedir a nadie. | — | — |
+| despedir | Lo voy a despedir. | I'll fire them. | engelska |
 | amable | Él es amable. | Han är vänlig. | direkt |
-| escrito | Así es como está escrito. | — | — |
-| confianza | He perdido toda mi confianza. | — | — |
-| poseer | Poseer cosas no es un trabajo. | — | — |
-| empujar | Oye, no hace falta empujar. | — | — |
-| rueda | Tuve que comprar una rueda nueva. | — | — |
+| escrito | Así es como está escrito. | It's written like that. | engelska |
+| confianza | He perdido la confianza en usted. | I've lost faith in you. | engelska |
+| poseer | Poseer cosas no es un trabajo. | Owning things isn't a job. | engelska |
+| empujar | Deja de empujar. | Stop pushing. | engelska |
+| rueda | Él inventó la rueda. | Han uppfann hjulet. | brygga |
 | claramente | Habla claramente. | Tala tydligt! | brygga |
 | aceite | Había escasez de aceite importado | Det rådde brist på importerad olja. | direkt |
 | definitivo | Esto no es definitivo, tan solo es una prueba. | — | — |
-| aparentemente | Aparentemente no hay nadie en casa. | — | — |
-| previo | Teníamos un compromiso previo. | — | — |
-| sabor | El sabor ya está. | — | — |
-| facultad | ¿Dónde está la facultad de derecho? | — | — |
-| rumbo | Hemos cambiado el rumbo. | — | — |
+| aparentemente | Aparentemente él sabía todo acerca de mí. | Apparently, he knew everything about me. | engelska |
+| previo | Teníamos un compromiso previo. | We had a previous agreement. | engelska |
+| sabor | Amo el sabor del café. | I love the smell of coffee. | engelska |
+| facultad | ¿Dónde está la facultad de derecho? | Where is law college? | engelska |
+| rumbo | Hemos cambiado el rumbo. | We've altered course. | engelska |
 | pescar | Vamos a pescar de vez en cuando. | Vi åker och fiskar då och då. | brygga |
-| quemado | Te los ha quemado. | — | — |
+| quemado | Todavía no se ha quemado nada. | Nothing has been burned yet. | engelska |
 | demandar | Debería demandar a Tom. | Jag borde stämma Tom. | brygga |
 | agenda | ¿Qué tenemos en la agenda el día hoy? | Vad står på dagens agenda? | direkt |
 | toalla | Necesito una toalla. | Jag behöver en handduk. | brygga |
-| cima | Estoy en la cima del mundo. | — | — |
-| creador | Dios es el creador de todo. | — | — |
-| complacer | Eso debería complacer a todos. | — | — |
-| circular | No se podía circular en ningún sentido. | — | — |
-| masaje | Quiero un masaje. | — | — |
-| franco | Para ser franco, no te queda. | — | — |
-| compositor | Tom Jobim fue un compositor muy conocido. | — | — |
-| cóctel | Tengo previsto ir a su cóctel. | — | — |
+| cima | Estoy en la cima del mundo. | I'm on top of the world. | engelska |
+| creador | Dios es el creador de todo. | God is the creator of everything. | engelska |
+| complacer | Eso debería complacer a todos. | That should please everyone. | engelska |
+| circular | Era casi imposible circular por esa calle. | It was almost impossible to get around on that street. | engelska |
+| masaje | Quiero un masaje. Necesito relajarme. | Jag vill ha en massage. Jag behöver slappna av. | brygga |
+| franco | Para ser franco, no te queda. | Frankly speaking, it doesn't suit you. | engelska |
+| compositor | Tom Jobim fue un compositor muy conocido. | Tom Jobim was a very well-known composer. | engelska |
+| cóctel | Tengo previsto ir a su cóctel. | I plan to go to her cocktail party. | engelska |
 | convocatoria | Tu sobrino aprobó en la convocatoria de junio. | — | — |
-| físicamente | Físicamente imposible. | — | — |
-| estafa | La vida es una estafa. | — | — |
-| lira | Toco la lira, la guitarra y la flauta. | — | — |
-| explorador | El explorador volvió en muy malas condiciones. | — | — |
+| físicamente | Físicamente imposible. | Physically impossible. | engelska |
+| estafa | La vida es una estafa. | Life is a scam. | engelska |
+| lira | Toco la lira, la guitarra y la flauta. | I play the lyre, the guitar, and the flute. | engelska |
+| explorador | El segundo hombre fue un explorador español. | The second man was a Spanish explorer. | engelska |
 
 ## Former
 
 | mål | mening | svensk | via |
 |---|---|---|---|
 | ser→es | ¿Eso es todo lo que tienes? | Är det allt du har? | direkt |
-| necesitar→necesitas | ¿Necesitas dinero? | Behöver du pengar? | direkt |
-| causar→causa | ¿Por qué causa? | — | — |
-| cambiar→cambia | Todo cambia. | Allt förändras. | brygga |
-| respirar→respira | ¡No respira! | — | — |
-| intentar→intentamos | Lo intentamos. | Vi försöker. | brygga |
-| empezar→empiezas | ¿Cuándo empiezas? | — | — |
-| tocar→tocas | ¿Tocas en una banda? | — | — |
-| fijar→fijo | Fijo que son estadounidenses. | — | — |
-| apoyar→apoya | Nadie le apoya. | — | — |
-| olvidar→olvidamos | Olvidamos algo. | Vi glömmer en sak. | brygga |
-| cenar→cenas | ¿Por qué no cenas con nosotros? | — | — |
-| actuar→actúan | Algunos animales actúan de noche. | — | — |
-| llorar→lloran | Los niños grandes no lloran. | Stora pojkar gråter inte. | brygga |
-| procurar→procura | Procura ir más rápido. | — | — |
-| llenar→llenan | Mis hijos me llenan de orgullo. | — | — |
-| continuar→continúas | ¿Continúas enfadado? | — | — |
-| reportar→reporta | Reporta la situación del progreso, por favor. | — | — |
-| estropear→estropea | Una manzana podrida estropea todo el barril. | — | — |
-| arruinar→arruinan | Muchas empresas se arruinan por llevar una pésima contabilidad. | — | — |
-| saludar→saludamos | ¿Saludamos a Mary? | — | — |
-| flotar→flotan | Las piedras no flotan. | — | — |
-| pelar→pela | Él se pela la manzana. | Han skalar sitt äpple. | brygga |
-| seleccionar→selecciona | Selecciona cualquier tarta que quieras. | — | — |
-| acomodar→acomoda | Hoy, la lluvia se acomoda con mi humor. | — | — |
+| tratar→trata | ¿De qué trata la reunión? | Vad handlar mötet om? | direkt |
+| existir→existe | ¡El amor verdadero no existe! | Sann kärlek existerar inte. | brygga |
+| costar→cuesta | ¿Cuánto cuesta esta cámara? | Vad kostar den här kameran? | direkt |
+| comprar→compra | Él compra ropa. | He buys clothes. | engelska |
+| apetecer→apetece | No vamos porque no nos apetece. | We're not going, because we don't feel like it. | engelska |
+| lograr→logro | No logro pensar en otra cosa. | I can't think about anything else. | engelska |
+| comprar→compro | Nunca compro azúcar. | Jag köper aldrig socker. | brygga |
+| proponer→propongo | Propongo que salgamos el viernes. | I suggest we go out on Friday. | engelska |
+| atacar→atacan | Los lobos usualmente no atacan a la gente. | Wolves won't usually attack people. | engelska |
+| parar→paramos | Nosotros nos paramos en la puerta y esperamos. | We stood at the door and waited. | engelska |
+| correr→corro | Yo corro diez kilómetros al día. | I run ten kilometers a day. | engelska |
+| golpear→golpeo | Golpeo a Tom. | I hit Tom. | engelska |
+| pegar→pegas | Casi me pegas. | You almost hit me. | engelska |
+| controlar→controlo | Controlo la situación. | — | — |
+| inventar→inventa | La verdad existe. Sólo se inventa la mentira. | Truth exists; only lies are invented. | engelska |
+| contratar→contratamos | ¿Se te dijo por qué nosotros no te contratamos? | Have you been told why we didn't hire you? | engelska |
+| pasear→pasea | Pasea todos los días. | Take a walk every day. | engelska |
+| suponer→suponemos | ¿Lo sabemos o lo suponemos? | — | — |
+| colocar→colocas | ¿Cuándo colocas tu árbol de Navidad? | When do you put up your Christmas tree? | engelska |
+| examinar→examina | Examina mi corazón. | — | — |
+| extrañar→extrañan | ¿Ellos extrañan a su madre? | Do they miss their mother? | engelska |
+| detestar→detestas | ¿Es que ahora me detestas? | — | — |
+| navegar→navegamos | Navegamos hacia el sur. | We're sailing southward. | engelska |
+| emplear→emplean | A veces se emplean otros centros públicos. | — | — |
 
 ## Ledtrådsord (betydelsekollade via svensk länk)
 
