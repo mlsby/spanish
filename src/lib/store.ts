@@ -483,7 +483,7 @@ export class Store {
       score: kan + lar, // nivåresans poäng — orden man kan + orden på väg
       started: lar + kan,
       total: this.words.length + this.forms.length,
-      goal: 5000,
+      goal: this.words.length + this.forms.length, // hela basen: ord + böjningsformer
       due: dueReps,
       nextNew: unseen + fresh, // nya enheter nästa övning innehåller (ärvda + påfyllda)
       firstToday,

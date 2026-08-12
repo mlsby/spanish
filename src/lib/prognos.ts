@@ -67,12 +67,12 @@ export function taktPerDag(
   return { perDag: nya / dagar, nyaIFonstret: nya, dagar };
 }
 
-/** Var landar man till Mexiko om takten håller? Cappad vid ordbasens tak. */
+/** Var landar man till Mexiko om takten håller? Cappad vid basens tak (ord + former). */
 export function prognosOrd(
   scoreNu: number,
   takt: Takt,
   now: Date,
-  total = 5000,
+  total = 7843,
 ): number {
   return Math.min(total, Math.round(scoreNu + takt.perDag * dagarKvar(now)));
 }
