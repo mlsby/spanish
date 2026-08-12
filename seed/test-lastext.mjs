@@ -173,13 +173,16 @@ function validera(meningar) {
 
 // ---------- prompten ----------
 function systemPrompt() {
-  return `Du skriver en liten sammanhängande scen på enkel spanska, ungefär ${N_MENINGAR} meningar, till en svensk som lär sig språket.
+  const lo = Math.max(2, N_MENINGAR - 1);
+  return `Du skriver en kort text på enkel spanska till en svensk som lär sig språket — ${lo}–${N_MENINGAR} meningar som hör ihop. Det kan vara en liten historia, en konversation eller en blandning; välj det som blir mest levande.
 
-Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att scenen ska bli naturlig. Ett ord utanför listorna och hen tappar meningen; småorden el, la, los, las, un, una, a, al, del, no samt es, son, está, están, hay är alltid ok, liksom regelbunden plural och femininum.
+Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att det ska flyta naturligt. Ett ord utanför listorna och hen tappar meningen; småorden el, la, los, las, un, una, a, al, del, no samt es, son, está, están, hay är alltid ok, liksom regelbunden plural och femininum.
 
 Väv in exakt ${N_OVNING} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
 
-Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet i meningen, eller "" om inget).`;
+Ge texten en talande titel som sätter scenen. Titeln skrivs på SVENSKA — det är den enda delen som ska vara på svenska, och den behöver inte hålla sig till ordlistorna.
+
+Svara i JSON: { "titelSv": "...", "meningar": [{ "es", "ovningsord" }] }.`;
 }
 
 function userPrompt() {
@@ -213,8 +216,9 @@ KANDIDATORD — övas nu (väv in exakt ${N_OVNING}, verb får böjas):\n${kand}
 const schema = {
   type: "object",
   additionalProperties: false,
-  required: ["meningar"],
+  required: ["titelSv", "meningar"],
   properties: {
+    titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska)" },
     meningar: {
       type: "array",
       items: {
@@ -268,7 +272,9 @@ for (let forsok = 1; forsok <= 3; forsok++) {
     console.error(`Inget textsvar (stop_reason: ${res.stop_reason}) — höj max_tokens?`);
     process.exit(1);
   }
-  meningar = JSON.parse(textBlock.text).meningar;
+  const svar = JSON.parse(textBlock.text);
+  meningar = svar.meningar;
+  console.log(`\n»${svar.titelSv}«`);
 
   const { brott, anvanda, forFa } = validera(meningar);
   console.log(`\n--- försök ${forsok} ---`);
