@@ -76,6 +76,7 @@ describe("filtreraLista", () => {
 
   it("ordklass grupperar övrigt", () => {
     expect(posGrupp("adv")).toBe("ovrig");
+    expect(posGrupp("vform")).toBe("form"); // böjningsrader får egen filtergrupp
     const f = { ...tomFilter(), pos: ["ovrig"] as const };
     expect(filtreraLista(alla, { ...f, pos: [...f.pos] }, inga, inga).map((w) => w.word.id)).toEqual(["kan"]);
   });

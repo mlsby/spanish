@@ -1,8 +1,8 @@
 import type { Social } from "../lib/social";
 import type { Store, WordStatus } from "../lib/store";
 import { isKnown } from "../lib/scheduler";
-import type { CardRec, Level } from "../lib/types";
-import { LEVEL_SV, POS_LABEL } from "../lib/types";
+import type { CardRec, Level, VerbForm, Word } from "../lib/types";
+import { LEVEL_SV, PERSON_SV, POS_LABEL } from "../lib/types";
 import {
   antalFilter, dagEtikett, felAntal, filtreraLista, introAt, type ListFilter,
   type PosGrupp, type RegelFilter, SORT_SV, sorteraLista, type SortKey,
@@ -43,6 +43,14 @@ const IKON_SORT = `<svg viewBox="0 0 24 24" aria-hidden="true">
 const IKON_FILTER = `<svg viewBox="0 0 24 24" aria-hidden="true">
   <path d="M4 5h16l-6.5 7.5v5L10.5 20v-7.5L4 5z"/></svg>`;
 
+/** Böjning som listbart "ord": rank = korpus-slot, sv = "vi pratar". */
+function formAsWord(f: VerbForm): Word {
+  return {
+    id: f.id, rank: f.slot, es: f.es, pos: "vform",
+    sv: `${PERSON_SV[f.person]} ${f.svPres}`, syn: [],
+  };
+}
+
 export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): void {
   let query = "";
   let shown = PAGE;
@@ -68,13 +76,23 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     if (undo) window.clearTimeout(undo.timer);
     undo = null;
   }
+  /** Nivå för ord ELLER böjning (null = okänt id). */
+  function unitLevel(id: string): Level | null {
+    const w = store.byId.get(id);
+    if (w) return store.wordStatus(w).level;
+    const f = store.formById.get(id);
+    return f ? store.wordStatus(formAsWord(f)).level : null;
+  }
+  function unitEs(id: string): string {
+    return store.byId.get(id)?.es ?? store.formById.get(id)?.es ?? id;
+  }
 
   el.innerHTML = `
     <div class="lista">
       <div class="searchrow">
         <label class="search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input id="searchInput" type="search" placeholder="Sök bland ${store.words.length} ord …" aria-label="Sök ord">
+          <input id="searchInput" type="search" placeholder="Sök bland ${store.words.length + store.forms.length} ord …" aria-label="Sök ord">
         </label>
         <button type="button" class="icobtn" id="sortBtn" aria-label="Sortera">${IKON_SORT}</button>
         <button type="button" class="icobtn" id="filtBtn" aria-label="Filtrera">${IKON_FILTER}<span class="bdot" hidden></span></button>
@@ -104,6 +122,13 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       if (q && !w.es.toLowerCase().includes(q) && !w.sv.toLowerCase().includes(q)) continue;
       out.push(store.wordStatus(w));
     }
+    // böjningarna som egna rader, insprängda på sin korpusplats (rank = slot)
+    for (const f of store.forms) {
+      const sw = formAsWord(f);
+      if (q && !sw.es.toLowerCase().includes(q) && !sw.sv.toLowerCase().includes(q)) continue;
+      out.push(store.wordStatus(sw));
+    }
+    out.sort((a, b) => a.word.rank - b.word.rank);
     const filtered = filtreraLista(out, filt(),
       (id) => marks.has(id), (id) => !!store.userWord(id).mnem);
     return sorteraLista(filtered, val.sort);
@@ -178,11 +203,47 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     return `<div class="stege">${stops}</div>${tip}`;
   }
 
+  /** Böjningsradens expansion: stege + härkomst + minnesregel (inga syns/exempel). */
+  function formRowx(ws: WordStatus, f: VerbForm, uw: { mnem: string }): string {
+    const parent = store.byId.get(f.parent);
+    return `
+      ${stegeHtml(ws)}
+      <div><div class="xl">Verbböjning · presens</div>
+        <p class="parentline" style="margin:4px 0 0">av <b>${esc(parent?.es ?? f.parent)}</b> = ${esc(parent?.sv ?? "")}</p></div>
+      <div><div class="xl">Minnesregel — din egen</div>
+        <textarea data-mnem aria-label="Minnesregel"
+          placeholder="Skriv något som får formen att fastna …">${esc(uw.mnem)}</textarea></div>
+      <button type="button" class="mini" data-savemnem>Spara</button>`;
+  }
+
   function rowHtml(ws: WordStatus): string {
     const { word } = ws;
     const uw = store.userWord(word.id);
     const open = word.id === openId;
     const es = word.art ? `${word.art} ${word.es}` : word.es;
+    const form = word.pos === "vform" ? store.formById.get(word.id) : undefined;
+    if (form) {
+      const known = ws.level === "kan";
+      return `
+      <div class="row${open ? " open" : ""}" data-id="${esc(word.id)}">
+        <div class="rowline">
+          <button type="button" class="rowbtn" aria-expanded="${open}">
+            <span class="es">${esc(word.es)}</span><span class="sv">${esc(word.sv)}</span>
+            <span class="meta">
+              ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
+              ${radNotis(ws)}
+              ${pathHtml(ws)}
+            </span>
+          </button>
+          <button type="button" class="qmark${known ? " done" : ""}" data-qmark
+            aria-pressed="${known}" aria-label="${known ? "Markerad: kan det" : "Markera: kan det"}">✓</button>
+        </div>
+        ${undo?.id === word.id
+          ? `<div class="qstrip">Kan det — kollas om 21 dagar ·
+              <button type="button" data-qundo>ångra</button></div>` : ""}
+        <div class="rowx">${formRowx(ws, form, uw)}</div>
+      </div>`;
+    }
     const baseSyns = word.syn.map((s) => `<span class="syn">${esc(s)}</span>`).join("");
     const ownSyns = uw.syn
       .map((s) => `<button class="syn egen" data-delsyn="${esc(s)}" title="Ta bort">${esc(s)} ×</button>`)
@@ -229,7 +290,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     kompis: "💡 Kompisregler", egen: "Egen regel", saknar: "Saknar regel",
   };
   const POSG_SV: Record<PosGrupp, string> = {
-    n: "Substantiv", v: "Verb", adj: "Adjektiv", ovrig: "Övrigt",
+    n: "Substantiv", v: "Verb", adj: "Adjektiv", form: "Böjningar", ovrig: "Övrigt",
   };
 
   function renderStatus(total: number): void {
@@ -259,7 +320,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const klar = list.length <= shown;
     sentinel.hidden = klar;
     slutRad.hidden = !klar;
-    slutRad.textContent = list.length === store.words.length
+    slutRad.textContent = list.length === store.words.length + store.forms.length
       ? `${list.length} ord` : `${list.length} ord matchar`;
     // väck observern så nästa sida laddas direkt om slutet redan syns
     io.unobserve(sentinel);
@@ -382,8 +443,8 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const id = row.dataset.id!;
     const qm = t.closest<HTMLElement>("[data-qmark]");
     if (qm) {
-      const w = store.byId.get(id);
-      if (!w || store.wordStatus(w).level === "kan") return; // redan där
+      const lvl = unitLevel(id);
+      if (lvl === null || lvl === "kan") return; // okänt id / redan där
       dropUndo();
       const snap = store.cardSnapshot(id);
       store.setLevel(id, "kan");
@@ -409,8 +470,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const steg = t.closest<HTMLElement>("[data-setlvl]");
     if (steg) {
       const lvl = steg.dataset.setlvl as Level;
-      const w = store.byId.get(id);
-      if (lvl === "ny" && !window.confirm(`Nollställa "${w?.es ?? id}"? Ordet börjar om från Ny.`)) return;
+      if (lvl === "ny" && !window.confirm(`Nollställa "${unitEs(id)}"? Ordet börjar om från Ny.`)) return;
       store.setLevel(id, lvl);
       moved = { id, text: MOVED_MSG[lvl] };
       renderRows();
@@ -433,7 +493,8 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       openId = openId === id ? null : id;
       moved = null;
       renderRows();
-      if (openId === id) loadFriendRules(id);
+      // kompisregler finns bara på ord — spara en fråga för böjningsrader
+      if (openId === id && !store.formById.has(id)) loadFriendRules(id);
     }
   });
 

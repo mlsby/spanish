@@ -15,7 +15,7 @@ export const SORT_SV: Record<SortKey, string> = {
 };
 
 export type RegelFilter = "kompis" | "egen" | "saknar";
-export type PosGrupp = "n" | "v" | "adj" | "ovrig";
+export type PosGrupp = "n" | "v" | "adj" | "form" | "ovrig";
 
 export interface ListFilter {
   niva: Level[];
@@ -41,6 +41,7 @@ export function felAntal(ws: WordStatus): number {
 }
 
 export function posGrupp(pos: string): PosGrupp {
+  if (pos === "vform") return "form"; // verbböjningar — egna rader i listan
   return pos === "n" || pos === "v" || pos === "adj" ? pos : "ovrig";
 }
 
