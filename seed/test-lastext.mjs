@@ -149,6 +149,14 @@ function tokenisera(text) {
   return (text.toLowerCase().match(/[a-záéíóúñü]+/g) ?? []);
 }
 
+/** Kandidatens godtagbara ytor: grundformen + (för verb) dess presensformer. */
+function ytorFor(id) {
+  const w = wordById.get(id);
+  const ytor = [ytform(id)];
+  if (w?.pos === "v") ytor.push(...(lasFormer.get(id) ?? []));
+  return ytor.filter(Boolean);
+}
+
 function validera(meningar) {
   const ok = byggVitlista();
   const brott = new Set();
@@ -156,9 +164,10 @@ function validera(meningar) {
     for (const tok of tokenisera(m.es)) if (!ok.has(tok)) brott.add(tok);
   }
   const text = " " + meningar.map((m) => m.es).join(" ").toLowerCase() + " ";
-  const anvanda = kandidater.filter((id) =>
-    new RegExp(`(^|[^a-záéíóúñü])${ytform(id).toLowerCase()}([^a-záéíóúñü]|$)`).test(text),
-  );
+  const finns = (y) =>
+    new RegExp(`(^|[^a-záéíóúñü])${y.toLowerCase()}([^a-záéíóúñü]|$)`).test(text);
+  // formacceptans: kandidatverbet räknas i valfri av sina egna former
+  const anvanda = kandidater.filter((id) => ytorFor(id).some(finns));
   return { brott: [...brott], anvanda, forFa: anvanda.length < N_OVNING };
 }
 
@@ -197,7 +206,7 @@ function userPrompt() {
 
 NÄSTAN KAN (om du behöver dem):\n${blanda(niva.nastan).join(", ")}
 
-KANDIDATORD — övas nu, använd exakt dessa former (väv in exakt ${N_OVNING}):\n${kand}`;
+KANDIDATORD — övas nu (väv in exakt ${N_OVNING}, verb får böjas):\n${kand}`;
 }
 
 // ---------- körning ----------

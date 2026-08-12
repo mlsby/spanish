@@ -33,7 +33,12 @@ export interface LasUnderlag {
   vitlista: string[];
 }
 export interface LasMening { es: string; ovningsord: string }
-export interface LasFraga { kandidat: LasKandidat; mening: string }
+export interface LasFraga {
+  kandidat: LasKandidat;
+  mening: string;
+  /** ytan som faktiskt står i meningen — kan vara en böjd form av kandidaten */
+  yta: string;
+}
 
 // alltid tillåten bindväv — quizzas aldrig (samma lista som i Edge Functionen)
 const SMAORD = ["el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no"];
@@ -171,6 +176,17 @@ export function byggUnderlag(
   };
 }
 
+/**
+ * Kandidatens godtagbara ytor: grundformen + (för verb) dess presensformer.
+ * Ett verb i en scen böjs — "llegar" dyker upp som "llega". Kortet som förhörs
+ * är ändå grundformen; meningen visar den form som faktiskt användes.
+ */
+export function kandidatYtor(store: Store, k: LasKandidat): string[] {
+  const w = store.byId.get(k.id);
+  if (w?.pos !== "v") return [k.es];
+  return [k.es, ...(store.lasFormer.get(k.id) ?? [])];
+}
+
 /** Finns ordet (hel yta, inte delsträng) i texten? */
 export function ordITexten(es: string, text: string): boolean {
   const safe = es.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -182,11 +198,21 @@ export function ordITexten(es: string, text: string): boolean {
  * klumpa ihop sig i samma mening — därför letar vi per kandidat, inte per
  * mening, så inget ord tappas när två delar mening.
  */
-export function byggQuiz(meningar: LasMening[], kandidater: LasKandidat[]): LasFraga[] {
+export function byggQuiz(
+  meningar: LasMening[],
+  kandidater: LasKandidat[],
+  ytor: (k: LasKandidat) => string[] = (k) => [k.es],
+): LasFraga[] {
   const traffar: { fraga: LasFraga; ordning: number }[] = [];
   for (const k of kandidater) {
-    const i = meningar.findIndex((m) => ordITexten(k.es, m.es));
-    if (i >= 0) traffar.push({ fraga: { kandidat: k, mening: meningar[i].es }, ordning: i });
+    let bast = -1, bastYta = k.es;
+    for (const yta of ytor(k)) {
+      const i = meningar.findIndex((m) => ordITexten(yta, m.es));
+      if (i >= 0 && (bast < 0 || i < bast)) { bast = i; bastYta = yta; }
+    }
+    if (bast >= 0) {
+      traffar.push({ fraga: { kandidat: k, mening: meningar[bast].es, yta: bastYta }, ordning: bast });
+    }
   }
   return traffar.sort((a, b) => a.ordning - b.ordning).map((t) => t.fraga);
 }
@@ -228,7 +254,7 @@ ${u.kan.join(", ")}
 NÄSTAN KAN (om du behöver dem):
 ${u.nastan.join(", ")}
 
-KANDIDATORD — övas nu, använd exakt dessa former (väv in exakt ${anvand}):
+KANDIDATORD — övas nu (väv in exakt ${anvand}; verb får böjas):
 ${kand}`;
 }
 
@@ -243,6 +269,7 @@ export function valideraText(
   u: LasUnderlag,
   anvand: number,
   meningar: LasMening[],
+  ytor: (k: LasKandidat) => string[] = (k) => [k.es],
 ): LasValidering {
   const ok = new Set(u.vitlista.map((t) => t.toLowerCase()));
   const brott = new Set<string>();
@@ -250,7 +277,8 @@ export function valideraText(
     for (const tok of tokenisera(m.es)) if (!ok.has(tok)) brott.add(tok);
   }
   const text = meningar.map((m) => m.es).join(" ");
-  const anvanda = u.kandidater.filter((k) => ordITexten(k.es, text)).map((k) => k.es);
+  // kandidatverb godtas i valfri egen form — "llegar" räknas som använt av "llega"
+  const anvanda = u.kandidater.filter((k) => ytor(k).some((y) => ordITexten(y, text))).map((k) => k.es);
   return { brott: [...brott], anvanda, godkand: brott.size === 0 && anvanda.length >= anvand };
 }
 
@@ -263,12 +291,13 @@ export async function hamtaText(
   sb: SupabaseClient,
   u: LasUnderlag,
   p: LasParametrar,
+  ytor: (k: LasKandidat) => string[] = (k) => [k.es],
 ): Promise<LasMening[]> {
   const system = lasSystemPrompt(p);
   const bas = lasUserPrompt(u, p.anvand);
   let meningar: LasMening[] | null = null;
   for (let forsok = 1; forsok <= 3; forsok++) {
-    const forra: LasValidering | null = meningar ? valideraText(u, p.anvand, meningar) : null;
+    const forra: LasValidering | null = meningar ? valideraText(u, p.anvand, meningar, ytor) : null;
     const extra: string = forra
       ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${forra.brott.join(", ") || "-"}. Använda kandidatord: ${forra.anvanda.length} av minst ${p.anvand}. Skriv om och håll dig strikt till listorna.`
       : "";
@@ -291,7 +320,7 @@ export async function hamtaText(
     } catch { continue; /* trasig JSON räknas som misslyckat försök */ }
     if (!Array.isArray(svar)) continue;
     meningar = svar;
-    if (valideraText(u, p.anvand, meningar).godkand) return meningar;
+    if (valideraText(u, p.anvand, meningar, ytor).godkand) return meningar;
   }
   throw new Error("Kunde inte skriva en text som håller sig till dina ord — försök igen.");
 }

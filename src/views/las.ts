@@ -1,7 +1,8 @@
 import { diffTarget } from "../lib/diff";
 import { gradeAnswer, type GradeResult } from "../lib/grading";
 import {
-  byggQuiz, byggUnderlag, hamtaText, lasCommit, type LasFraga, lasNiva, minnsQuizzade,
+  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, type LasKandidat, lasCommit,
+  type LasFraga, lasNiva, minnsQuizzade,
 } from "../lib/lastext";
 import type { Store } from "../lib/store";
 import type { SupabaseClient } from "../lib/supabase";
@@ -133,12 +134,13 @@ export class LasView {
       return;
     }
     try {
+      const ytor = (k: LasKandidat) => kandidatYtor(this.store, k);
       const meningar = await hamtaText(this.sb, underlag, {
         meningar: p.meningar,
         anvand: Math.min(p.anvand, underlag.kandidater.length),
-      });
+      }, ytor);
       this.meningar = meningar.map((m) => m.es);
-      this.quiz = byggQuiz(meningar, underlag.kandidater);
+      this.quiz = byggQuiz(meningar, underlag.kandidater, ytor);
       if (!this.quiz.length) throw new Error("Texten saknade övningsord — prova igen.");
       // minns ~3 rundors quizord — de utesluts helt ur kommande texter
       this.senaste = minnsQuizzade(this.senaste, this.quiz.map((q) => q.kandidat.id), p.anvand * 3);
@@ -250,7 +252,7 @@ export class LasView {
     }
     const f = this.quiz[this.idx];
     const p = this.pend;
-    let html = `<p class="lasmening">${this.markerad(f.mening, f.kandidat.es)}</p>
+    let html = `<p class="lasmening">${this.markerad(f.mening, f.yta)}</p>
       <p class="head">${esc(f.kandidat.es)}</p>`;
     if (this.state === "fraga" || !p) return { cls: "st-idle", html };
     if (p.grade === "good") {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  byggQuiz, byggUnderlag, hamtaText, lasCommit, lasNiva, lasSystemPrompt,
+  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, lasCommit, lasNiva, lasSystemPrompt,
   minnsQuizzade, ordITexten, valideraText,
 } from "../src/lib/lastext";
 import type { SupabaseClient } from "../src/lib/supabase";
@@ -248,6 +248,41 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
     await expect(hamtaText(sb, underlag, { meningar: 3, anvand: 1 }))
       .rejects.toThrow(/håller sig till dina ord/);
     expect(invoke).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe("formacceptans — kandidatverb får böjas", () => {
+  function verbStore(): Store {
+    const store = makeStore();
+    store.lasFormer = new Map([["ser|v", ["soy", "eres", "es", "somos", "son"]]]);
+    return store;
+  }
+
+  it("kandidatYtor: verb ger grundform + presensformer, andra ord bara sig själva", () => {
+    const store = verbStore();
+    expect(kandidatYtor(store, { id: "ser|v", es: "ser", sv: "vara" }))
+      .toEqual(["ser", "soy", "eres", "es", "somos", "son"]);
+    expect(kandidatYtor(store, { id: "casa|n", es: "casa", sv: "hus" })).toEqual(["casa"]);
+  });
+
+  it("böjd kandidat räknas som använd och quizzas med den form som står i texten", () => {
+    const store = verbStore();
+    const kandidater = [{ id: "ser|v", es: "ser", sv: "vara" }];
+    const ytor = (k: typeof kandidater[number]) => kandidatYtor(store, k);
+    const meningar = [{ es: "Mi amigo es feliz.", ovningsord: "es" }];
+    const u = { kan: [], nastan: [], kandidater, vitlista: ["mi", "amigo", "es", "feliz"] };
+    expect(valideraText(u, 1, meningar, ytor)).toMatchObject({ godkand: true, anvanda: ["ser"] });
+    const quiz = byggQuiz(meningar, kandidater, ytor);
+    expect(quiz).toHaveLength(1);
+    expect(quiz[0]).toMatchObject({ yta: "es", mening: "Mi amigo es feliz." });
+    expect(quiz[0].kandidat.es).toBe("ser"); // förhöret gäller grundformen
+  });
+
+  it("utan formacceptans räknas den böjda formen inte", () => {
+    const kandidater = [{ id: "ser|v", es: "ser", sv: "vara" }];
+    const meningar = [{ es: "Mi amigo es feliz.", ovningsord: "es" }];
+    const u = { kan: [], nastan: [], kandidater, vitlista: ["mi", "amigo", "es", "feliz"] };
+    expect(valideraText(u, 1, meningar).godkand).toBe(false);
   });
 });
 
