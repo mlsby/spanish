@@ -1,5 +1,6 @@
 import { LAS_UNLOCK } from "../lib/lastext";
 import { loadPass } from "../lib/passpaus";
+import { dagarKvar, MIN_DAGAR, prognosOrd, taktPerDag } from "../lib/prognos";
 import { resaFor, TITLAR } from "../lib/resa";
 import type { Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
@@ -80,30 +81,73 @@ function heatmapHtml(days: Record<string, number>): string {
     </div>`;
 }
 
-function sparklineHtml(snapshots: Record<string, { kan: number; lar: number }>): string {
-  const entries = Object.entries(snapshots).sort(([a], [b]) => (a < b ? -1 : 1)).slice(-60);
-  if (entries.length < 2) {
-    return `<p class="omtext" style="margin:0">Grafen ritas när du övat ett par dagar.</p>`;
+/** Mexiko-grafen: historiken (kan + på gång) till idag, streckad prognos till resan. */
+function mexikoHtml(store: Store): string {
+  const now = new Date();
+  const score = store.stats().score;
+  const kvar = dagarKvar(now);
+  const takt = taktPerDag(store.data.reviews, now);
+  if (!takt) {
+    return `<p class="omtext" style="margin:0">Du har <b>${score}</b> ord med dig.
+      Prognosen ritas när du övat i ${MIN_DAGAR} dagar.</p>`;
   }
-  const vals = entries.map(([, v]) => v.kan);
-  const min = Math.min(...vals), max = Math.max(...vals, min + 1);
-  const W = 300, H = 84, P = 6;
-  const x = (i: number) => P + (i * (W - 2 * P)) / (vals.length - 1);
-  const y = (v: number) => H - 14 - ((v - min) / (max - min)) * (H - 26);
-  const line = vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
-  const area = `${line} L${x(vals.length - 1).toFixed(1)} ${H - 8} L${x(0).toFixed(1)} ${H - 8} Z`;
+  const prognos = prognosOrd(score, takt, now);
+  const niva = resaFor(prognos).titel.name;
+  const serie = Object.entries(store.data.snapshots)
+    .sort(([a], [b]) => (a < b ? -1 : 1)).slice(-60)
+    .map(([, v]) => v.kan + v.lar);
+  if (!serie.length || serie[serie.length - 1] !== score) serie.push(score);
+
+  const W = 300, H = 96, P = 6;
+  const idagX = P + (W - 2 * P) * 0.35;
+  const slutX = W - P - 14; // plats för kaktusen
+  const lo = Math.min(...serie, score);
+  const hi = Math.max(prognos, ...serie, lo + 1);
+  const yTop = 12, yBot = H - 12;
+  const y = (v: number) => yBot - ((v - lo) / (hi - lo)) * (yBot - yTop);
+  const xHist = (i: number) => serie.length > 1 ? P + (i * (idagX - P)) / (serie.length - 1) : idagX;
+  const line = serie.map((v, i) => `${i ? "L" : "M"}${xHist(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  const area = `${line} L${idagX.toFixed(1)} ${yBot} L${P} ${yBot} Z`;
+  // nivåtrösklar man passerar på vägen — max tre, annars blir det brus
+  const trosklar = TITLAR.filter((t) => t.min > score && t.min <= prognos).slice(0, 3)
+    .map((t) => `<line x1="${idagX.toFixed(1)}" y1="${y(t.min).toFixed(1)}" x2="${slutX}" y2="${y(t.min).toFixed(1)}"
+        stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
+      <text x="${(idagX + 5).toFixed(1)}" y="${(y(t.min) - 3).toFixed(1)}" font-size="8.5"
+        fill="var(--muted)">${esc(t.name)} ${t.min}</text>`).join("");
+  const taktStr = (Math.round(takt.perDag * 10) / 10).toLocaleString("sv-SE");
   return `
+    <div class="mexrad">
+      <div><b>${score}</b><span>ord nu</span></div>
+      <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>i Mexiko · ≈ ${esc(niva)}</span></div>
+    </div>
     <svg class="spark" viewBox="0 0 ${W} ${H}" role="img"
-         aria-label="Antal ord med status Kan det över tid, nu ${vals[vals.length - 1]}">
-      <line x1="${P}" y1="${H - 8}" x2="${W - P}" y2="${H - 8}" stroke="var(--line)" stroke-width="1"/>
+         aria-label="Ord nu ${score}, prognos till Mexikoresan ~${prognos}">
+      <line x1="${P}" y1="${yBot}" x2="${W - P}" y2="${yBot}" stroke="var(--line)" stroke-width="1"/>
+      ${trosklar}
       <path d="${area}" fill="var(--accent)" opacity="0.12"/>
       <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="${x(vals.length - 1)}" cy="${y(vals[vals.length - 1])}" r="4"
+      <path d="M${idagX.toFixed(1)} ${y(score).toFixed(1)} L${slutX} ${y(prognos).toFixed(1)}"
+            fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 5"
+            stroke-linecap="round" opacity="0.75"/>
+      <circle cx="${idagX.toFixed(1)}" cy="${y(score).toFixed(1)}" r="4"
               fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>
+      <circle cx="${slutX}" cy="${y(prognos).toFixed(1)}" r="3.5"
+              fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
+      <text x="${slutX + 4}" y="${(y(prognos) + 4.5).toFixed(1)}" font-size="13">🌵</text>
     </svg>
-    <div class="sparkcap"><span>${esc(entries[0][0].slice(5))}</span>
-      <span>idag · ${vals[vals.length - 1]}</span></div>`;
+    <div class="sparkcap mexcap"><span>${esc(dagEtikettKort(store))}</span>
+      <span class="mitt">idag</span><span>26 dec 2026</span></div>
+    <p class="omtext" style="margin:7px 0 0">~${taktStr} nya ord/dag senaste ${takt.dagar} dagarna
+      · ${kvar} dagar kvar till avresan</p>`;
+}
+
+/** Startetiketten för x-axeln — första snapshot-dagen, "5 aug"-format. */
+function dagEtikettKort(store: Store): string {
+  const first = Object.keys(store.data.snapshots).sort()[0];
+  if (!first) return "start";
+  const d = new Date(first);
+  return `${d.getDate()} ${["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"][d.getMonth()]}`;
 }
 
 function kontoHtml(cloud: CloudUi): string {
@@ -258,8 +302,8 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
       ${heatmapHtml(store.data.days)}
     </div>
     <div class="panel">
-      <p class="plabel">Kan det · över tid</p>
-      ${sparklineHtml(store.data.snapshots)}
+      <p class="plabel">Resan till Mexiko 🇲🇽</p>
+      ${mexikoHtml(store)}
     </div>`;
 }
 
