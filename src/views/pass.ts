@@ -180,6 +180,11 @@ export class PassView {
     if (this.state === "question") this.input.focus({ preventScroll: true });
   }
 
+  /** I tvingade regel-läget bor skrivandet i textrutan — flytta dit fokus direkt. */
+  private focusMnem(): void {
+    this.card.querySelector<HTMLTextAreaElement>("#mnemInput")?.focus({ preventScroll: true });
+  }
+
   // ---------- flöde ----------
   private onSubmit(): void {
     const s = this.session;
@@ -211,7 +216,10 @@ export class PassView {
     else {
       this.state = p.forcedMnem ? "forced" : "wrong";
       this.render();
-      if (this.state === "forced") void this.loadFriendRules(p.word.id);
+      if (this.state === "forced") {
+        this.focusMnem();
+        void this.loadFriendRules(p.word.id);
+      }
     }
   }
 
@@ -604,6 +612,9 @@ export class PassView {
     }
     this.el.querySelector<HTMLButtonElement>("#passExit")!.hidden = !this.live;
     this.el.querySelector<HTMLElement>("#vetInte")!.hidden = this.state !== "question";
+    // tvingad minnesregel: svarsraden är död vikt (fokus bor i textrutan) —
+    // göm den så kortet får plats med regelfältet när tangentbordet är uppe
+    this.form.hidden = this.state === "forced";
     document.getElementById("app")?.classList.toggle("pass-live", this.live);
     if (s && this.state !== "idle") {
       const pr = s.progress();
