@@ -44,6 +44,11 @@ export class LasView {
   private felText = "";
   /** nyligen quizzade ord (nyaste först) — bannlysta ur nästa texter, överlever omladdning */
   private senaste = laddaSenaste();
+  // auto-vidare från facit — samma inställningar och paus-beteende som passet
+  private timer: number | null = null;
+  private tRemain = 0;
+  private tStart = 0;
+  private paused = false;
 
   private card!: HTMLElement;
   private bar!: HTMLElement;
@@ -93,6 +98,7 @@ export class LasView {
     this.knappar = el.querySelector("#lasKnappar")!;
 
     el.querySelector("#lasExit")!.addEventListener("click", () => {
+      this.rensaTimer();
       this.setLive(false);
       this.onExit();
     });
@@ -112,10 +118,64 @@ export class LasView {
       const t = e.target as HTMLElement;
       if (t.closest("button") && !t.closest("#lasExit")) e.preventDefault();
     });
+    // håll in kortet = paus (som passet), släpp = fortsätt
+    this.card.addEventListener("pointerdown", (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("button,textarea,input,a")) return;
+      if (this.state === "svar" && this.timer !== null) {
+        e.preventDefault();
+        this.hallPaus(true);
+      }
+    });
+    const slapp = () => this.hallPaus(false);
+    this.card.addEventListener("pointerup", slapp);
+    this.card.addEventListener("pointercancel", slapp);
+    this.card.addEventListener("pointerleave", slapp);
+    this.card.addEventListener("contextmenu", (e) => {
+      if (this.state === "svar" && (this.timer !== null || this.paused)) e.preventDefault();
+    });
+  }
+
+  // ---------- facittimer (passets logik i miniformat) ----------
+  private rensaTimer(): void {
+    if (this.timer !== null) { window.clearTimeout(this.timer); this.timer = null; }
+    this.paused = false;
+    this.card.classList.remove("paused");
+  }
+  /** Rätt/stavfel går vidare av sig självt — fel väntar på Enter, som i passet. */
+  private startaFacittimer(): void {
+    if (!this.store.data.settings.autoNext || this.pend?.grade === "again") return;
+    const ms = this.pend?.grade === "hard"
+      ? Math.max(4000, this.store.data.settings.autoMs)
+      : this.store.data.settings.autoMs;
+    this.tRemain = ms;
+    this.tStart = Date.now();
+    this.timer = window.setTimeout(() => this.nasta(), ms);
+    const bar = this.card.querySelector<HTMLElement>("#lasCdbar");
+    if (bar) bar.style.animationDuration = `${ms}ms`;
+  }
+  private hallPaus(on: boolean): void {
+    if (on && !this.paused && this.timer !== null) {
+      window.clearTimeout(this.timer);
+      this.timer = null;
+      this.tRemain -= Date.now() - this.tStart;
+      this.paused = true;
+      this.card.classList.add("paused");
+      const note = this.card.querySelector<HTMLElement>("#lasTapnote");
+      if (note) note.textContent = "pausat — släpp för att gå vidare";
+    } else if (!on && this.paused) {
+      this.tStart = Date.now();
+      this.timer = window.setTimeout(() => this.nasta(), Math.max(this.tRemain, 300));
+      this.paused = false;
+      this.card.classList.remove("paused");
+      const note = this.card.querySelector<HTMLElement>("#lasTapnote");
+      if (note) note.textContent = "håll för paus · Enter för nästa";
+    }
   }
 
   /** Hämta en ny text och börja om flödet. */
   async start(): Promise<void> {
+    this.rensaTimer();
     this.setLive(true); // tabbaren gömd från första stund till Avsluta — inget flimmer
     this.state = "laddar";
     this.meningar = [];
@@ -171,9 +231,11 @@ export class LasView {
     lasCommit(this.store, f.kandidat.id, grade, raw.trim(), raw.trim() ? r.step : "none");
     this.state = "svar";
     this.render(); // inputfältet lever kvar — tangentbordet ligger stilla
+    this.startaFacittimer();
   }
 
   private nasta(): void {
+    this.rensaTimer();
     this.pend = null;
     this.input.value = "";
     if (this.idx + 1 < this.quiz.length) {
@@ -187,6 +249,22 @@ export class LasView {
       this.input.blur(); // svarsfältet göms — fäll ihop tangentbordet så hela texten syns
       this.render();
     }
+  }
+
+  /** Nedräkningsbar + fine-rad — bara när auto-vidare är på (som passet). */
+  private cdHtml(farg: string): string {
+    if (!this.store.data.settings.autoNext) return "";
+    return `<div class="cd"><i class="cdbar" id="lasCdbar" style="--cdc:${farg}"></i></div>`;
+  }
+  private tapHtml(): string {
+    return `<p class="tapnote" id="lasTapnote">${this.store.data.settings.autoNext
+      ? "håll för paus · Enter för nästa" : "Enter för nästa"}</p>`;
+  }
+  private mnembox(wordId: string): string {
+    const mnem = this.store.userWord(wordId).mnem
+      || this.store.userWord(this.store.formById.get(wordId)?.parent ?? "").mnem;
+    if (!mnem) return "";
+    return `<div class="mnembox"><span class="mlabel">Din minnesregel</span><p class="mtext">${esc(mnem)}</p></div>`;
   }
 
   /** Meningen med övningsordet markerat. */
@@ -256,22 +334,21 @@ export class LasView {
       <p class="head">${esc(f.kandidat.es)}</p>`;
     if (this.state === "fraga" || !p) return { cls: "st-idle", html };
     if (p.grade === "good") {
-      return { cls: "st-good", html: html + `<p class="verdict v-good">${IC_OK}Rätt</p>${this.stodLinjer(f)}
-        <p class="fine">Enter för nästa</p>` };
+      return { cls: "st-good", html: this.cdHtml("var(--good)") + html
+        + `<p class="verdict v-good">${IC_OK}Rätt</p>${this.stodLinjer(f)}${this.mnembox(f.kandidat.id)}
+        ${this.tapHtml()}` };
     }
     if (p.grade === "hard") {
-      return { cls: "st-hard", html: html + `<p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
+      return { cls: "st-hard", html: this.cdHtml("var(--warn)") + html
+        + `<p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
         <p class="cmp"><code>${this.markedFacit(p.raw, f)}</code></p>
-        <p class="fine">Svenskt stavfel — räknas som rätt. Enter för nästa.</p>` };
+        <p class="fine">Svenskt stavfel — räknas som rätt.</p>${this.mnembox(f.kandidat.id)}
+        ${this.tapHtml()}` };
     }
-    let mnemBox = "";
-    const mnem = this.store.userWord(f.kandidat.id).mnem
-      || this.store.userWord(this.store.formById.get(f.kandidat.id)?.parent ?? "").mnem;
-    if (mnem) mnemBox = `<div class="mnembox"><span class="mlabel">Din minnesregel</span><p class="mtext">${esc(mnem)}</p></div>`;
     return { cls: "st-again", html: html + `<p class="verdict v-bad">${IC_X}${p.raw ? "Fel" : "Visste inte"}</p>
       <p class="qline">${esc(f.kandidat.es)} =</p>
       <p class="cmp"><code>${esc(this.facit(f))}</code></p>
-      ${this.stodLinjer(f)}${mnemBox}
+      ${this.stodLinjer(f)}${this.mnembox(f.kandidat.id)}
       <p class="fine">Enter för nästa</p>` };
   }
 
