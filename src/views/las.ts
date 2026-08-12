@@ -6,6 +6,7 @@ import {
 } from "../lib/lastext";
 import type { Store } from "../lib/store";
 import type { SupabaseClient } from "../lib/supabase";
+import type { CardRec } from "../lib/types";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -41,7 +42,7 @@ export class LasView {
   private quiz: LasFraga[] = [];
   private idx = 0;
   private ratt = 0;
-  private pend: (GradeResult & { raw: string }) | null = null;
+  private pend: (GradeResult & { raw: string; fore?: CardRec; override?: boolean }) | null = null;
   private felText = "";
   /** nyligen quizzade ord (nyaste först) — bannlysta ur nästa texter, överlever omladdning */
   private senaste = laddaSenaste();
@@ -113,6 +114,7 @@ export class LasView {
       if (act === "retry") void this.start();
       if (act === "ord") { this.state = "fraga"; this.render(); this.input.focus(); }
       if (act === "giveup") this.svara("");
+      if (act === "override") this.hadeRatt();
     });
     // knappar får aldrig sno fokus från textfältet — annars fälls mobiltangentbordet ihop
     el.addEventListener("pointerdown", (e) => {
@@ -146,7 +148,7 @@ export class LasView {
   /** Rätt/stavfel går vidare av sig självt — fel väntar på Enter, som i passet. */
   private startaFacittimer(): void {
     if (!this.store.data.settings.autoNext || this.pend?.grade === "again") return;
-    const ms = this.pend?.grade === "hard"
+    const ms = this.pend?.grade === "hard" || this.pend?.override
       ? Math.max(4000, this.store.data.settings.autoMs)
       : this.store.data.settings.autoMs;
     this.tRemain = ms;
@@ -229,11 +231,26 @@ export class LasView {
     if (!card) { this.nasta(); return; }
     const r = gradeAnswer(raw, this.store.targetsFor(card), "sv");
     const grade = raw.trim() ? r.grade : "again";
-    this.pend = { ...r, grade, raw: raw.trim() };
+    // ögonblicksbild före bokföringen — "jag hade rätt" backar felet exakt
+    this.pend = { ...r, grade, raw: raw.trim(), fore: { ...card, fsrs: { ...card.fsrs } } };
     if (grade !== "again") this.ratt++;
     lasCommit(this.store, f.kandidat.id, grade, raw.trim(), raw.trim() ? r.step : "none");
     this.state = "svar";
     this.render(); // inputfältet lever kvar — tangentbordet ligger stilla
+    this.startaFacittimer();
+  }
+
+  /** "jag hade rätt": backa felet, spara svaret som synonym och rätta om som good. */
+  private hadeRatt(): void {
+    const p = this.pend;
+    if (this.state !== "svar" || !p || p.grade !== "again" || !p.raw || !p.fore) return;
+    const f = this.quiz[this.idx];
+    this.store.putCard({ ...p.fore, fsrs: { ...p.fore.fsrs } }); // återställ FSRS-läget
+    this.store.addUserSyn(f.kandidat.id, p.raw);                 // nästa gång rättas den direkt
+    lasCommit(this.store, f.kandidat.id, "good", p.raw, "override");
+    this.ratt++;
+    this.pend = { ...p, grade: "good", override: true };
+    this.render();
     this.startaFacittimer();
   }
 
@@ -338,6 +355,12 @@ export class LasView {
       <p class="head">${esc(f.kandidat.es)}</p>`;
     if (this.state === "fraga" || !p) return { cls: "st-idle", html };
     if (p.grade === "good") {
+      if (p.override) {
+        return { cls: "st-hard", html: this.cdHtml("var(--warn)") + html
+          + `<p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
+          <p class="also">»<b>${esc(p.raw)}</b>« sparas som synonym — nästa gång rättas den direkt.</p>
+          ${this.tapHtml()}` };
+      }
       return { cls: "st-good", html: this.cdHtml("var(--good)") + html
         + `<p class="verdict v-good">${IC_OK}Rätt</p>${this.stodLinjer(f)}${this.mnembox(f.kandidat.id)}
         ${this.tapHtml()}` };
@@ -350,6 +373,8 @@ export class LasView {
         ${this.tapHtml()}` };
     }
     return { cls: "st-again", html: html + `<p class="verdict v-bad">${IC_X}${p.raw ? "Fel" : "Visste inte"}</p>
+      ${p.raw ? `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
+        <button type="button" class="linkbtn" data-act="override">jag hade rätt</button></p>` : ""}
       <p class="qline">${esc(f.kandidat.es)} =</p>
       <p class="cmp"><code>${esc(this.facit(f))}</code></p>
       ${this.stodLinjer(f)}${this.mnembox(f.kandidat.id)}
