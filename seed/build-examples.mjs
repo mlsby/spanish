@@ -355,6 +355,17 @@ for (const f of forms) {
   if (!b && ex[f.id]) nForms++;
 }
 
+// ---------- manuella korrigeringar — appliceras sist, vinner alltid ----------
+// seed/exempel-overrides.json: { "ord|pos": ["spansk mening", "svensk översättning", "engelsk?"] }
+try {
+  const over = JSON.parse(readFileSync("seed/exempel-overrides.json", "utf8"));
+  for (const [id, tupel] of Object.entries(over)) {
+    ex[id] = tupel;
+    via.set(id, "override");
+  }
+  console.log(`overrides: ${Object.keys(over).length} exempel handsatta`);
+} catch { /* ingen override-fil är helt ok */ }
+
 // ---------- skriv ----------
 const out = {
   schema: 1,
