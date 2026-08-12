@@ -1,19 +1,22 @@
-import type { ReviewRec } from "./types";
+import type { CardRec } from "./types";
 
 /**
  * Mexiko-prognosen: hela gänget åker 26 dec 2026 — grafen visar orden man
  * har nu (kan + på gång) och var man landar om takten håller i sig.
  *
- * Takten räknas ur review-loggen, INTE ur poängserien: ett ord räknas den
- * dag det fick sin FÖRSTA riktiga övning. Snabbmarkerade ord (✓ i ordlistan,
- * "kan redan") skapar inga reviews och blåser därmed aldrig upp takten —
- * de var ju ord man kunde sen innan. Böjningsformer ingår inte i poängen
- * och räknas därför inte heller här.
+ * Takten räknas ur KORTEN (de synkas mellan enheter — review-loggen gör det
+ * inte): ett ord räknas den dag det introducerades, förutsatt att det fått
+ * minst ett svar (obesvarade introduktioner ger ingen poäng och räknas inte).
+ * ✓-markerade ord räknas alltså också — man kan lära sig spanska utanför
+ * appen — men en enskild dag får bidra med max TAK_PER_DAG nya ord, så en
+ * städdag där någon bockar av hela sitt gamla ordförråd inte blåser upp
+ * prognosen. Böjningsformer ligger utanför poängen och räknas inte.
  */
 
 export const MEXIKO_ISO = "2026-12-26";
 export const TAKT_FONSTER = 30; // dagar bakåt som takten mäts över
 export const MIN_DAGAR = 3;     // kortare historik än så → ingen prognos
+export const TAK_PER_DAG = 15;  // maxbidrag per kalenderdag (dämpar bulk-✓)
 
 const DAG_MS = 86_400_000;
 
@@ -23,32 +26,45 @@ export function dagarKvar(now: Date, malIso: string = MEXIKO_ISO): number {
 }
 
 export interface Takt {
-  perDag: number;      // nya riktigt övade ord per dag i fönstret
+  perDag: number;      // nya ord per dag i fönstret (dagstak tillämpat)
   nyaIFonstret: number;
   dagar: number;       // fönstrets faktiska längd (≤ TAKT_FONSTER)
 }
 
-/** Nya ord per dag — ordets första review i fönstret räknas. null = för tidigt. */
+type TaktKort = Pick<CardRec, "wordId" | "introducedAt"> & { fsrs: { reps: number } };
+
+/** Nya ord per dag ur korten. null = kortare historik än MIN_DAGAR. */
 export function taktPerDag(
-  reviews: Pick<ReviewRec, "ts" | "wordId">[],
+  cards: Iterable<TaktKort>,
   now: Date,
   fonster: number = TAKT_FONSTER,
+  tak: number = TAK_PER_DAG,
 ): Takt | null {
-  const forsta = new Map<string, string>();
-  for (const r of reviews) {
-    if (r.wordId.includes("#")) continue; // böjningar ligger utanför poängen
-    const prev = forsta.get(r.wordId);
-    if (!prev || r.ts < prev) forsta.set(r.wordId, r.ts);
+  // ordets inträdesdag = äldsta introducedAt bland kort med minst ett svar
+  const intrade = new Map<string, string>();
+  for (const c of cards) {
+    if (c.wordId.includes("#")) continue; // böjningar ligger utanför poängen
+    if (c.fsrs.reps <= 0) continue;       // obesvarat = ingen poäng = ingen takt
+    const prev = intrade.get(c.wordId);
+    if (!prev || c.introducedAt < prev) intrade.set(c.wordId, c.introducedAt);
   }
-  if (!forsta.size) return null;
+  if (!intrade.size) return null;
   let aldst = Infinity;
-  for (const ts of forsta.values()) aldst = Math.min(aldst, new Date(ts).getTime());
+  for (const ts of intrade.values()) aldst = Math.min(aldst, new Date(ts).getTime());
   const dagarAktiv = Math.max(1, Math.ceil((now.getTime() - aldst) / DAG_MS));
   if (dagarAktiv < MIN_DAGAR) return null;
   const dagar = Math.min(fonster, dagarAktiv);
   const grans = now.getTime() - dagar * DAG_MS;
+  // räkna per kalenderdag och kapa varje dag — jämn inlärning utanför appen
+  // räknas fullt, en bulkdag räknas som högst `tak`
+  const perDagAntal = new Map<string, number>();
+  for (const ts of intrade.values()) {
+    if (new Date(ts).getTime() < grans) continue;
+    const dag = ts.slice(0, 10);
+    perDagAntal.set(dag, (perDagAntal.get(dag) ?? 0) + 1);
+  }
   let nya = 0;
-  for (const ts of forsta.values()) if (new Date(ts).getTime() >= grans) nya++;
+  for (const n of perDagAntal.values()) nya += Math.min(n, tak);
   return { perDag: nya / dagar, nyaIFonstret: nya, dagar };
 }
 

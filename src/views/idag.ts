@@ -86,7 +86,7 @@ function mexikoHtml(store: Store): string {
   const now = new Date();
   const score = store.stats().score;
   const kvar = dagarKvar(now);
-  const takt = taktPerDag(store.data.reviews, now);
+  const takt = taktPerDag(Object.values(store.data.cards), now);
   if (!takt) {
     return `<p class="omtext" style="margin:0">Du har <b>${score}</b> ord med dig.
       Prognosen ritas när du övat i ${MIN_DAGAR} dagar.</p>`;

@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { dagarKvar, prognosOrd, taktPerDag } from "../src/lib/prognos";
+import { dagarKvar, prognosOrd, TAK_PER_DAG, taktPerDag } from "../src/lib/prognos";
 
 const NU = new Date("2026-08-12T12:00:00Z");
 const dagarSen = (n: number) => new Date(NU.getTime() - n * 86_400_000).toISOString();
+
+function kort(wordId: string, introDagarSen: number, reps = 1) {
+  return { wordId, introducedAt: dagarSen(introDagarSen), fsrs: { reps } };
+}
 
 describe("Mexiko-prognosen", () => {
   it("dagarKvar räknar till avresan 26 dec 2026", () => {
@@ -11,40 +15,41 @@ describe("Mexiko-prognosen", () => {
     expect(dagarKvar(NU)).toBeGreaterThan(100);
   });
 
-  it("takten räknar ordets FÖRSTA review — senare repetitioner ändrar inget", () => {
-    const reviews = [
-      { ts: dagarSen(10), wordId: "casa|n" },
-      { ts: dagarSen(2), wordId: "casa|n" },  // repetition — räknas inte igen
-      { ts: dagarSen(5), wordId: "ser|v" },
-      { ts: dagarSen(4), wordId: "cada|determiner" },
+  it("takten räknas ur korten — båda riktningarna ger ändå ETT ord", () => {
+    const cards = [
+      kort("casa|n", 10), kort("casa|n", 10),
+      kort("ser|v", 5), kort("ser|v", 5),
+      kort("cada|determiner", 4), kort("cada|determiner", 4),
     ];
-    const t = taktPerDag(reviews, NU, 30)!;
+    const t = taktPerDag(cards, NU, 30)!;
     expect(t.nyaIFonstret).toBe(3);
     expect(t.dagar).toBe(10); // aktiv i 10 dagar — fönstret krymper till historiken
     expect(t.perDag).toBeCloseTo(0.3);
   });
 
-  it("böjningsformer räknas inte (ligger utanför poängen)", () => {
-    const reviews = [
-      { ts: dagarSen(5), wordId: "ser|v" },
-      { ts: dagarSen(4), wordId: "ser|v#pres.3s" },
+  it("obesvarade introduktioner och böjningsformer räknas inte", () => {
+    const cards = [
+      kort("ser|v", 5),
+      kort("casa|n", 4, 0),          // introducerad men aldrig besvarad
+      kort("ser|v#pres.3s", 4),      // böjning — utanför poängen
     ];
-    expect(taktPerDag(reviews, NU, 30)!.nyaIFonstret).toBe(1);
+    expect(taktPerDag(cards, NU, 30)!.nyaIFonstret).toBe(1);
   });
 
-  it("gamla ord utanför fönstret räknas inte i takten", () => {
-    const reviews = [
-      { ts: dagarSen(45), wordId: "casa|n" },
-      { ts: dagarSen(3), wordId: "ser|v" },
+  it("en bulkdag kapas vid dagstaket — jämn inlärning berörs inte", () => {
+    const cards = [
+      ...Array.from({ length: 40 }, (_, i) => kort(`bulk${i}|n`, 2)), // städdag: 40 ✓
+      kort("a|n", 5), kort("b|n", 5), kort("c|n", 5),                 // vanlig dag: 3
+      kort("gammal|n", 45),                                           // utanför fönstret
     ];
-    const t = taktPerDag(reviews, NU, 30)!;
-    expect(t.nyaIFonstret).toBe(1);
+    const t = taktPerDag(cards, NU, 30)!;
+    expect(t.nyaIFonstret).toBe(TAK_PER_DAG + 3);
     expect(t.dagar).toBe(30);
   });
 
-  it("kortare historik än 3 dagar ger ingen prognos — ✓-markeringar utan reviews likaså", () => {
+  it("kortare historik än 3 dagar ger ingen prognos", () => {
     expect(taktPerDag([], NU)).toBeNull();
-    expect(taktPerDag([{ ts: dagarSen(1), wordId: "casa|n" }], NU)).toBeNull();
+    expect(taktPerDag([kort("casa|n", 1)], NU)).toBeNull();
   });
 
   it("prognosen cappar vid ordbasens tak", () => {
