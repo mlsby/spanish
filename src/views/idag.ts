@@ -30,6 +30,11 @@ export interface CloudUi {
 let pendingEmail = "";
 let authError = "";
 let settingsOpen = false;
+
+/** Tvinga fram kontopanelen — synkfel måste kunna visas även från dashboarden. */
+export function oppnaKonto(): void {
+  settingsOpen = true;
+}
 let resaOpen = false; // nivåtrappan utfälld? (minns tills appen laddas om)
 
 const esc = (s: string) =>
@@ -282,7 +287,14 @@ function resaPanelHtml(s: { kan: number; lar: number; score: number }): string {
 
 function dashboardHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
+  // synkfel blockerar övning — då måste det synas direkt, inte först när
+  // man klickar på en knapp som inte gör något
+  const synkvarning = cloud.email && cloud.status === "error"
+    ? `<div class="synkbanner">Synken kom inte fram — dina ord är säkra lokalt, men
+        övning är pausad tills den funkar. <button type="button" id="synkFix">Visa konto</button></div>`
+    : "";
   return `
+    ${synkvarning}
     ${streakRowHtml(store)}
     ${heroHtml(store, cloud)}
     ${cloud.email ? "" : `<div class="panel" id="kontoPanel">
@@ -374,6 +386,10 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
 
   const rerender = () => renderIdag(el, store, cb, cloud);
 
+  el.querySelector<HTMLButtonElement>("#synkFix")?.addEventListener("click", () => {
+    settingsOpen = true;
+    rerender();
+  });
   el.querySelector<HTMLButtonElement>("#gearBtn")!.onclick = () => {
     settingsOpen = !settingsOpen;
     rerender();

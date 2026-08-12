@@ -8,7 +8,7 @@ import { loadPass } from "./lib/passpaus";
 import { CloudSync } from "./lib/sync";
 import { Social } from "./lib/social";
 import { activityStats } from "./lib/streak";
-import { renderIdag, type CloudUi } from "./views/idag";
+import { oppnaKonto, renderIdag, type CloudUi } from "./views/idag";
 import { PassView } from "./views/pass";
 import { LasView } from "./views/las";
 import { renderOrdlista } from "./views/ordlista";
@@ -131,6 +131,12 @@ async function boot(): Promise<void> {
   }
 
   function flashKonto(): void {
+    // panelen bor i inställningsvyn — utan den blir felet helt osynligt
+    // ("jag klickar och inget händer"), så fäll ut den först
+    if (!document.getElementById("kontoPanel")) {
+      oppnaKonto();
+      showTab("idag");
+    }
     const p = document.getElementById("kontoPanel");
     p?.scrollIntoView({ behavior: "smooth", block: "center" });
     p?.classList.add("pulse");
