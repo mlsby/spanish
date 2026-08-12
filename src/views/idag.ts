@@ -108,12 +108,6 @@ function mexikoHtml(store: Store): string {
   const xHist = (i: number) => serie.length > 1 ? P + (i * (idagX - P)) / (serie.length - 1) : idagX;
   const line = serie.map((v, i) => `${i ? "L" : "M"}${xHist(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
   const area = `${line} L${idagX.toFixed(1)} ${yBot} L${P} ${yBot} Z`;
-  // nivåtrösklar man passerar på vägen — max tre, annars blir det brus
-  const trosklar = TITLAR.filter((t) => t.min > score && t.min <= prognos).slice(0, 3)
-    .map((t) => `<line x1="${idagX.toFixed(1)}" y1="${y(t.min).toFixed(1)}" x2="${slutX}" y2="${y(t.min).toFixed(1)}"
-        stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
-      <text x="${(idagX + 5).toFixed(1)}" y="${(y(t.min) - 3).toFixed(1)}" font-size="8.5"
-        fill="var(--muted)">${esc(t.name)} ${t.min}</text>`).join("");
   const taktStr = (Math.round(takt.perDag * 10) / 10).toLocaleString("sv-SE");
   return `
     <div class="mexrad">
@@ -123,7 +117,6 @@ function mexikoHtml(store: Store): string {
     <svg class="spark" viewBox="0 0 ${W} ${H}" role="img"
          aria-label="Ord nu ${score}, prognos till Mexikoresan ~${prognos}">
       <line x1="${P}" y1="${yBot}" x2="${W - P}" y2="${yBot}" stroke="var(--line)" stroke-width="1"/>
-      ${trosklar}
       <path d="${area}" fill="var(--accent)" opacity="0.12"/>
       <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round"/>
@@ -134,7 +127,7 @@ function mexikoHtml(store: Store): string {
               fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>
       <circle cx="${slutX}" cy="${y(prognos).toFixed(1)}" r="3.5"
               fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
-      <text x="${slutX + 4}" y="${(y(prognos) + 4.5).toFixed(1)}" font-size="13">🌵</text>
+      <text x="${slutX + 4}" y="${(y(prognos) + 4.5).toFixed(1)}" font-size="13">🏄</text>
     </svg>
     <div class="sparkcap mexcap"><span>${esc(dagEtikettKort(store))}</span>
       <span class="mitt">idag</span><span>26 dec 2026</span></div>
