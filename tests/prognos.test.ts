@@ -38,7 +38,7 @@ describe("Mexiko-prognosen", () => {
 
   it("en bulkdag kapas vid dagstaket — jämn inlärning berörs inte", () => {
     const cards = [
-      ...Array.from({ length: 40 }, (_, i) => kort(`bulk${i}|n`, 2)), // städdag: 40 ✓
+      ...Array.from({ length: 70 }, (_, i) => kort(`bulk${i}|n`, 2)), // städdag: 70 ✓
       kort("a|n", 5), kort("b|n", 5), kort("c|n", 5),                 // vanlig dag: 3
       kort("gammal|n", 45),                                           // utanför fönstret
     ];

@@ -16,7 +16,7 @@ import type { CardRec } from "./types";
 export const MEXIKO_ISO = "2026-12-26";
 export const TAKT_FONSTER = 30; // dagar bakåt som takten mäts över
 export const MIN_DAGAR = 3;     // kortare historik än så → ingen prognos
-export const TAK_PER_DAG = 15;  // maxbidrag per kalenderdag (dämpar bulk-✓)
+export const TAK_PER_DAG = 50;  // maxbidrag per kalenderdag (dämpar bara riktiga bulk-✓-städdagar)
 
 const DAG_MS = 86_400_000;
 
