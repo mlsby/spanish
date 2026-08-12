@@ -44,6 +44,12 @@ export interface LasFraga {
 const SMAORD = ["el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no"];
 // ser/estar/hay i presens är också bindväv — utan dem blir varje text tarzanspanska
 const VERBGLUE = ["es", "son", "está", "están", "hay"];
+// vanliga förnamn — fria historier vill namnge sina karaktärer; quizzas aldrig
+const NAMN = [
+  "juan", "maría", "ana", "pedro", "luis", "carmen", "sofía", "carlos", "lucía",
+  "miguel", "elena", "pablo", "marta", "diego", "rosa", "david", "laura", "josé",
+  "clara", "antonio",
+];
 const BOJBARA = new Set(["n", "adj", "determiner", "pron", "num"]);
 
 /** Regelbunden plural + femininum in i vitlistan (perro→perros, feliz→felices). */
@@ -134,7 +140,7 @@ export function byggUnderlag(
   // ---- listorna: varje ord i sin nivå, kandidaterna har egen lista ----
   const kanRader: string[] = [];
   const nastanRader: string[] = [];
-  const vitlista = new Set<string>([...SMAORD, ...VERBGLUE]);
+  const vitlista = new Set<string>([...SMAORD, ...VERBGLUE, ...NAMN]);
   const verbKlara = new Set<string>();
   for (const id of introducerade) {
     if (uteslut.has(id)) continue; // borta ur listor + vitlista → kan inte dyka upp
@@ -222,8 +228,9 @@ export function byggQuiz(
 const LAS_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["meningar"],
+  required: ["titelSv", "meningar"],
   properties: {
+    titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska)" },
     meningar: {
       type: "array",
       items: {
@@ -237,13 +244,16 @@ const LAS_SCHEMA = {
 };
 
 export function lasSystemPrompt(p: LasParametrar): string {
-  return `Du skriver en liten sammanhängande scen på enkel spanska, ungefär ${p.meningar} meningar, till en svensk som lär sig språket.
+  const lo = Math.max(2, p.meningar - 1);
+  return `Du skriver en kort text på enkel spanska till en svensk som lär sig språket — ${lo}–${p.meningar} meningar som hör ihop. Det kan vara en liten historia, en konversation eller en blandning; välj det som blir mest levande.
 
-Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att scenen ska bli naturlig. Ett ord utanför listorna och hen tappar meningen; småorden ${SMAORD.filter((x) => !["unos", "unas"].includes(x)).join(", ")} samt ${VERBGLUE.join(", ")} är alltid ok, liksom regelbunden plural och femininum.
+Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att det ska flyta naturligt. Ett ord utanför listorna och hen tappar meningen; småorden ${SMAORD.filter((x) => !["unos", "unas"].includes(x)).join(", ")} samt ${VERBGLUE.join(", ")} är alltid ok, liksom regelbunden plural och femininum. Vanliga spanska förnamn (Juan, María, Pedro …) går också bra.
 
 Väv in exakt ${p.anvand} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
 
-Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet i meningen, eller "" om inget).`;
+Ge texten en talande titel som sätter scenen. Titeln skrivs på SVENSKA — det är den enda delen som ska vara på svenska, och den behöver inte hålla sig till ordlistorna.
+
+Svara i JSON: { "titelSv": "...", "meningar": [{ "es", "ovningsord" }] }.`;
 }
 
 export function lasUserPrompt(u: LasUnderlag, anvand: number): string {
@@ -287,15 +297,18 @@ export function valideraText(
  * med klienten). Appen validerar och försöker om (max 3) med felen som
  * feedback — hellre lucka än fel text.
  */
+export interface LasText { titel: string; meningar: LasMening[] }
+
 export async function hamtaText(
   sb: SupabaseClient,
   u: LasUnderlag,
   p: LasParametrar,
   ytor: (k: LasKandidat) => string[] = (k) => [k.es],
-): Promise<LasMening[]> {
+): Promise<LasText> {
   const system = lasSystemPrompt(p);
   const bas = lasUserPrompt(u, p.anvand);
   let meningar: LasMening[] | null = null;
+  let titel = "";
   for (let forsok = 1; forsok <= 3; forsok++) {
     const forra: LasValidering | null = meningar ? valideraText(u, p.anvand, meningar, ytor) : null;
     const extra: string = forra
@@ -314,13 +327,14 @@ export async function hamtaText(
       throw new Error(msg);
     }
     if (data?.fel) throw new Error(String(data.fel));
-    let svar: LasMening[] | undefined;
+    let svar: { titelSv?: unknown; meningar?: LasMening[] };
     try {
-      svar = (JSON.parse(String(data?.text ?? "")) as { meningar: LasMening[] }).meningar;
+      svar = JSON.parse(String(data?.text ?? "")) as typeof svar;
     } catch { continue; /* trasig JSON räknas som misslyckat försök */ }
-    if (!Array.isArray(svar)) continue;
-    meningar = svar;
-    if (valideraText(u, p.anvand, meningar, ytor).godkand) return meningar;
+    if (!Array.isArray(svar.meningar)) continue;
+    meningar = svar.meningar;
+    titel = typeof svar.titelSv === "string" ? svar.titelSv : "";
+    if (valideraText(u, p.anvand, meningar, ytor).godkand) return { titel, meningar };
   }
   throw new Error("Kunde inte skriva en text som håller sig till dina ord — försök igen.");
 }

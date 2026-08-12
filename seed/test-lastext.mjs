@@ -85,6 +85,10 @@ const blanda = (a) => {
 const SMAORD = [
   "el", "la", "los", "las", "un", "una", "unos", "unas", "a", "al", "del", "no",
   "es", "son", "está", "están", "hay",
+  // vanliga förnamn — fria historier namnger sina karaktärer
+  "juan", "maría", "ana", "pedro", "luis", "carmen", "sofía", "carlos", "lucía",
+  "miguel", "elena", "pablo", "marta", "diego", "rosa", "david", "laura", "josé",
+  "clara", "antonio",
 ];
 // mött verb ⇒ alla dess presensformer får läsas (samma expansion som i appen)
 const formsByParent = new Map();
@@ -176,7 +180,7 @@ function systemPrompt() {
   const lo = Math.max(2, N_MENINGAR - 1);
   return `Du skriver en kort text på enkel spanska till en svensk som lär sig språket — ${lo}–${N_MENINGAR} meningar som hör ihop. Det kan vara en liten historia, en konversation eller en blandning; välj det som blir mest levande.
 
-Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att det ska flyta naturligt. Ett ord utanför listorna och hen tappar meningen; småorden el, la, los, las, un, una, a, al, del, no samt es, son, está, están, hay är alltid ok, liksom regelbunden plural och femininum.
+Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att det ska flyta naturligt. Ett ord utanför listorna och hen tappar meningen; småorden el, la, los, las, un, una, a, al, del, no samt es, son, está, están, hay är alltid ok, liksom regelbunden plural och femininum. Vanliga spanska förnamn (Juan, María, Pedro …) går också bra.
 
 Väv in exakt ${N_OVNING} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
 

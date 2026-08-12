@@ -220,9 +220,12 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
 
   it("systemprompten bär nivåvärdena och verbgluet", () => {
     const s = lasSystemPrompt({ meningar: 5, anvand: 4 });
-    expect(s).toContain("ungefär 5 meningar");
+    expect(s).toContain("4–5 meningar");
     expect(s).toContain("exakt 4 kandidatord");
     expect(s).toContain("es, son, está, están, hay");
+    expect(s).toContain("titel");
+    expect(s).toContain("SVENSKA");
+    expect(s).toContain("förnamn");
   });
 
   function fakeSb(svar: string[]): { sb: SupabaseClient; invoke: ReturnType<typeof vi.fn> } {
@@ -231,11 +234,12 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
   }
 
   it("hamtaText: underkänt försök ger omförsök med felen i prompten", async () => {
-    const daligt = JSON.stringify({ meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
-    const bra = JSON.stringify({ meningar: [{ es: "Cada casa es la casa.", ovningsord: "cada" }] });
+    const daligt = JSON.stringify({ titelSv: "Test", meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
+    const bra = JSON.stringify({ titelSv: "Hemma hos oss", meningar: [{ es: "Cada casa es la casa.", ovningsord: "cada" }] });
     const { sb, invoke } = fakeSb([daligt, bra]);
-    const meningar = await hamtaText(sb, underlag, { meningar: 3, anvand: 1 });
-    expect(meningar[0].es).toBe("Cada casa es la casa.");
+    const text = await hamtaText(sb, underlag, { meningar: 3, anvand: 1 });
+    expect(text.meningar[0].es).toBe("Cada casa es la casa.");
+    expect(text.titel).toBe("Hemma hos oss"); // svenska titeln följer med ut
     expect(invoke).toHaveBeenCalledTimes(2);
     const andra = invoke.mock.calls[1][1].body;
     expect(andra.user).toContain("Otillåtna ord: perro, corre");
@@ -243,7 +247,7 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
   });
 
   it("hamtaText: tre underkända försök ger fel — hellre lucka än fel text", async () => {
-    const daligt = JSON.stringify({ meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
+    const daligt = JSON.stringify({ titelSv: "Test", meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
     const { sb, invoke } = fakeSb([daligt, daligt, daligt]);
     await expect(hamtaText(sb, underlag, { meningar: 3, anvand: 1 }))
       .rejects.toThrow(/håller sig till dina ord/);

@@ -37,6 +37,7 @@ function laddaSenaste(): string[] {
 export class LasView {
   private state: LasState = "laddar";
   private meningar: string[] = [];
+  private titel = "";
   private quiz: LasFraga[] = [];
   private idx = 0;
   private ratt = 0;
@@ -179,6 +180,7 @@ export class LasView {
     this.setLive(true); // tabbaren gömd från första stund till Avsluta — inget flimmer
     this.state = "laddar";
     this.meningar = [];
+    this.titel = "";
     this.quiz = [];
     this.idx = 0;
     this.ratt = 0;
@@ -195,12 +197,13 @@ export class LasView {
     }
     try {
       const ytor = (k: LasKandidat) => kandidatYtor(this.store, k);
-      const meningar = await hamtaText(this.sb, underlag, {
+      const text = await hamtaText(this.sb, underlag, {
         meningar: p.meningar,
         anvand: Math.min(p.anvand, underlag.kandidater.length),
       }, ytor);
-      this.meningar = meningar.map((m) => m.es);
-      this.quiz = byggQuiz(meningar, underlag.kandidater, ytor);
+      this.titel = text.titel;
+      this.meningar = text.meningar.map((m) => m.es);
+      this.quiz = byggQuiz(text.meningar, underlag.kandidater, ytor);
       if (!this.quiz.length) throw new Error("Texten saknade övningsord — prova igen.");
       // minns ~3 rundors quizord — de utesluts helt ur kommande texter
       this.senaste = minnsQuizzade(this.senaste, this.quiz.map((q) => q.kandidat.id), p.anvand * 3);
@@ -277,7 +280,8 @@ export class LasView {
   }
 
   private textHtml(): string {
-    return `<p class="lastext">${this.meningar.map(esc).join(" ")}</p>`;
+    return `${this.titel ? `<p class="lastitel">${esc(this.titel)}</p>` : ""}
+      <p class="lastext">${this.meningar.map(esc).join(" ")}</p>`;
   }
 
   private facit(f: LasFraga): string {

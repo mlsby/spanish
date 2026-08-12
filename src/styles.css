@@ -444,6 +444,7 @@ html.kbd .extips .exline{font-size:13.5px}
 
 /* ---------- läsförståelse (delar passets skelett) ---------- */
 .lascard{gap:10px}
+.lastitel{font-family:var(--serif);font-weight:600;font-size:22px;margin:2px 0 0;text-wrap:balance}
 .lastext{font-family:var(--serif);font-size:19px;line-height:1.65;margin:4px 0 2px;text-wrap:pretty}
 .lasmening{font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.5;
            color:var(--muted);margin:0;max-width:40ch}
