@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
-  byggQuiz, byggUnderlag, lasCommit, lasNiva, minnsQuizzade, ordITexten,
+  byggQuiz, byggUnderlag, hamtaText, lasCommit, lasNiva, lasSystemPrompt,
+  minnsQuizzade, ordITexten, valideraText,
 } from "../src/lib/lastext";
+import type { SupabaseClient } from "../src/lib/supabase";
 import { applyReview, newCardRec } from "../src/lib/scheduler";
 import { Store } from "../src/lib/store";
 import { emptyData, type StorageAdapter } from "../src/lib/storage";
@@ -179,6 +181,57 @@ describe("byggQuiz + ordITexten", () => {
     ], kandidater);
     expect(quiz.map((q) => q.kandidat.es).sort()).toEqual(["cada", "feliz"]);
     expect(quiz[0].mening).toBe("Cada día es feliz.");
+  });
+});
+
+describe("valideraText + hamtaText (klienten äger regler och omförsök)", () => {
+  const underlag = {
+    verb: [],
+    ovriga: ["la casa"],
+    kandidater: [{ id: "cada|determiner", es: "cada", sv: "varje" }],
+    vitlista: ["cada", "casa", "la", "es", "el", "hombre"],
+  };
+
+  it("valideraText: otillåtna ord och kandidatkravet", () => {
+    const ok = valideraText(underlag, 1, [{ es: "Cada casa es la casa.", ovningsord: "cada" }]);
+    expect(ok).toMatchObject({ godkand: true, brott: [], anvanda: ["cada"] });
+    const brott = valideraText(underlag, 1, [{ es: "Cada perro corre.", ovningsord: "cada" }]);
+    expect(brott.godkand).toBe(false);
+    expect(brott.brott.sort()).toEqual(["corre", "perro"]);
+    const utanKandidat = valideraText(underlag, 1, [{ es: "La casa es la casa.", ovningsord: "" }]);
+    expect(utanKandidat).toMatchObject({ godkand: false, anvanda: [] });
+  });
+
+  it("systemprompten bär nivåvärdena och verbgluet", () => {
+    const s = lasSystemPrompt({ meningar: 5, anvand: 4 });
+    expect(s).toContain("ungefär 5 meningar");
+    expect(s).toContain("exakt 4 av KANDIDATORDEN");
+    expect(s).toContain("es, son, está, están, hay");
+  });
+
+  function fakeSb(svar: string[]): { sb: SupabaseClient; invoke: ReturnType<typeof vi.fn> } {
+    const invoke = vi.fn(async () => ({ data: { text: svar.shift() ?? "" }, error: null }));
+    return { sb: { functions: { invoke } } as unknown as SupabaseClient, invoke };
+  }
+
+  it("hamtaText: underkänt försök ger omförsök med felen i prompten", async () => {
+    const daligt = JSON.stringify({ meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
+    const bra = JSON.stringify({ meningar: [{ es: "Cada casa es la casa.", ovningsord: "cada" }] });
+    const { sb, invoke } = fakeSb([daligt, bra]);
+    const meningar = await hamtaText(sb, underlag, { meningar: 3, anvand: 1 });
+    expect(meningar[0].es).toBe("Cada casa es la casa.");
+    expect(invoke).toHaveBeenCalledTimes(2);
+    const andra = invoke.mock.calls[1][1].body;
+    expect(andra.user).toContain("Otillåtna ord: perro, corre");
+    expect(andra.system).toBe(invoke.mock.calls[0][1].body.system);
+  });
+
+  it("hamtaText: tre underkända försök ger fel — hellre lucka än fel text", async () => {
+    const daligt = JSON.stringify({ meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
+    const { sb, invoke } = fakeSb([daligt, daligt, daligt]);
+    await expect(hamtaText(sb, underlag, { meningar: 3, anvand: 1 }))
+      .rejects.toThrow(/håller sig till dina ord/);
+    expect(invoke).toHaveBeenCalledTimes(3);
   });
 });
 

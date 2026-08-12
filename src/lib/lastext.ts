@@ -181,34 +181,109 @@ export function byggQuiz(meningar: LasMening[], kandidater: LasKandidat[]): LasF
   return traffar.sort((a, b) => a.ordning - b.ordning).map((t) => t.fraga);
 }
 
-/** Hämta text från Edge Functionen (kräver inloggning — JWT följer med klienten). */
+// ---------- prompt + validering (bor i appen — Edge Functionen är bara nyckelhållare) ----------
+
+const LAS_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["meningar"],
+  properties: {
+    meningar: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["es", "ovningsord"],
+        properties: { es: { type: "string" }, ovningsord: { type: "string" } },
+      },
+    },
+  },
+};
+
+export function lasSystemPrompt(p: LasParametrar): string {
+  return `Du skriver en pytteliten sammanhängande scen på enkel spanska (presens) för svenska nybörjare — ungefär ${p.meningar} meningar som hör ihop.
+
+REGLER:
+- Använd ENDAST ord från listorna nedan. Inga andra ord, inga namn, inga siffertecken.
+- Verb får bara användas i exakt de former som står i verblistan. Saknas formen: skriv om (ir a/querer/poder + infinitiv) eller välj ett annat verb.
+- Substantiv, adjektiv, pronomen och determinerare får böjas i regelbunden plural och femininum.
+- Alltid tillåtna småord: ${SMAORD.filter((s) => !["unos", "unas"].includes(s)).join(", ")} — och verben ${VERBGLUE.join(", ")}.
+- Använd exakt ${p.anvand} av KANDIDATORDEN, i exakt angiven form — välj de som passar scenen bäst.
+- Vanligaste felet är verbformer utanför listan (t.ex. "quiere" när bara "quiero" står med) — kontrollera varje verbform innan du svarar.
+
+Svara i JSON: en lista "meningar" där varje element har "es" (meningen) och "ovningsord" (kandidatordet i meningen, eller "" om inget).`;
+}
+
+export function lasUserPrompt(u: LasUnderlag, anvand: number): string {
+  const verb = u.verb
+    .map((v) => (v.former.length ? `${v.inf}: ${v.inf}, ${v.former.join(", ")}` : v.inf))
+    .join(" · ");
+  const kand = u.kandidater.map((k) => `${k.es} (${k.sv})`).join("\n");
+  return `VERB — endast dessa former är tillåtna:\n${verb}\n\nÖVRIGA TILLÅTNA ORD:\n${u.ovriga.join(", ")}\n\nKANDIDATORD (välj ${anvand} st, exakt dessa former):\n${kand}`;
+}
+
+function tokenisera(text: string): string[] {
+  return text.toLowerCase().match(/[a-záéíóúñü]+/g) ?? [];
+}
+
+export interface LasValidering { brott: string[]; anvanda: string[]; godkand: boolean }
+
+/** Håller sig texten till vitlistan och använder den nog många kandidater? */
+export function valideraText(
+  u: LasUnderlag,
+  anvand: number,
+  meningar: LasMening[],
+): LasValidering {
+  const ok = new Set(u.vitlista.map((t) => t.toLowerCase()));
+  const brott = new Set<string>();
+  for (const m of meningar) {
+    for (const tok of tokenisera(m.es)) if (!ok.has(tok)) brott.add(tok);
+  }
+  const text = meningar.map((m) => m.es).join(" ");
+  const anvanda = u.kandidater.filter((k) => ordITexten(k.es, text)).map((k) => k.es);
+  return { brott: [...brott], anvanda, godkand: brott.size === 0 && anvanda.length >= anvand };
+}
+
+/**
+ * Hämta text via den generiska promptmotorn (kräver inloggning — JWT följer
+ * med klienten). Appen validerar och försöker om (max 3) med felen som
+ * feedback — hellre lucka än fel text.
+ */
 export async function hamtaText(
   sb: SupabaseClient,
   u: LasUnderlag,
   p: LasParametrar,
 ): Promise<LasMening[]> {
-  const { data, error } = await sb.functions.invoke("las-text", {
-    body: {
-      verb: u.verb,
-      ovriga: u.ovriga,
-      kandidater: u.kandidater.map(({ es, sv }) => ({ es, sv })),
-      vitlista: u.vitlista,
-      meningar: p.meningar,
-      anvand: p.anvand,
-    },
-  });
-  if (error) {
-    let msg = "Kunde inte hämta texten — prova igen om en stund.";
+  const system = lasSystemPrompt(p);
+  const bas = lasUserPrompt(u, p.anvand);
+  let meningar: LasMening[] | null = null;
+  for (let forsok = 1; forsok <= 3; forsok++) {
+    const forra: LasValidering | null = meningar ? valideraText(u, p.anvand, meningar) : null;
+    const extra: string = forra
+      ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${forra.brott.join(", ") || "-"}. Använda kandidatord: ${forra.anvanda.length} av minst ${p.anvand}. Skriv om och håll dig strikt till listorna.`
+      : "";
+    const { data, error } = await sb.functions.invoke<{ text?: string; fel?: string }>("prompt", {
+      body: { system, user: bas + extra, schema: LAS_SCHEMA, effort: "medium" },
+    });
+    if (error) {
+      let msg = "Kunde inte hämta texten — prova igen om en stund.";
+      try {
+        const ctx = (error as { context?: Response }).context;
+        const j = ctx ? await ctx.json() : null;
+        if (j?.fel) msg = j.fel;
+      } catch { /* behåll standardmeddelandet */ }
+      throw new Error(msg);
+    }
+    if (data?.fel) throw new Error(String(data.fel));
+    let svar: LasMening[] | undefined;
     try {
-      const ctx = (error as { context?: Response }).context;
-      const j = ctx ? await ctx.json() : null;
-      if (j?.fel) msg = j.fel;
-    } catch { /* behåll standardmeddelandet */ }
-    throw new Error(msg);
+      svar = (JSON.parse(String(data?.text ?? "")) as { meningar: LasMening[] }).meningar;
+    } catch { continue; /* trasig JSON räknas som misslyckat försök */ }
+    if (!Array.isArray(svar)) continue;
+    meningar = svar;
+    if (valideraText(u, p.anvand, meningar).godkand) return meningar;
   }
-  if (data?.fel) throw new Error(data.fel);
-  if (!Array.isArray(data?.meningar)) throw new Error("Konstigt svar från textmotorn.");
-  return data.meningar as LasMening[];
+  throw new Error("Kunde inte skriva en text som håller sig till dina ord — försök igen.");
 }
 
 /**
