@@ -10118,5 +10118,14 @@
   },
   "pijama|n": {
     "art": "el"
+  },
+  "hasta|prep": {
+    "sv": "till",
+    "syn": [
+      "tills",
+      "ända till",
+      "fram till"
+    ],
+    "hint": "ända fram/tills: 'hasta luego' — inte 'a'"
   }
 }
