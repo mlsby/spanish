@@ -1,4 +1,5 @@
 import type { CardRec } from "./types";
+import { dayKey } from "./time";
 
 /**
  * Mexiko-prognosen: hela gänget åker 26 dec 2026 — grafen visar orden man
@@ -65,6 +66,20 @@ export function taktPerDag(
   let nya = 0;
   for (const n of perDagAntal.values()) nya += Math.min(n, tak);
   return { perDag: nya / dagar, nyaIFonstret: nya, dagar };
+}
+
+/** Antal nya ord i poängen idag — unika ord vars inträdesdag (lokal) är nu-dagen. Otaksat: dagstaket dämpar prognosen, inte dagens facit. */
+export function nyaIdag(cards: Iterable<TaktKort>, now: Date): number {
+  const intrade = new Map<string, string>();
+  for (const c of cards) {
+    if (c.fsrs.reps <= 0) continue;
+    const prev = intrade.get(c.wordId);
+    if (!prev || c.introducedAt < prev) intrade.set(c.wordId, c.introducedAt);
+  }
+  const idag = dayKey(now);
+  let n = 0;
+  for (const ts of intrade.values()) if (dayKey(new Date(ts)) === idag) n++;
+  return n;
 }
 
 /** Var landar man till Mexiko om takten håller? Cappad vid basens tak (ord + former). */

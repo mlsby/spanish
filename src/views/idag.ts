@@ -1,6 +1,6 @@
 import { LAS_UNLOCK } from "../lib/lastext";
 import { loadPass } from "../lib/passpaus";
-import { dagarKvar, MIN_DAGAR, prognosOrd, taktPerDag } from "../lib/prognos";
+import { dagarKvar, MIN_DAGAR, nyaIdag, prognosOrd, taktPerDag } from "../lib/prognos";
 import { resaFor, TITLAR } from "../lib/resa";
 import type { Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
@@ -117,6 +117,7 @@ function mexikoHtml(store: Store): string {
   return `
     <div class="mexrad">
       <div><b>${score}</b><span>ord nu</span></div>
+      <div><b>+${nyaIdag(Object.values(store.data.cards), now)}</b><span>nya idag</span></div>
       <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>i Mexiko · ≈ ${esc(niva)}</span></div>
     </div>
     <svg class="spark" viewBox="0 0 ${W} ${H}" role="img"

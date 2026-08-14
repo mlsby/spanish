@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dagarKvar, prognosOrd, TAK_PER_DAG, taktPerDag } from "../src/lib/prognos";
+import { dagarKvar, nyaIdag, prognosOrd, TAK_PER_DAG, taktPerDag } from "../src/lib/prognos";
 
 const NU = new Date("2026-08-12T12:00:00Z");
 const dagarSen = (n: number) => new Date(NU.getTime() - n * 86_400_000).toISOString();
@@ -50,6 +50,17 @@ describe("Mexiko-prognosen", () => {
   it("kortare historik än 3 dagar ger ingen prognos", () => {
     expect(taktPerDag([], NU)).toBeNull();
     expect(taktPerDag([kort("casa|n", 1)], NU)).toBeNull();
+  });
+
+  it("nya idag räknar unika besvarade ord med dagens inträdesdag", () => {
+    const cards = [
+      kort("hoy1|n", 0), kort("hoy1|n", 0),   // två riktningar → ETT ord
+      kort("hoy2|n", 0),
+      kort("obesvarad|n", 0, 0),              // introducerad men aldrig besvarad
+      kort("igar|n", 1),                      // gårdagens
+    ];
+    expect(nyaIdag(cards, NU)).toBe(2);
+    expect(nyaIdag([], NU)).toBe(0);
   });
 
   it("prognosen cappar vid basens tak — ord + former", () => {
