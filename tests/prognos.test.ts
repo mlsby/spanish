@@ -52,15 +52,15 @@ describe("Mexiko-prognosen", () => {
     expect(taktPerDag([kort("casa|n", 1)], NU)).toBeNull();
   });
 
-  it("nya idag räknar unika besvarade ord med dagens inträdesdag", () => {
-    const cards = [
-      kort("hoy1|n", 0), kort("hoy1|n", 0),   // två riktningar → ETT ord
-      kort("hoy2|n", 0),
-      kort("obesvarad|n", 0, 0),              // introducerad men aldrig besvarad
-      kort("igar|n", 1),                      // gårdagens
-    ];
-    expect(nyaIdag(cards, NU)).toBe(2);
-    expect(nyaIdag([], NU)).toBe(0);
+  it("nya idag = poängökning sedan senaste snapshot före idag", () => {
+    const snaps = {
+      "2026-08-10": { kan: 100, lar: 20 },
+      "2026-08-11": { kan: 110, lar: 25 }, // gårdagens = baslinje 135
+      "2026-08-12": { kan: 112, lar: 30 }, // dagens snapshot räknas inte som bas
+    };
+    expect(nyaIdag(snaps, 142, NU)).toBe(7);
+    expect(nyaIdag({}, 50, NU)).toBe(50); // ingen baslinje → allt är dagens
+    expect(nyaIdag(snaps, 130, NU)).toBe(0); // netto minus klampas
   });
 
   it("prognosen cappar vid basens tak — ord + former", () => {

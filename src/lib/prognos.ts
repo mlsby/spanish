@@ -68,18 +68,27 @@ export function taktPerDag(
   return { perDag: nya / dagar, nyaIFonstret: nya, dagar };
 }
 
-/** Antal nya ord i poängen idag — unika ord vars inträdesdag (lokal) är nu-dagen. Otaksat: dagstaket dämpar prognosen, inte dagens facit. */
-export function nyaIdag(cards: Iterable<TaktKort>, now: Date): number {
-  const intrade = new Map<string, string>();
-  for (const c of cards) {
-    if (c.fsrs.reps <= 0) continue;
-    const prev = intrade.get(c.wordId);
-    if (!prev || c.introducedAt < prev) intrade.set(c.wordId, c.introducedAt);
-  }
+/**
+ * Poäng tillagda idag = score nu − senaste snapshot före idag. Kortens
+ * introducedAt duger inte här: kort köas in i pass en dag och kan besvaras
+ * (= ge poäng) en senare dag. Utan tidigare snapshot är allt dagens skörd;
+ * netto minus (ord som föll ur poängen) klampas till 0.
+ */
+export function nyaIdag(
+  snapshots: Record<string, { kan: number; lar: number }>,
+  scoreNu: number,
+  now: Date,
+): number {
   const idag = dayKey(now);
-  let n = 0;
-  for (const ts of intrade.values()) if (dayKey(new Date(ts)) === idag) n++;
-  return n;
+  let basDag = "";
+  let bas = 0;
+  for (const [dag, v] of Object.entries(snapshots)) {
+    if (dag < idag && dag > basDag) {
+      basDag = dag;
+      bas = v.kan + v.lar;
+    }
+  }
+  return Math.max(0, scoreNu - bas);
 }
 
 /** Var landar man till Mexiko om takten håller? Cappad vid basens tak (ord + former). */

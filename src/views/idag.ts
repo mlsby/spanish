@@ -117,7 +117,7 @@ function mexikoHtml(store: Store): string {
   return `
     <div class="mexrad">
       <div><b>${score}</b><span>ord nu</span></div>
-      <div><b>+${nyaIdag(Object.values(store.data.cards), now)}</b><span>nya idag</span></div>
+      <div><b>+${nyaIdag(store.data.snapshots, score, now)}</b><span>nya idag</span></div>
       <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>i Mexiko · ≈ ${esc(niva)}</span></div>
     </div>
     <svg class="spark" viewBox="0 0 ${W} ${H}" role="img"
