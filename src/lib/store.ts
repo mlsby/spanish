@@ -471,6 +471,13 @@ export class Store {
       else if (lvl === "kan") kan++;
       else lar++;
     }
+    // böjningsformerna är fullvärdiga poäng — samma nivåregler som orden
+    for (const f of this.forms) {
+      const lvl = this.formLevel(f);
+      if (lvl === "ny") ny++;
+      else if (lvl === "kan") kan++;
+      else lar++;
+    }
     // repetitioner = förfallna kort som mötts minst en gång; osedda räknas som "nya"
     const dueReps = this.dueCards(now).filter((c) => c.fsrs.reps > 0).length;
     const firstToday = this.firstToday(now);

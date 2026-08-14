@@ -245,3 +245,22 @@ describe("Kan det-etiketten", () => {
     expect(isKnown(rec)).toBe(true);
   });
 });
+
+describe("poängen räknar böjningsformer", () => {
+  it("ett besvarat formkort ger score precis som ett ord", () => {
+    const store = makeStore();
+    const form = {
+      id: "empezar|v#pres.1s", parent: "empezar|v", es: "empiezo",
+      person: "1s" as const, svPres: "börjar", r: 500, slot: 1,
+    };
+    store.forms = [form];
+    store.formById = new Map([[form.id, form]]);
+    expect(store.stats().score).toBe(0);
+
+    const rec = newCardRec(form.id, "es2sv", new Date());
+    rec.fsrs.reps = 1; // besvarad → "på gång" → poäng
+    store.putCard(rec);
+    expect(store.stats().score).toBe(1);
+    expect(store.stats().total).toBe(WORDS.length + 1);
+  });
+});
