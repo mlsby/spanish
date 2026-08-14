@@ -18,6 +18,12 @@
   "para|prep": {
     "hint": "syfte/mål: 'en present för dig'"
   },
+  "de|prep": {
+    "hint": "ursprung/ägande: 'jag är från Sverige'"
+  },
+  "desde|prep": {
+    "hint": "startpunkt: 'ända sedan i går'"
+  },
   "sentir|v": {
     "hint": "känna en känsla"
   },
