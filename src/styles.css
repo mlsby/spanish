@@ -183,9 +183,11 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .spark{width:100%;height:auto;display:block;margin-top:2px}
 .sparkcap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
 /* Mexiko-grafen: nu-siffran + prognosen sida vid sida, "idag" fäst vid brytpunkten */
-.mexrad{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 0 4px}
+/* stat-kolumner: siffran stor, etiketten medvetet på egen rad under — inga knäckta fraser */
+.mexrad{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin:0 0 4px}
+.mexrad div{display:flex;flex-direction:column;line-height:1.3}
 .mexrad b{font-family:var(--serif);font-size:22px;font-variant-numeric:tabular-nums}
-.mexrad span{color:var(--muted);font-size:11.5px;margin-left:5px}
+.mexrad span{color:var(--muted);font-size:11.5px}
 .mexrad div:last-child{text-align:right}
 .mexcap{position:relative}
 .mexcap .mitt{position:absolute;left:35%;transform:translateX(-50%)}

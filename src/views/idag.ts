@@ -116,9 +116,9 @@ function mexikoHtml(store: Store): string {
   const taktStr = (Math.round(takt.perDag * 10) / 10).toLocaleString("sv-SE");
   return `
     <div class="mexrad">
-      <div><b>${score}</b><span>ord nu</span></div>
-      <div><b>+${nyaIdag(store.data.snapshots, score, now)}</b><span>nya idag</span></div>
-      <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>i Mexiko · ≈ ${esc(niva)}</span></div>
+      <div><b>${score}</b><span>ord</span></div>
+      <div><b>+${nyaIdag(store.data.snapshots, score, now)}</b><span>idag</span></div>
+      <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>i Mexiko</span><span>≈ ${esc(niva)}</span></div>
     </div>
     <svg class="spark" viewBox="0 0 ${W} ${H}" role="img"
          aria-label="Ord nu ${score}, prognos till Mexikoresan ~${prognos}">
