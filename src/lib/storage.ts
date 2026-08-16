@@ -12,7 +12,7 @@ export interface StorageAdapter {
 export function emptyData(): AppData {
   return {
     version: 1,
-    settings: { newFirst: 10, newMore: 5, autoNext: true, autoMs: 3000 },
+    settings: { niva: "lagom", newFirst: 10, newMore: 5, autoNext: true, autoMs: 3000 },
     userWords: {},
     cards: {},
     reviews: [],
@@ -25,9 +25,10 @@ export function emptyData(): AppData {
 /** Äldre sparfiler har `newPerDay` — den blir första övningens takt. */
 function normSettings(s: Partial<Settings> & { newPerDay?: number } = {}): Settings {
   return {
+    // gamla sparfiler saknar fälten — defaulta i stället för att migrera
+    niva: s.niva === "lugn" || s.niva === "ambitios" ? s.niva : "lagom",
     newFirst: s.newFirst ?? s.newPerDay ?? 10,
     newMore: s.newMore ?? 5,
-    // gamla sparfiler saknar fälten — defaulta i stället för att migrera
     autoNext: s.autoNext ?? true,
     autoMs: Math.max(1000, Math.min(10_000, s.autoMs ?? 3000)),
     updatedAt: s.updatedAt,

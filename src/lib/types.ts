@@ -83,10 +83,15 @@ export interface ReviewRec {
   step: Step;
 }
 
+/** Ambitionsnivån styr portionsstorlek och dagsbudget för nya ord. */
+export type Niva = "lugn" | "lagom" | "ambitios";
+
 export interface Settings {
-  /** nya ord i dagens första övning (synkas som new_per_day i molnet) */
+  /** ambitionsnivå: portionens kort + nya ord per dag (lokal, synkas inte) */
+  niva: Niva;
+  /** pensionerad — låg till grund för gamla övningsmodellen (synkas som new_per_day) */
   newFirst: number;
-  /** nya ord per "Öva mer"-omgång (lokal inställning tills en molnkolumn finns) */
+  /** pensionerad — nya ord per "Öva mer" i gamla modellen */
   newMore: number;
   /** facit vid rätt: gå vidare automatiskt? (lokal, synkas inte) */
   autoNext: boolean;

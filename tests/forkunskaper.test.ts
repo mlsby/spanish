@@ -22,8 +22,6 @@ function makeStore(): Store {
   store.words = WORDS;
   store.byId = new Map(WORDS.map((w) => [w.id, w]));
   store.data = emptyData();
-  store.data.settings.newFirst = 2;
-  store.data.settings.newMore = 2;
   return store;
 }
 
@@ -32,7 +30,7 @@ describe("förkunskaps-fast-track", () => {
   beforeEach(() => { store = makeStore(); });
 
   it("exakt rätt vid första mötet ⇒ Easy: långt intervall, ingen kortsiktig återkomst", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const first = s.current!;
     expect(first.dir).toBe("es2sv");
@@ -46,7 +44,7 @@ describe("förkunskaps-fast-track", () => {
   });
 
   it("andra mötet ger vanlig Good — ingen fast-track", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const id = s.current!.wordId;
     s.answer("hej"); s.commit(); // första mötet: easy + syskonuppskov
@@ -59,7 +57,7 @@ describe("förkunskaps-fast-track", () => {
   });
 
   it("stavfel vid första mötet ⇒ hard, men 'kan redan' uppgraderar till Easy", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const id = s.current!.wordId;
     const p = s.answer("hejj");
@@ -71,7 +69,7 @@ describe("förkunskaps-fast-track", () => {
   });
 
   it("syskonuppskov: sv→es-kortet lämnar kön och väntar ~2 veckor", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const id = s.current!.wordId;
     expect(s.queue.some((c) => c.wordId === id && c.dir === "sv2es")).toBe(true);
@@ -84,7 +82,7 @@ describe("förkunskaps-fast-track", () => {
   });
 
   it("fel eller stavfel utan claim ⇒ syskonet blir kvar i kön", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const id = s.current!.wordId;
     s.answer("hejj"); s.commit(); // hard utan claim
@@ -92,7 +90,7 @@ describe("förkunskaps-fast-track", () => {
   });
 
   it("budgetåterbäring: fast-track på dagens ord låser upp nästa enhet — med 3×-tak", () => {
-    const fresh = store.introduceForSession(); // 2 ord (hola, casa)
+    const fresh = store.introduceUnits(2); // 2 ord (hola, casa)
     expect(store.introducedToday()).toBe(2);
     const s = new Session(store, fresh);
     s.answer("hej"); s.commit(); // fast-track → återbäring
@@ -118,7 +116,7 @@ describe("prognos & broms i vanliga övningar", () => {
 
   it("prognosen växer när nya ord tas in — baslinjen mäts före introduktionen", () => {
     const baseline = store.dueSoonCount();
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh, { dueSoonBaseline: baseline });
     const cur = s.current!;
     s.answer("heeeelt fel svar");

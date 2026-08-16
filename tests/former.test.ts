@@ -72,8 +72,9 @@ describe("böjningsformer: introduktion", () => {
 
   it("upplåsta former slår ord med sämre korpusläge (slot före rank)", () => {
     store.introduceUnits(2); // poder + casa
-    store.data.settings.newFirst = 0; // stäng av återbäringen (tak 0) för ren ordningstest
-    unlockParent(store, "poder|v");
+    // lås upp för hand (ingen session → ingen återbäring) för ren ordningstest
+    const pc = store.card("poder|v", "es2sv")!;
+    store.putCard({ ...pc, fsrs: { ...pc.fsrs, reps: 1, stability: 2 } });
     const units = store.nextIntroUnits(2);
     // puedo (slot 1) ska komma före querer (rank 3)
     expect(units[0]).toMatchObject({ kind: "form" });

@@ -1,17 +1,16 @@
-import { LAS_UNLOCK } from "../lib/lastext";
+import { LAS_UNLOCK, lasNiva } from "../lib/lastext";
 import { loadPass } from "../lib/passpaus";
 import { dagarKvar, MIN_DAGAR, nyaIdag, prognosOrd, taktPerDag } from "../lib/prognos";
 import { resaFor, TITLAR } from "../lib/resa";
-import type { Store } from "../lib/store";
+import { NIVAER, type Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
 import { activityStats } from "../lib/streak";
 import { addDays, dayKey, fmtDate, weekdayMon } from "../lib/time";
 import type { SyncStatus } from "../lib/sync";
+import type { Niva } from "../lib/types";
 
 export interface IdagCallbacks {
   startPass(): void;
-  /** bara repetitioner — inga nya ord (flyktvägen för trötta dagar) */
-  startRep(): void;
   /** läsförståelse — låses upp vid Turista (100 poäng) */
   startLas(): void;
 }
@@ -36,6 +35,7 @@ export function oppnaKonto(): void {
   settingsOpen = true;
 }
 let resaOpen = false; // nivåtrappan utfälld? (minns tills appen laddas om)
+let valdTyp: "glosor" | "las" | null = null; // typväljaren; null = följ förvalet
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -191,13 +191,19 @@ function nivBadge(store: Store): string {
   return `<div class="nivbadge">🏅 <b>${r.titel.name}</b><span class="nivsub"> · ${s.score} ord</span></div>`;
 }
 
+/** Portionens innehållsdeklaration — max en rad, inga kösiffror. */
+function deklaration(plan: { repKort: number; nyaOrd: number }): string {
+  const delar: string[] = [];
+  if (plan.repKort > 0) delar.push(`<b>${plan.repKort}</b> ${plan.repKort === 1 ? "repetition" : "repetitioner"}`);
+  if (plan.nyaOrd > 0) delar.push(`<b>${plan.nyaOrd}</b> nya ord`);
+  return delar.join(" · ");
+}
+
 function heroHtml(store: Store, cloud: CloudUi): string {
   const s = store.stats();
-  const doneToday = store.data.days[dayKey()] ?? 0;
   const busy = cloud.status === "syncing";
   // läsförståelsen låses upp vid Turista — kräver inloggning (texten genereras i molnet)
-  const lasBtn = cloud.email && s.score >= LAS_UNLOCK
-    ? `<button class="btn ghost" id="lasBtn" ${busy ? "disabled" : ""}>Läs en text</button>` : "";
+  const lasUpplast = !!cloud.email && s.score >= LAS_UNLOCK;
 
   // pausad övning? den fortsätts alltid först — där man slutade
   const paused = loadPass();
@@ -207,38 +213,45 @@ function heroHtml(store: Store, cloud: CloudUi): string {
       ${nivBadge(store)}
       <div class="cap">du fortsätter exakt där du slutade</div>
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Fortsätt övningen"}</button>
-      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button>${lasBtn}</div>
     </div>`;
   }
 
-  const total = s.due + s.nextNew;
-  const plabel = s.firstToday ? "Dagens övning" : "Öva mer";
-  const cta = s.firstToday ? "Starta dagens övning" : "Öva mer";
-
   if (!cloud.email) {
     return `<div class="hero">
-      <p class="plabel">${plabel}</p>
+      <p class="plabel">Nästa övning</p>
       ${nivBadge(store)}
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
       <p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>
     </div>`;
   }
 
-  if (total === 0) {
-    return `<div class="hero klar">
-      <p class="plabel">Dagens övning</p>
-      ${nivBadge(store)}
-      <div class="klartxt">✓ Klart för idag</div>
-      <div class="cap">${doneToday > 0 ? `<b>${doneToday}</b> kort idag — streaken säkrad` : "inget förfallet just nu"}</div>
-      <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button>${lasBtn}</div>
+  const plan = store.portionsPlan();
+  const typ: "glosor" | "las" = valdTyp ?? (lasUpplast && store.glosorKlara() ? "las" : "glosor");
+  const picker = lasUpplast
+    ? `<div class="picker" id="typVal">
+        <button type="button" data-typ="glosor" class="${typ === "glosor" ? "on" : ""}">Glosor</button>
+        <button type="button" data-typ="las" class="${typ === "las" ? "on" : ""}">Läsövning</button>
+      </div>` : "";
+
+  if (typ === "las") {
+    return `<div class="hero">
+      ${picker}
+      <div class="big">📖</div>
+      <p class="cap">en text på din nivå · <b>${lasNiva(s.score).anvand}</b> övningsord</p>
+      <button class="btn" id="lasBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Läs"}</button>
     </div>`;
   }
 
+  const repPct = plan.totalKort > 0 ? (plan.repKort / plan.totalKort) * 100 : 0;
+  const mix = plan.totalKort > 0
+    ? `<div class="mix">${repPct > 0 ? `<i class="mrep" style="width:${repPct.toFixed(1)}%"></i>` : ""}${repPct < 100 ? `<i class="mny" style="width:${(100 - repPct).toFixed(1)}%"></i>` : ""}</div>`
+    : "";
   return `<div class="hero">
-    <p class="plabel">${plabel}</p>
-    ${nivBadge(store)}
-    <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : cta}</button>
-    <div class="ghostrow"><button class="btn ghost" id="repBtn" ${busy || !s.repAvailable ? "disabled" : ""}>Repetera</button>${lasBtn}</div>
+    ${picker}
+    <div class="big">${plan.totalKort} <small>kort</small></div>
+    <p class="cap">${deklaration(plan) || "inget att öva just nu"}</p>
+    ${mix}
+    <button class="btn" id="startBtn" ${busy || plan.totalKort === 0 ? "disabled" : ""}>${busy ? "Synkar …" : "Öva"}</button>
   </div>`;
 }
 
@@ -314,22 +327,17 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
 }
 
 function settingsHtml(store: Store, cloud: CloudUi): string {
+  const niva = store.data.settings.niva ?? "lagom";
+  const conf = NIVAER[niva];
   return `
-    <div class="panel setting">
-      <span class="t">Nya ord — dagens första övning</span>
-      <span class="stepper">
-        <button type="button" aria-label="Färre nya ord i första övningen" id="firstDown">−</button>
-        <span class="v">${store.data.settings.newFirst}</span>
-        <button type="button" aria-label="Fler nya ord i första övningen" id="firstUp">+</button>
-      </span>
-    </div>
-    <div class="panel setting">
-      <span class="t">Nya ord — per "Öva mer"</span>
-      <span class="stepper">
-        <button type="button" aria-label="Färre nya ord per extra övning" id="moreDown">−</button>
-        <span class="v">${store.data.settings.newMore}</span>
-        <button type="button" aria-label="Fler nya ord per extra övning" id="moreUp">+</button>
-      </span>
+    <div class="panel setting" style="display:block">
+      <span class="t">Ambition</span>
+      <div class="picker" id="nivaVal" style="margin:10px 0 8px">
+        <button type="button" data-niva="lugn" class="${niva === "lugn" ? "on" : ""}">Lugn</button>
+        <button type="button" data-niva="lagom" class="${niva === "lagom" ? "on" : ""}">Lagom</button>
+        <button type="button" data-niva="ambitios" class="${niva === "ambitios" ? "on" : ""}">Ambitiös</button>
+      </div>
+      <span class="finstilt">${conf.kort} kort per övning · upp till ${conf.nya} nya ord om dagen</span>
     </div>
     <div class="panel setting">
       <span class="t">Facit — gå vidare automatiskt</span>
@@ -396,25 +404,21 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
     rerender();
   };
   el.querySelector<HTMLButtonElement>("#startBtn")?.addEventListener("click", () => cb.startPass());
-  el.querySelector<HTMLButtonElement>("#repBtn")?.addEventListener("click", () => cb.startRep());
   el.querySelector<HTMLButtonElement>("#lasBtn")?.addEventListener("click", () => cb.startLas());
+  el.querySelectorAll<HTMLButtonElement>("#typVal [data-typ]").forEach((b) =>
+    b.addEventListener("click", () => {
+      valdTyp = b.dataset.typ as "glosor" | "las";
+      rerender();
+    }));
+  el.querySelectorAll<HTMLButtonElement>("#nivaVal [data-niva]").forEach((b) =>
+    b.addEventListener("click", () => {
+      store.setNiva(b.dataset.niva as Niva);
+      rerender();
+    }));
   el.querySelector<HTMLElement>("#resaPanel")?.addEventListener("click", () => {
     resaOpen = !resaOpen;
     rerender();
   });
-
-  const bumpFirst = (d: number) => {
-    store.setNewFirst(Math.max(0, Math.min(50, store.data.settings.newFirst + d)));
-    rerender();
-  };
-  const bumpMore = (d: number) => {
-    store.setNewMore(Math.max(0, Math.min(20, store.data.settings.newMore + d)));
-    rerender();
-  };
-  el.querySelector<HTMLButtonElement>("#firstDown")?.addEventListener("click", () => bumpFirst(-1));
-  el.querySelector<HTMLButtonElement>("#firstUp")?.addEventListener("click", () => bumpFirst(1));
-  el.querySelector<HTMLButtonElement>("#moreDown")?.addEventListener("click", () => bumpMore(-1));
-  el.querySelector<HTMLButtonElement>("#moreUp")?.addEventListener("click", () => bumpMore(1));
   el.querySelector<HTMLButtonElement>("#autoNextTgl")?.addEventListener("click", () => {
     store.setAutoNext(!store.data.settings.autoNext);
     rerender();

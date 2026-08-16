@@ -1,4 +1,4 @@
-import type { AppData, CardRec, Dir, DirtyKind, Level, ReviewRec, UserWord, VerbForm, Word } from "./types";
+import type { AppData, CardRec, Dir, DirtyKind, Level, Niva, ReviewRec, UserWord, VerbForm, Word } from "./types";
 import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
 import { svBestamd } from "./grading";
 import { dueDate, isKnown, KNOWN_STABILITY_DAYS, levelCardRec, newCardRec } from "./scheduler";
@@ -7,6 +7,24 @@ import { dayKey, endOfToday } from "./time";
 
 /** Nästa enhet i introduktionskön: ett nytt ord eller en upplåst verbböjning. */
 export type IntroUnit = { kind: "word"; word: Word } | { kind: "form"; form: VerbForm };
+
+/** Ambitionsnivåerna: portionens kort per övning + dagsbudget nya ord (≈ ⅔ av korten). */
+export const NIVAER: Record<Niva, { kort: number; nya: number }> = {
+  lugn: { kort: 20, nya: 15 },
+  lagom: { kort: 30, nya: 20 },
+  ambitios: { kort: 40, nya: 25 },
+};
+
+/** Dagens portion, uträknad men inte startad — hjälten visar den, Öva kör den. */
+export interface PortionsPlan {
+  rep: CardRec[];        // förfallna repetitioner, mest kritiska först
+  unseen: CardRec[];     // ärvda: introducerade men aldrig besvarade
+  nyaUnits: IntroUnit[]; // nya enheter som skulle introduceras
+  forvag: CardRec[];     // repetition i förväg — fyller när inget annat finns
+  nyaOrd: number;        // deklarationens "nya ord" (ärvda + färska)
+  repKort: number;       // deklarationens "repetitioner" (due + i förväg)
+  totalKort: number;
+}
 
 export interface WordStatus {
   word: Word;
@@ -176,6 +194,12 @@ export class Store {
   /** Facittempo — lokala inställningar (ingen molnkolumn, ingen migrering). */
   setAutoNext(on: boolean): void {
     this.data.settings.autoNext = on;
+    this.save();
+  }
+
+  /** Ambitionsnivån — lokal inställning precis som facittempot. */
+  setNiva(n: Niva): void {
+    this.data.settings.niva = n;
     this.save();
   }
 
@@ -349,28 +373,81 @@ export class Store {
     return n;
   }
 
-  /**
-   * En övning startar: fyll på med nya enheter upp till målet — newFirst i
-   * dagens första övning, newMore per "öva mer". Osedda enheter från en
-   * avbruten övning ärvs och räknas av, så nya aldrig staplas ovanpå.
-   */
-  introduceForSession(now: Date = new Date()): CardRec[] {
-    const s = this.data.settings;
-    const target = this.firstToday(now) ? s.newFirst : s.newMore;
-    const room = Math.max(0, target - this.unseenCount(now));
-    return this.introduceUnits(room, now);
+  /** Nivåns portionsstorlek (kort) och dagsbudget (nya ord). */
+  nivaConf(): { kort: number; nya: number } {
+    return NIVAER[this.data.settings.niva ?? "lagom"];
+  }
+
+  /** Nya ord kvar i dagens budget — introduktioner räknas ur korten (delas mellan enheter). */
+  budgetKvar(now: Date = new Date()): number {
+    return Math.max(0, this.nivaConf().nya - this.introducedToday(now));
   }
 
   /**
-   * Repetitionskort ("Repetera"-knappen): alltid ett lagom pass om ~cap kort,
-   * mest brådskande först — förfallna (äldst först), sen de som förfaller
-   * närmast (förhandsrepetition). Aldrig nya ord.
+   * Dagens portion — motorn väljer, användaren trycker bara Öva:
+   *   1. förfallna repetitioner, mest kritiska först (försening i förhållande
+   *      till stabiliteten: ett färskt kort tål inte att vänta, ett gammalt gör det)
+   *   2. ärvda osedda kort (introducerade men aldrig besvarade)
+   *   3. nya ord (2 kort/ord) — bara när ingen repskuld väntar utanför portionen
+   *      och dagsbudgeten har utrymme
+   *   4. repetition i förväg (närmast förfall) så knappen aldrig är död
+   * Ändrar ingenting — `startPortion` gör själva introduktionen.
    */
-  repCards(_now: Date = new Date(), cap = 20): CardRec[] {
-    return Object.values(this.data.cards)
-      .filter((c) => c.fsrs.reps > 0)
-      .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime())
-      .slice(0, cap);
+  portionsPlan(now: Date = new Date()): PortionsPlan {
+    const N = this.nivaConf().kort;
+    const cutoff = endOfToday(now).getTime();
+    const alla = Object.values(this.data.cards);
+    const kritik = (c: CardRec) =>
+      (now.getTime() - dueDate(c).getTime()) / Math.max(c.fsrs.stability, 0.1);
+    const dueRep = alla
+      .filter((c) => c.fsrs.reps > 0 && dueDate(c).getTime() <= cutoff)
+      .sort((a, b) => kritik(b) - kritik(a));
+    const rep = dueRep.slice(0, N);
+    const skuldKvar = dueRep.length > N;
+
+    let plats = N - rep.length;
+    const unseen = alla
+      .filter((c) => c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff)
+      .sort((a, b) =>
+        a.dir === b.dir ? (a.introducedAt < b.introducedAt ? -1 : 1) : a.dir === "es2sv" ? -1 : 1)
+      .slice(0, Math.max(0, plats));
+    plats -= unseen.length;
+
+    const nyaUnits = !skuldKvar && plats >= 2
+      ? this.nextIntroUnits(Math.min(Math.floor(plats / 2), this.budgetKvar(now)), now)
+      : [];
+    plats -= nyaUnits.length * 2;
+
+    const med = new Set([...rep, ...unseen].map((c) => cardKey(c.wordId, c.dir)));
+    const forvag = plats > 0 && !skuldKvar
+      ? alla
+          .filter((c) => c.fsrs.reps > 0 && !med.has(cardKey(c.wordId, c.dir)) &&
+                         dueDate(c).getTime() > cutoff)
+          .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime())
+          .slice(0, plats)
+      : [];
+
+    const nyaOrd = new Set(unseen.map((c) => c.wordId)).size + nyaUnits.length;
+    return {
+      rep, unseen, nyaUnits, forvag, nyaOrd,
+      repKort: rep.length + forvag.length,
+      totalKort: rep.length + unseen.length + nyaUnits.length * 2 + forvag.length,
+    };
+  }
+
+  /** Bygg portionen på riktigt: introducera planens nya enheter och ge hela kön. */
+  startPortion(now: Date = new Date()): CardRec[] {
+    const plan = this.portionsPlan(now);
+    const fresh = this.introduceUnits(plan.nyaUnits.length, now);
+    return [...plan.rep, ...plan.unseen, ...fresh, ...plan.forvag];
+  }
+
+  /** Dagens glosor klara? Inga förfallna kvar och nya-budgeten använd → läsövning förvald. */
+  glosorKlara(now: Date = new Date()): boolean {
+    const cutoff = endOfToday(now).getTime();
+    const harDue = Object.values(this.data.cards)
+      .some((c) => dueDate(c).getTime() <= cutoff);
+    return !harDue && (this.budgetKvar(now) === 0 || this.nextIntroUnits(1, now).length === 0);
   }
 
   /** Budgetåterbäring vid fast-track: en extra enhet, utanför övningsmålet. */
@@ -461,7 +538,7 @@ export class Store {
     this.save();
   }
 
-  stats(now: Date = new Date()) {
+  stats() {
     // poängen räknas på NIVÅN: ny = inget svar än; lar = på väg (minst ett svar);
     // kan = sitter. Introducerade men obesvarade ord ger ingen poäng.
     let ny = 0, lar = 0, kan = 0;
@@ -478,29 +555,18 @@ export class Store {
       else if (lvl === "kan") kan++;
       else lar++;
     }
-    // repetitioner = förfallna kort som mötts minst en gång; osedda räknas som "nya"
-    const dueReps = this.dueCards(now).filter((c) => c.fsrs.reps > 0).length;
-    const firstToday = this.firstToday(now);
-    const target = firstToday ? this.data.settings.newFirst : this.data.settings.newMore;
-    const unseen = this.unseenCount(now);
-    const room = Math.max(0, target - unseen);
-    const fresh = room > 0 ? this.nextIntroUnits(room, now).length : 0;
     return {
       ny, lar, kan,
       score: kan + lar, // nivåresans poäng — orden man kan + orden på väg
       started: lar + kan,
       total: this.words.length + this.forms.length,
       goal: this.words.length + this.forms.length, // hela basen: ord + böjningsformer
-      due: dueReps,
-      nextNew: unseen + fresh, // nya enheter nästa övning innehåller (ärvda + påfyllda)
-      firstToday,
-      repAvailable: this.repCards(now).length > 0,
     };
   }
 
   /** Dagens statussnapshot för grafen (skrivs vid appstart och efter pass). */
   snapshotToday(now: Date = new Date()): void {
-    const { kan, lar } = this.stats(now);
+    const { kan, lar } = this.stats();
     this.data.snapshots[dayKey(now)] = { kan, lar };
     this.save();
     this.dirty("snapshot", dayKey(now));

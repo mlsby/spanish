@@ -197,12 +197,12 @@ export class Session {
   /**
    * Budgetåterbäring: ett ord som sitter vid första mötet kostar ingen
    * introduktionsplats — nästa enhet låses upp direkt (aldrig över
-   * 3× första övningens takt per dag).
+   * 3× nivåns dagsbudget).
    */
   private maybeRefund(card: CardRec, now: Date): void {
     const today = now.toDateString();
     if (new Date(card.introducedAt).toDateString() !== today) return;
-    const cap = this.store.data.settings.newFirst * REFUND_CAP_FACTOR;
+    const cap = this.store.nivaConf().nya * REFUND_CAP_FACTOR;
     if (this.store.introducedToday(now) >= cap) return;
     this.store.introduceExtra(now); // hamnar i nästa pass — inte mitt i pågående kö
   }

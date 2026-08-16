@@ -21,8 +21,6 @@ function makeStore(): Store {
   store.words = WORDS;
   store.byId = new Map(WORDS.map((w) => [w.id, w]));
   store.data = emptyData();
-  store.data.settings.newFirst = 2;
-  store.data.settings.newMore = 2;
   return store;
 }
 
@@ -32,7 +30,7 @@ describe("nivåstegen: beräknad nivå", () => {
 
   it("ny = inte mött än — även introducerad men obesvarad", () => {
     expect(store.wordStatus(WORDS[0]).level).toBe("ny");
-    store.introduceForSession();
+    store.introduceUnits(1);
     expect(store.wordStatus(WORDS[0]).level).toBe("ny"); // kort finns, men inget svar än
     const s = new Session(store, [store.card("hola|interj", "es2sv")!]);
     s.answer("hej"); s.commit();

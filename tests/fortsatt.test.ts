@@ -22,7 +22,6 @@ function makeStore(): Store {
   store.words = WORDS;
   store.byId = new Map(WORDS.map((w) => [w.id, w]));
   store.data = emptyData();
-  store.data.settings.newFirst = 3;
   return store;
 }
 
@@ -42,7 +41,7 @@ describe("fortsätt avbruten övning", () => {
   beforeEach(() => { store = makeStore(); stubStorage(); });
 
   it("ögonblicksbild + återupptagning: kön, ordning, räknare och prognos följer med", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const first = s.current!;
     s.answer("hej"); s.commit(); // ett kort klart (+ ev. syskonuppskov)
@@ -60,7 +59,7 @@ describe("fortsätt avbruten övning", () => {
   });
 
   it("kort som hunnit ändras under pausen hoppar av kön", () => {
-    const fresh = store.introduceForSession();
+    const fresh = store.introduceUnits(2);
     const s = new Session(store, fresh);
     const snap = s.snapshot();
     // under pausen: casa ✓-markeras som Kan det → förfaller om 30 dagar
@@ -71,7 +70,7 @@ describe("fortsätt avbruten övning", () => {
   });
 
   it("sparning gäller bara samma dag — gårdagens pass rensas", () => {
-    const s = new Session(store, store.introduceForSession());
+    const s = new Session(store, store.introduceUnits(2));
     savePass(s.snapshot());
     expect(loadPass()?.queue.length).toBe(s.queue.length);
     // manipulera dagsstämpeln → ska förkastas och städas bort

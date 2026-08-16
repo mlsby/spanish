@@ -25,98 +25,98 @@ function makeStore(): Store {
   return store;
 }
 
-describe("övningsmodellen: dagens övning + öva mer", () => {
-  it("dagens första övning fyller till newFirst — frekvensordning, es→sv först", () => {
+describe("portionsmotorn: Öva bygger dagens portion", () => {
+  it("tom historik: portionen fylls med nya ord — es→sv först, ärvda staplas inte", () => {
     const store = makeStore();
-    store.data.settings.newFirst = 2;
-    const fresh = store.introduceForSession();
-    expect(fresh).toHaveLength(4); // 2 ord × 2 riktningar
-    // es→sv-korten först, sedan sv→es — samma ord förhörs inte rygg i rygg
-    expect(fresh.map((c) => `${c.wordId}:${c.dir}`)).toEqual([
-      "empezar|v:es2sv", "ciudad|n:es2sv", "empezar|v:sv2es", "ciudad|n:sv2es",
+    const plan = store.portionsPlan();
+    expect(plan.rep).toHaveLength(0);
+    expect(plan.nyaUnits).toHaveLength(3); // hela lilla basen ryms i portionen
+    expect(plan.nyaOrd).toBe(3);
+    const kort = store.startPortion();
+    expect(kort.map((c) => `${c.wordId}:${c.dir}`)).toEqual([
+      "empezar|v:es2sv", "ciudad|n:es2sv", "feliz|adj:es2sv",
+      "empezar|v:sv2es", "ciudad|n:sv2es", "feliz|adj:sv2es",
     ]);
     // omstart utan att ha övat: de osedda ärvs — inget staplas ovanpå
-    expect(store.introduceForSession()).toHaveLength(0);
+    const plan2 = store.portionsPlan();
+    expect(plan2.nyaUnits).toHaveLength(0);
+    expect(plan2.unseen).toHaveLength(6);
+    expect(plan2.nyaOrd).toBe(3);
   });
 
-  it("efter dagens första övning ger varje 'öva mer' newMore nya", () => {
+  it("ambitionsnivåerna styr portionens kort och dagsbudgeten", () => {
     const store = makeStore();
-    store.data.settings.newFirst = 1;
-    store.data.settings.newMore = 1;
-    expect(store.introduceForSession()).toHaveLength(2); // empezar
-    // markera att första övningen skett: kortet besvarat + review loggad
-    store.logReview({
-      ts: new Date().toISOString(), wordId: "empezar|v", dir: "es2sv",
-      raw: "börja", grade: "good", step: "exact",
-    });
-    for (const dir of ["es2sv", "sv2es"] as const) {
-      const c = store.card("empezar|v", dir)!;
-      store.putCard({ ...c, fsrs: { ...c.fsrs, reps: 1 } });
+    expect(store.nivaConf()).toEqual({ kort: 30, nya: 20 });
+    store.setNiva("lugn");
+    expect(store.nivaConf()).toEqual({ kort: 20, nya: 15 });
+    store.setNiva("ambitios");
+    expect(store.nivaConf()).toEqual({ kort: 40, nya: 25 });
+  });
+
+  it("repskuld fyller portionen — nya ord väntar tills högen är nere", () => {
+    const store = makeStore();
+    store.setNiva("lugn"); // 20 kort per portion
+    const now = Date.now();
+    for (let i = 0; i < 25; i++) {
+      const c = newCardRec(`skuld${i}|n`, "es2sv", new Date());
+      c.fsrs.reps = 1;
+      c.fsrs.stability = 5;
+      c.fsrs.due = new Date(now - (i + 1) * 3600e3).toISOString();
+      store.data.cards[`skuld${i}|n:es2sv`] = c;
     }
-    const more = store.introduceForSession();
-    expect(more).toHaveLength(2); // +1 nytt ord
-    expect(more[0].wordId).toBe("ciudad|n");
+    const plan = store.portionsPlan();
+    expect(plan.rep).toHaveLength(20);
+    expect(plan.nyaUnits).toHaveLength(0); // skuld kvar utanför portionen
+    expect(plan.forvag).toHaveLength(0);
+    expect(plan.totalKort).toBe(20);
   });
 
-  it("avbruten övning: osedda ord räknas av mot nästa övnings mål", () => {
-    const store = makeStore();
-    store.data.settings.newFirst = 2;
-    store.data.settings.newMore = 1;
-    store.introduceForSession(); // empezar + ciudad
-    // öva bara ett kort (stavfel — ingen fast-track), hoppa av
-    const s = new Session(store, store.dueCards());
-    s.answer("börjaa");
-    s.commit();
-    // ciudad är fortfarande osedd (1) ≥ målet (1) → inget nytt introduceras
-    expect(store.introduceForSession()).toHaveLength(0);
-    expect(store.card("feliz|adj", "es2sv")).toBeUndefined();
-  });
-
-  it("osedda ord från en annan enhet räknas av — härlett ur korten", () => {
-    const store = makeStore();
-    store.data.settings.newFirst = 2;
-    const now = new Date();
-    for (const id of ["empezar|v", "ciudad|n"]) {
-      store.data.cards[`${id}:es2sv`] = newCardRec(id, "es2sv", now);
-      store.data.cards[`${id}:sv2es`] = newCardRec(id, "sv2es", now);
-    }
-    expect(store.introduceForSession()).toHaveLength(0); // målet redan täckt
-  });
-
-  it("stats beskriver nästa övning: firstToday, nextNew och bara sedda i due", () => {
-    const store = makeStore();
-    store.data.settings.newFirst = 2;
-    store.data.settings.newMore = 1;
-    let st = store.stats();
-    expect(st.firstToday).toBe(true);
-    expect(st.nextNew).toBe(2);
-    expect(st.due).toBe(0);
-    store.introduceForSession();
-    st = store.stats();
-    expect(st.nextNew).toBe(2); // ärvda osedda — samma övning, inte fler
-    expect(st.due).toBe(0);     // osedda räknas som nya, inte repetitioner
-  });
-});
-
-describe("repetera-knappen", () => {
-  it("ger alltid ett lagom pass: förfallna först, påfyllt med närmast förfallande, max 20", () => {
+  it("ömtåliga kort går före: relativ försening slår rå väntetid", () => {
     const store = makeStore();
     const now = Date.now();
-    // ett förfallet + två kommande sedda kort
-    const mk = (id: string, dir: "es2sv" | "sv2es", dueMs: number) => {
-      const c = newCardRec(id, dir, new Date());
+    const mk = (id: string, stab: number, dagarSen: number) => {
+      const c = newCardRec(id, "es2sv", new Date());
+      c.fsrs.reps = 1;
+      c.fsrs.stability = stab;
+      c.fsrs.due = new Date(now - dagarSen * 86400e3).toISOString();
+      store.data.cards[`${id}:es2sv`] = c;
+    };
+    mk("gammal|n", 60, 3); // stabilt kort, 3 dagar sent — tål väntan
+    mk("farsk|n", 1, 1);   // färskt kort, 1 dag sent — glöms på dagar
+    const plan = store.portionsPlan();
+    expect(plan.rep[0].wordId).toBe("farsk|n");
+  });
+
+  it("utan skuld fylls portionen i förväg — närmast förfall först", () => {
+    const store = makeStore();
+    const now = Date.now();
+    const mk = (id: string, dueMs: number) => {
+      const c = newCardRec(id, "es2sv", new Date());
       c.fsrs.reps = 1;
       c.fsrs.due = new Date(dueMs).toISOString();
-      store.data.cards[`${id}:${dir}`] = c;
+      store.data.cards[`${id}:es2sv`] = c;
     };
-    mk("empezar|v", "es2sv", now - 3600e3);        // förfallet
-    mk("ciudad|n", "es2sv", now + 5 * 86400e3);    // om 5 dagar
-    mk("feliz|adj", "es2sv", now + 2 * 86400e3);   // om 2 dagar
-    const cards = store.repCards();
-    expect(cards).toHaveLength(3); // inte bara det förfallna
-    expect(cards[0].wordId).toBe("empezar|v");     // mest brådskande först
-    expect(cards[1].wordId).toBe("feliz|adj");
-    expect(cards.length).toBeLessThanOrEqual(20);
+    mk("empezar|v", now - 3600e3);       // förfallet
+    mk("ciudad|n", now + 5 * 86400e3);   // om 5 dagar
+    mk("feliz|adj", now + 2 * 86400e3);  // om 2 dagar
+    const plan = store.portionsPlan();
+    expect(plan.rep.map((c) => c.wordId)).toEqual(["empezar|v"]);
+    expect(plan.nyaUnits).toHaveLength(0); // alla ord har redan kort
+    expect(plan.forvag.map((c) => c.wordId)).toEqual(["feliz|adj", "ciudad|n"]);
+    expect(plan.repKort).toBe(3);
+    expect(store.glosorKlara()).toBe(false); // empezar är förfallet
+  });
+
+  it("glosorKlara: inga förfallna + inget nytt kvar ⇒ läsövning förvald", () => {
+    const store = makeStore();
+    const now = Date.now();
+    for (const w of ["empezar|v", "ciudad|n", "feliz|adj"]) {
+      const c = newCardRec(w, "es2sv", new Date());
+      c.fsrs.reps = 1;
+      c.fsrs.due = new Date(now + 3 * 86400e3).toISOString();
+      store.data.cards[`${w}:es2sv`] = c;
+    }
+    expect(store.glosorKlara()).toBe(true); // ordbasen slut → klart trots budget kvar
   });
 });
 

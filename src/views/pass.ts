@@ -1,6 +1,5 @@
 import { diffTarget } from "../lib/diff";
 import { clearPass, loadPass, savePass } from "../lib/passpaus";
-import { resaFor } from "../lib/resa";
 import { Session, type Pending, type SessionState } from "../lib/session";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
@@ -9,7 +8,7 @@ import { PERSON_SV, POS_LABEL } from "../lib/types";
 
 type UiState =
   | "idle" | "question" | "good" | "hard" | "override"
-  | "wrong" | "forced" | "done";
+  | "wrong" | "forced";
 
 const AUTO_STATES: UiState[] = ["good", "hard", "override"];
 // tvekar man på ett spanskt ord tonas exempelmeningen fram — kontext, inte facit
@@ -32,7 +31,6 @@ export class PassView {
   private gaveUp = false;            // "vet inte" — fel-flödet utan "du skrev"-rad
   private showMnem = false;          // ✎-utfällt minnesregelfält i fel-läget
   private friendRules: FriendRule[] = [];
-  private kanBefore = 0;         // resapoäng vid passtart — för nivåfirandet
   private pendingSno: string | null = null; // regelägare som får poäng om snodd regel sparas
 
   private card: HTMLElement;
@@ -46,7 +44,7 @@ export class PassView {
     private el: HTMLElement,
     private store: Store,
     private onDone: () => void,
-    private onStartRequest: (repOnly?: boolean) => void,
+    private onStartRequest: () => void,
     private loggedIn: () => boolean = () => true,
     private syncBusy: () => boolean = () => false,
     private social?: Social
@@ -137,10 +135,10 @@ export class PassView {
 
   start(cards: CardRec[], dueSoonBaseline?: number): void {
     this.clearTimer();
-    this.kanBefore = this.store.stats().score;
     this.session = new Session(this.store, cards, { dueSoonBaseline });
     if (this.session.finished) {
-      this.state = "done";
+      this.session = null;
+      this.state = "idle";
       this.render();
       return;
     }
@@ -153,7 +151,6 @@ export class PassView {
   /** Fortsätt en avbruten övning. false = inget kvar att fortsätta (rensat). */
   resume(state: SessionState): boolean {
     this.clearTimer();
-    this.kanBefore = this.store.stats().score;
     const s = Session.restore(this.store, state);
     if (s.finished) {
       clearPass();
@@ -173,7 +170,7 @@ export class PassView {
 
   /** Rita om vilo-/klart-skärmen (färska siffror & inloggningsläge) — rör aldrig ett pågående pass. */
   refreshIdle(): void {
-    if (this.state === "idle" || this.state === "done") this.render();
+    if (this.state === "idle") this.render();
   }
 
   focusInput(): void {
@@ -246,8 +243,6 @@ export class PassView {
   private onAction(act: string): void {
     // start-/navigeringsknappar funkar utan aktiv session (vilo- och klart-lägena)
     if (act === "start" || act === "gologin") { this.onStartRequest(); return; }
-    if (act === "rep") { this.onStartRequest(true); return; }
-    if (act === "restart") { this.onDone(); return; }
     const s = this.session;
     if (!s) return;
     if (act === "giveup") {
@@ -315,9 +310,11 @@ export class PassView {
     s.commit();
     if (s.finished) {
       clearPass(); // övningen slutförd — inget att återuppta
-      this.state = "done";
       this.store.snapshotToday();
+      this.session = null;
+      this.state = "idle";
       this.render();
+      this.onDone(); // ingen klarskärm — hjälten på Idag visar nästa läge
       return;
     }
     savePass(s.snapshot()); // avbrott härifrån kan alltid fortsättas
@@ -491,39 +488,16 @@ export class PassView {
             <button class="btn" data-act="gologin">Till inloggningen</button>
           </div></div>`;
       }
-      const st = this.store.stats();
       const paused = loadPass();
-      const total = st.due + st.nextNew;
+      const plan = this.store.portionsPlan();
       const busy = this.syncBusy();
-      const label = busy ? "Synkar …"
-        : paused ? "Fortsätt övningen"
-        : st.firstToday ? "Starta dagens övning" : "Öva mer";
+      const label = busy ? "Synkar …" : paused ? "Fortsätt övningen" : "Öva";
       return `<div class="tomt">
         <div class="stor">${paused ? "Övning pausad" : "Ingen övning igång"}</div>
         ${paused ? `<p>Du fortsätter där du slutade.</p>` : ""}
         <div class="btnrow" style="max-width:250px">
-          <button class="btn" data-act="start" ${(!paused && total === 0) || busy ? "disabled" : ""}>${label}</button>
-          <button class="btn ghost" data-act="rep" ${busy || !st.repAvailable ? "disabled" : ""}>Repetera</button>
+          <button class="btn" data-act="start" ${(!paused && plan.totalKort === 0) || busy ? "disabled" : ""}>${label}</button>
         </div></div>`;
-    }
-    if (this.state === "done") {
-      const c = s.counts;
-      const answered = c.good + c.hard + c.again;
-      const st = this.store.stats();
-      const more = st.due + st.nextNew > 0;
-      const forecast = s.forecastAdded();
-      const r = resaFor(st.score);
-      const uppflytt = resaFor(this.kanBefore).nr < r.nr;
-      return `${uppflytt ? `<p class="nivupp">🏅 ¡Felicidades! Ny nivå: <b>${r.titel.name}</b> — ${r.titel.sub}</p>` : ""}
-        <p class="verdict v-good">${IC_OK}Övningen klar</p>
-        <h2 class="head">${c.good + c.hard} av ${answered}</h2>
-        <p class="also">rätt <b>${c.good}</b> · med hjälp <b>${c.hard}</b> · fel <b>${c.again}</b></p>
-        ${forecast > 0 ? `<p class="fine">~${forecast} repetitioner läggs på kommande vecka.</p>` : ""}
-        <div class="btnrow" style="max-width:250px">
-          ${more ? `<button type="button" class="btn" data-act="start">Öva mer</button>
-          <button type="button" class="btn ghost" data-act="restart">Till startsidan</button>`
-          : `<button type="button" class="btn" data-act="restart">Till startsidan</button>`}
-        </div>`;
     }
     const p = s.pending;
     if (this.state === "question") {
@@ -593,7 +567,7 @@ export class PassView {
 
   /** Pågår ett pass just nu? Styr avsluta-knappen och att flikraden göms. */
   private get live(): boolean {
-    return this.session !== null && this.state !== "idle" && this.state !== "done";
+    return this.session !== null && this.state !== "idle";
   }
 
   render(): void {
@@ -619,9 +593,7 @@ export class PassView {
     if (s && this.state !== "idle") {
       const pr = s.progress();
       this.bar.style.width = pr.total ? `${(pr.done / pr.total) * 100}%` : "100%";
-      this.count.textContent = this.state === "done"
-        ? "klart"
-        : `${s.queue.length} kort kvar`;
+      this.count.textContent = `${s.queue.length} kort kvar`;
       const cur = s.pending?.card ?? s.current;
       if (cur) {
         this.chip.textContent = cur.dir === "es2sv" ? "spanska → svenska" : "svenska → spanska";

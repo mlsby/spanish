@@ -143,7 +143,7 @@ async function boot(): Promise<void> {
     window.setTimeout(() => p?.classList.remove("pulse"), 1500);
   }
 
-  /** Dagens övning / Öva mer — samma väg: fyll på nya enligt målet + allt förfallet. */
+  /** Öva — motorn bygger portionen: förfallet först, nya i mån av plats och budget. */
   function startPass(): void {
     // inlogg krävs för att öva — annars riskerar ett helt pass att aldrig sparas i molnet
     if (!sync.session) {
@@ -162,24 +162,9 @@ async function boot(): Promise<void> {
       return;
     }
     const baseline = store.dueSoonCount(); // före introduktionen — prognosen räknar de nya
-    store.introduceForSession();
-    const cards = store.dueCards();
-    pass.start(cards, baseline);
-    showTab("pass");
-  }
-
-  /** Bara repetitioner — inga nya ord. Förfallna först, annars de närmast förfallande. */
-  function startRep(): void {
-    if (!sync.session) {
-      showTab("idag");
-      flashKonto();
-      return;
-    }
-    if (sync.status === "syncing") return;
-    if (sync.status === "error") { flashKonto(); return; }
-    const cards = store.repCards();
+    const cards = store.startPortion();
     if (!cards.length) return;
-    pass.start(cards, store.dueSoonCount());
+    pass.start(cards, baseline);
     showTab("pass");
   }
 
@@ -211,7 +196,7 @@ async function boot(): Promise<void> {
     screens.pass,
     store,
     () => { pushMyStats(); showTab("idag"); },
-    (repOnly) => (repOnly ? startRep() : startPass()),
+    () => startPass(),
     () => sync.session !== null,
     () => sync.status === "syncing",
     social
@@ -221,7 +206,7 @@ async function boot(): Promise<void> {
   const las = new LasView(screens.las, store, sb, () => { pushMyStats(); showTab("idag"); });
 
   function renderIdagTab(): void {
-    renderIdag(screens.idag, store, { startPass, startRep, startLas }, cloud);
+    renderIdag(screens.idag, store, { startPass, startLas }, cloud);
   }
 
   sync.onStatus = () => {
