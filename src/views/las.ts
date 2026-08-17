@@ -1,7 +1,7 @@
 import { diffTarget } from "../lib/diff";
 import { gradeAnswer, type GradeResult } from "../lib/grading";
 import {
-  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, kopplaKandidatord, type LasKandidat, lasCommit,
+  bojdaTargets, byggQuiz, byggUnderlag, hamtaText, kandidatYtor, kopplaKandidatord, type LasKandidat, lasCommit,
   type LasFraga, lasNiva, minnsQuizzade,
 } from "../lib/lastext";
 import type { Store } from "../lib/store";
@@ -39,7 +39,7 @@ export class LasView {
   private state: LasState = "laddar";
   private meningar: string[] = [];
   private oversatt: string[] = [];
-  private flippade = new Set<number>();
+  private flippad = false;
   private titel = "";
   private quiz: LasFraga[] = [];
   private idx = 0;
@@ -112,11 +112,8 @@ export class LasView {
       else if (this.state === "svar") this.nasta(); // Enter för nästa — som i passet
     });
     el.addEventListener("click", (e) => {
-      const men = (e.target as HTMLElement).closest<HTMLElement>("[data-men]")?.dataset.men;
-      if (men !== undefined && this.state === "klar") {
-        const i = Number(men);
-        if (this.flippade.has(i)) this.flippade.delete(i);
-        else this.flippade.add(i);
+      if ((e.target as HTMLElement).closest("[data-flip]") && this.state === "klar") {
+        this.flippad = !this.flippad;
         this.render();
         return;
       }
@@ -216,7 +213,7 @@ export class LasView {
       this.titel = text.titel;
       this.meningar = text.meningar.map((m) => m.es);
       this.oversatt = text.oversattning;
-      this.flippade = new Set();
+      this.flippad = false;
       // deklarerade böjningar (t.ex. "llegó") blir quizytor — markeras i sin mening
       const extra = kopplaKandidatord(underlag.kandidater, text.kandidatord, ytor);
       const quizYtor = (k: LasKandidat) => [...ytor(k), ...(extra.get(k.id) ?? [])];
@@ -244,7 +241,14 @@ export class LasView {
     const f = this.quiz[this.idx];
     const card = this.store.card(f.kandidat.id, "es2sv");
     if (!card) { this.nasta(); return; }
-    const r = gradeAnswer(raw, this.store.targetsFor(card), "sv");
+    const targets = [...this.store.targetsFor(card), ...bojdaTargets(this.store, f.kandidat, f.yta)];
+    let r = gradeAnswer(raw, targets, "sv");
+    // "han visar" om ytan är böjd: pronomenet är rätt läsning, inte fel svar
+    const utanPron = raw.trim().replace(/^(jag|du|han|hon|den|det|vi|ni|de|man)\s+/i, "");
+    if (r.grade === "again" && utanPron !== raw.trim()) {
+      const r2 = gradeAnswer(utanPron, targets, "sv");
+      if (r2.grade !== "again") r = r2;
+    }
     const grade = raw.trim() ? r.grade : "again";
     // ögonblicksbild före bokföringen — "jag hade rätt" backar felet exakt
     this.pend = { ...r, grade, raw: raw.trim(), fore: { ...card, fsrs: { ...card.fsrs } } };
@@ -317,13 +321,10 @@ export class LasView {
       return `${titel}
       <p class="lastext">${this.meningar.map(esc).join(" ")}</p>`;
     }
-    const men = this.meningar.map((es, i) => {
-      const flip = this.flippade.has(i) && this.oversatt[i];
-      return `<span class="lasmen${flip ? " flip" : ""}" data-men="${i}">${esc(flip ? this.oversatt[i] : es)}</span>`;
-    }).join(" ");
+    const innehall = this.flippad ? this.oversatt.join(" ") : this.meningar.join(" ");
     return `${titel}
-      <p class="lastext">${men}</p>
-      <p class="lasfliptips">tryck på en mening för översättning</p>`;
+      <p class="lastext lasflip${this.flippad ? " flip" : ""}" data-flip>${esc(innehall)}</p>
+      <p class="lasfliptips">${this.flippad ? "tryck för spanskan igen" : "tryck på texten för översättning"}</p>`;
   }
 
   private facit(f: LasFraga): string {
@@ -377,7 +378,7 @@ export class LasView {
     const f = this.quiz[this.idx];
     const p = this.pend;
     let html = `<p class="lasmening">${this.markerad(f.mening, f.yta)}</p>
-      <p class="head">${esc(f.kandidat.es)}</p>`;
+      <p class="head">${esc(f.yta)}</p>`;
     if (this.state === "fraga" || !p) return { cls: "st-idle", html };
     if (p.grade === "good") {
       if (p.override) {

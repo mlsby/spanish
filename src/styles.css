@@ -111,9 +111,9 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .mix .mrep{background:var(--accent-soft)}
 .mix .mny{background:var(--pavag)}
 .finstilt{font-size:11.5px;color:var(--muted)}
-/* flippbar parallelltext efter läsquizet — tryck på en mening växlar språk */
-.lasmen{cursor:pointer;border-radius:4px}
-.lasmen.flip{color:var(--accent);font-style:italic}
+/* flippbar översättning efter läsquizet — tryck på texten växlar språk */
+.lasflip{cursor:pointer}
+.lasflip.flip{color:var(--accent);font-style:italic}
 .lasfliptips{font-size:11px;color:var(--muted);margin:6px 0 0;text-align:center}
 .nivbadge{font-size:16px;margin:2px 0 4px}
 .nivbadge b{font-family:var(--serif);font-size:22px}

@@ -1,6 +1,7 @@
 import type { Store } from "./store";
 import type { SupabaseClient } from "./supabase";
 import { applyReview, KNOWN_STABILITY_DAYS } from "./scheduler";
+import { PERSON_SV_SVAR } from "./types";
 import type { Grade, Step } from "./types";
 
 /**
@@ -208,6 +209,39 @@ export function kandidatYtor(store: Store, k: LasKandidat): string[] {
   const w = store.byId.get(k.id);
   if (w?.pos !== "v") return [k.es];
   return [k.es, ...(store.lasFormer.get(k.id) ?? [])];
+}
+
+/** Svenska böjningsvarianter av en glosa — generösa: hellre godkänna "visade" än kräva "visa". */
+function svBojda(t: string): string[] {
+  const ut = [t];
+  if (t.endsWith("a")) {
+    const stam = t.slice(0, -1);
+    ut.push(t + "r", stam + "er", t + "de", t + "t", stam + "dde", stam + "tt");
+  } else {
+    ut.push(t + "r", t + "dde", t + "tt");
+  }
+  return ut;
+}
+
+/**
+ * Extra facit när quizets yta är en BÖJD form av kandidaten ("muestra" för
+ * mostrar): känd presensform ger sina pronomenvarianter ("han visar"), och
+ * grundfacitets glosor godtas i svensk böjd form — att översätta formen man
+ * faktiskt läste ska aldrig räknas som fel.
+ */
+export function bojdaTargets(store: Store, kandidat: LasKandidat, yta: string): string[] {
+  if (yta.toLowerCase() === kandidat.es.toLowerCase()) return [];
+  const extra: string[] = [];
+  const form = (store.formsByParent.get(kandidat.id) ?? [])
+    .find((x) => x.es.toLowerCase() === yta.toLowerCase());
+  if (form) {
+    extra.push(...PERSON_SV_SVAR[form.person].map((pr) => `${pr} ${form.svPres}`), form.svPres);
+  }
+  const w = store.byId.get(kandidat.id);
+  for (const glosa of [w?.sv ?? kandidat.sv, ...(w?.syn ?? [])]) {
+    extra.push(...svBojda(glosa));
+  }
+  return extra;
 }
 
 /** Finns ordet (hel yta, inte delsträng) i texten? */

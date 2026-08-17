@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, kopplaKandidatord, lasCommit, lasNiva,
-  lasPrompt, minnsQuizzade, ordITexten, splitMeningar, valideraText,
+  bojdaTargets, byggQuiz, byggUnderlag, hamtaText, kandidatYtor, kopplaKandidatord, lasCommit,
+  lasNiva, lasPrompt, minnsQuizzade, ordITexten, splitMeningar, valideraText,
 } from "../src/lib/lastext";
 import type { SupabaseClient } from "../src/lib/supabase";
 import { applyReview, newCardRec } from "../src/lib/scheduler";
@@ -320,6 +320,30 @@ describe("formacceptans — kandidatverb får böjas", () => {
     const meningar = [{ es: "Mi amigo es feliz." }];
     const u = { kan: [], nastan: [], kandidater, vitlista: ["mi", "amigo", "es", "feliz"] };
     expect(valideraText(u, 1, meningar).godkand).toBe(false);
+  });
+});
+
+describe("bojdaTargets — böjd yta ska gå att översätta som den lästes", () => {
+  it("känd presensform ger pronomenvarianter, glosorna böjs på svenska", () => {
+    const store = makeStore(); // ser|v har formen es (3s, svPres "är")
+    const t = bojdaTargets(store, { id: "ser|v", es: "ser", sv: "vara" }, "es");
+    expect(t).toContain("han är");
+    expect(t).toContain("hon är");
+    expect(t).toContain("är");
+    expect(t).toContain("vara"); // grundglosan
+    expect(t).toContain("varar"); // generös svensk böjning — hellre snäll än orättvis
+  });
+
+  it("okänd deklarerad böjning får ändå glosornas böjda former", () => {
+    const store = makeStore();
+    const t = bojdaTargets(store, { id: "casa|n", es: "casa", sv: "hus" }, "casas");
+    expect(t).toContain("hus");
+    expect(t.length).toBeGreaterThan(1); // böjda varianter — ofarliga, fuzzy städar aldrig bort rätt svar
+  });
+
+  it("grundform som yta ger inga extra facit", () => {
+    const store = makeStore();
+    expect(bojdaTargets(store, { id: "ser|v", es: "ser", sv: "vara" }, "ser")).toEqual([]);
   });
 });
 
