@@ -242,7 +242,13 @@ async function boot(): Promise<void> {
     if (currentTab === "pass") pass.refreshIdle();
   });
 
-  tabButtons.forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab as TabId)));
+  // tryck på fliken du redan står på = hoppa till toppen (iOS statusbar-tap
+  // når aldrig .screen-scrollern, så appen har sitt eget sätt)
+  tabButtons.forEach((b) => b.addEventListener("click", () => {
+    const id = b.dataset.tab as TabId;
+    if (id === currentTab) screens[id].scrollTo({ top: 0, behavior: "smooth" });
+    else showTab(id);
+  }));
   showTab("idag");
 
   // debug-handtag för felsökning i konsolen (och smoke-tester)

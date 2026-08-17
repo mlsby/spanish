@@ -392,6 +392,7 @@ html.kbd .vetinte button{padding:3px 14px}
 .row .es{font-family:var(--serif);font-weight:600;font-size:15.5px;white-space:nowrap}
 .row .sv{color:var(--muted);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .meta{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+.row .rank{font-family:var(--mono);font-size:9.5px;color:var(--muted);opacity:.65;font-variant-numeric:tabular-nums}
 .chip-regel{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);
             background:var(--accent-soft);border:0;border-radius:99px;padding:2px 7px}
 .rowx{display:none;border-top:1px solid var(--line);padding:12px 13px;flex-direction:column;gap:10px}

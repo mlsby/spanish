@@ -231,6 +231,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
           <button type="button" class="rowbtn" aria-expanded="${open}">
             <span class="es">${esc(word.es)}</span><span class="sv">${esc(word.sv)}</span>
             <span class="meta">
+              <span class="rank">#${word.rank}</span>
               ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
               ${radNotis(ws)}
               ${pathHtml(ws)}
@@ -256,6 +257,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
           <button type="button" class="rowbtn" aria-expanded="${open}">
             <span class="es">${esc(es)}</span><span class="sv">${esc(word.sv)}</span>
             <span class="meta">
+              <span class="rank">#${word.rank}</span>
               ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
               ${kompisChip(word.id)}
               ${radNotis(ws)}
