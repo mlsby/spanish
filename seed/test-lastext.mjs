@@ -196,11 +196,11 @@ ${ordlistor()}
 
 ## Svarsformat
 
-JSON med tre fält: "titelSv" (titeln), "text" (hela texten på spanska), "kandidatord" (de kandidatord du använde, i exakt den form de står i texten).
+JSON med fyra fält: "titelSv" (titeln), "text" (hela texten på spanska), "textSv" (samma text på naturlig svenska — samma meningar i samma ordning), "kandidatord" (de kandidatord du använde, i exakt den form de står i texten).
 
 ## Exempel på svar
 
-{ "titelSv": "Mötet på torget", "text": "María llega al mercado y ve a Juan. …", "kandidatord": ["llega", "cada", …] }`;
+{ "titelSv": "Mötet på torget", "text": "María llega al mercado y ve a Juan. …", "textSv": "María kommer fram till torget och ser Juan. …", "kandidatord": ["llega", "cada", …] }`;
 }
 
 function ordlistor() {
@@ -263,10 +263,11 @@ function kopplaDeklarerade(deklarerade) {
 const schema = {
   type: "object",
   additionalProperties: false,
-  required: ["titelSv", "text", "kandidatord"],
+  required: ["titelSv", "text", "textSv", "kandidatord"],
   properties: {
     titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska) — utan kandidatordens betydelser" },
     text: { type: "string", description: "Hela texten på spanska, löpande" },
+    textSv: { type: "string", description: "Samma text på naturlig svenska — samma meningar i samma ordning" },
     kandidatord: {
       type: "array",
       items: { type: "string" },
@@ -320,6 +321,7 @@ for (let forsok = 1; forsok <= 3; forsok++) {
   const deklarerade = Array.isArray(svar.kandidatord) ? svar.kandidatord : [];
   senaste = { meningar, deklarerade };
   console.log(`\n»${svar.titelSv}«`);
+  if (svar.textSv) console.log(`  (sv: ${svar.textSv})`);
 
   const { brott, anvanda, forFa } = validera(meningar, deklarerade);
   console.log(`\n--- försök ${forsok} ---`);

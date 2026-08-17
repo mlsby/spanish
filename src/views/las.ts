@@ -38,6 +38,8 @@ function laddaSenaste(): string[] {
 export class LasView {
   private state: LasState = "laddar";
   private meningar: string[] = [];
+  private oversatt: string[] = [];
+  private flippade = new Set<number>();
   private titel = "";
   private quiz: LasFraga[] = [];
   private idx = 0;
@@ -110,6 +112,14 @@ export class LasView {
       else if (this.state === "svar") this.nasta(); // Enter för nästa — som i passet
     });
     el.addEventListener("click", (e) => {
+      const men = (e.target as HTMLElement).closest<HTMLElement>("[data-men]")?.dataset.men;
+      if (men !== undefined && this.state === "klar") {
+        const i = Number(men);
+        if (this.flippade.has(i)) this.flippade.delete(i);
+        else this.flippade.add(i);
+        this.render();
+        return;
+      }
       const act = (e.target as HTMLElement).closest<HTMLElement>("[data-act]")?.dataset.act;
       if (act === "retry") void this.start();
       if (act === "ord") { this.state = "fraga"; this.render(); this.input.focus(); }
@@ -190,7 +200,7 @@ export class LasView {
     this.render();
     const p = lasNiva(this.store.stats().score);
     // 3× målet: gott om kandidater att välja bland ger naturligare scener (Lucas)
-    const underlag = byggUnderlag(this.store, p.anvand * 3, { exkludera: new Set(this.senaste) });
+    const underlag = byggUnderlag(this.store, p.anvand * 4, { exkludera: new Set(this.senaste) });
     if (underlag.kandidater.length === 0) {
       this.felText = "Inga övningsord just nu — öva lite först, sen finns det något att läsa om.";
       this.state = "fel";
@@ -205,13 +215,15 @@ export class LasView {
       }, ytor);
       this.titel = text.titel;
       this.meningar = text.meningar.map((m) => m.es);
+      this.oversatt = text.oversattning;
+      this.flippade = new Set();
       // deklarerade böjningar (t.ex. "llegó") blir quizytor — markeras i sin mening
       const extra = kopplaKandidatord(underlag.kandidater, text.kandidatord, ytor);
       const quizYtor = (k: LasKandidat) => [...ytor(k), ...(extra.get(k.id) ?? [])];
       this.quiz = byggQuiz(text.meningar, underlag.kandidater, quizYtor);
       if (!this.quiz.length) throw new Error("Texten saknade övningsord — prova igen.");
       // minns ~3 rundors quizord — de utesluts helt ur kommande texter
-      this.senaste = minnsQuizzade(this.senaste, this.quiz.map((q) => q.kandidat.id), p.anvand * 3);
+      this.senaste = minnsQuizzade(this.senaste, this.quiz.map((q) => q.kandidat.id), p.anvand * 4);
       try { localStorage.setItem(SENASTE_KEY, JSON.stringify(this.senaste)); } catch { /* privat läge */ }
       this.state = "las";
     } catch (e) {
@@ -299,9 +311,19 @@ export class LasView {
     return `${esc(mening.slice(0, start))}<mark>${esc(mening.slice(start, start + es.length))}</mark>${esc(mening.slice(start + es.length))}`;
   }
 
-  private textHtml(): string {
-    return `${this.titel ? `<p class="lastitel">${esc(this.titel)}</p>` : ""}
+  private textHtml(flippbar = false): string {
+    const titel = this.titel ? `<p class="lastitel">${esc(this.titel)}</p>` : "";
+    if (!flippbar || !this.oversatt.length) {
+      return `${titel}
       <p class="lastext">${this.meningar.map(esc).join(" ")}</p>`;
+    }
+    const men = this.meningar.map((es, i) => {
+      const flip = this.flippade.has(i) && this.oversatt[i];
+      return `<span class="lasmen${flip ? " flip" : ""}" data-men="${i}">${esc(flip ? this.oversatt[i] : es)}</span>`;
+    }).join(" ");
+    return `${titel}
+      <p class="lastext">${men}</p>
+      <p class="lasfliptips">tryck på en mening för översättning</p>`;
   }
 
   private facit(f: LasFraga): string {
@@ -350,7 +372,7 @@ export class LasView {
     if (this.state === "klar") {
       return { cls: "st-good", html: `<p class="verdict v-good">${IC_OK}${this.ratt} av ${this.quiz.length} ord rätt</p>
         <p class="pos" style="margin-top:8px">Läs texten igen — nu sitter orden</p>
-        ${this.textHtml()}` };
+        ${this.textHtml(true)}` };
     }
     const f = this.quiz[this.idx];
     const p = this.pend;

@@ -226,6 +226,7 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
     expect(s).toContain("## Ordlistor");
     expect(s).toContain("## Svarsformat");
     expect(s.trim().endsWith('"kandidatord": ["llega", "cada", …] }')).toBe(true);
+    expect(s).toContain('"textSv"');
     expect(s).not.toContain("Juan, María, Pedro"); // inga namnexempel
     expect(s.indexOf("## Exempel på svar")).toBeGreaterThan(s.indexOf("## Svarsformat"));
   });
@@ -242,12 +243,13 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
 
   it("hamtaText: löpande text splittas, underkänt försök ger omförsök med felen i prompten", async () => {
     const daligt = JSON.stringify({ titelSv: "Test", text: "Cada perro corre.", kandidatord: ["cada"] });
-    const bra = JSON.stringify({ titelSv: "Hemma hos oss", text: "Cada casa es la casa. El hombre es feliz…", kandidatord: ["cada"] });
+    const bra = JSON.stringify({ titelSv: "Hemma hos oss", text: "Cada casa es la casa. El hombre es feliz…", textSv: "Varje hus är huset. Mannen är lycklig…", kandidatord: ["cada"] });
     const { sb, invoke } = fakeSb([daligt, bra]);
     const text = await hamtaText(sb, { ...underlag, vitlista: [...underlag.vitlista, "feliz"] }, { meningar: 3, anvand: 1 });
     expect(text.meningar.map((m) => m.es)).toEqual(["Cada casa es la casa.", "El hombre es feliz…"]);
     expect(text.titel).toBe("Hemma hos oss"); // svenska titeln följer med ut
     expect(text.kandidatord).toEqual(["cada"]);
+    expect(text.oversattning).toEqual(["Varje hus är huset.", "Mannen är lycklig…"]);
     expect(invoke).toHaveBeenCalledTimes(2);
     const andra = invoke.mock.calls[1][1].body;
     expect(andra.user).toContain("Otillåtna ord: perro, corre");
