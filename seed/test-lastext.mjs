@@ -184,7 +184,7 @@ Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på
 
 Väv in exakt ${N_OVNING} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
 
-Ge texten en talande titel som sätter scenen. Titeln skrivs på SVENSKA — det är den enda delen som ska vara på svenska, och den behöver inte hålla sig till ordlistorna.
+Ge texten en talande titel som sätter scenen. Titeln skrivs på SVENSKA — det är den enda delen som ska vara på svenska, och den behöver inte hålla sig till ordlistorna. Men avslöja ingenting: kandidatordens svenska betydelser får inte förekomma i titeln — läsaren förhörs på dem efteråt.
 
 Svara i JSON: { "titelSv": "...", "meningar": [{ "es", "ovningsord" }] }.`;
 }
@@ -222,7 +222,7 @@ const schema = {
   additionalProperties: false,
   required: ["titelSv", "meningar"],
   properties: {
-    titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska)" },
+    titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska) — utan kandidatordens betydelser" },
     meningar: {
       type: "array",
       items: {
