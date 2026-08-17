@@ -1040,7 +1040,19 @@
     "hint": "syftar på person"
   },
   "cual|pron": {
-    "hint": "efter el/la: 'vilken'"
+    "sv": "vilken",
+    "syn": [
+      "vilket",
+      "som"
+    ],
+    "hint": "relativt: 'huset i vilket jag bor'"
+  },
+  "cuál|pron": {
+    "sv": "vilken?",
+    "syn": [
+      "vilken",
+      "vilket"
+    ]
   },
   "ir|v": {
     "hint": "förflytta sig"
