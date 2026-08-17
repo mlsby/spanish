@@ -1,7 +1,7 @@
 import { diffTarget } from "../lib/diff";
 import { gradeAnswer, type GradeResult } from "../lib/grading";
 import {
-  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, type LasKandidat, lasCommit,
+  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, kopplaKandidatord, type LasKandidat, lasCommit,
   type LasFraga, lasNiva, minnsQuizzade,
 } from "../lib/lastext";
 import type { Store } from "../lib/store";
@@ -205,7 +205,10 @@ export class LasView {
       }, ytor);
       this.titel = text.titel;
       this.meningar = text.meningar.map((m) => m.es);
-      this.quiz = byggQuiz(text.meningar, underlag.kandidater, ytor);
+      // deklarerade böjningar (t.ex. "llegó") blir quizytor — markeras i sin mening
+      const extra = kopplaKandidatord(underlag.kandidater, text.kandidatord, ytor);
+      const quizYtor = (k: LasKandidat) => [...ytor(k), ...(extra.get(k.id) ?? [])];
+      this.quiz = byggQuiz(text.meningar, underlag.kandidater, quizYtor);
       if (!this.quiz.length) throw new Error("Texten saknade övningsord — prova igen.");
       // minns ~3 rundors quizord — de utesluts helt ur kommande texter
       this.senaste = minnsQuizzade(this.senaste, this.quiz.map((q) => q.kandidat.id), p.anvand * 3);

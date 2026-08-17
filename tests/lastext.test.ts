@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, lasCommit, lasNiva, lasSystemPrompt,
-  minnsQuizzade, ordITexten, valideraText,
+  byggQuiz, byggUnderlag, hamtaText, kandidatYtor, kopplaKandidatord, lasCommit, lasNiva,
+  lasPrompt, minnsQuizzade, ordITexten, splitMeningar, valideraText,
 } from "../src/lib/lastext";
 import type { SupabaseClient } from "../src/lib/supabase";
 import { applyReview, newCardRec } from "../src/lib/scheduler";
@@ -55,7 +55,7 @@ describe("lasNiva", () => {
     expect(lasNiva(250)).toEqual({ meningar: 4, anvand: 3 });
     expect(lasNiva(700)).toEqual({ meningar: 5, anvand: 4 });
     expect(lasNiva(1500)).toEqual({ meningar: 6, anvand: 5 });
-    expect(lasNiva(2400)).toEqual({ meningar: 8, anvand: 6 });
+    expect(lasNiva(2400)).toEqual({ meningar: 6, anvand: 6 });
   });
 });
 
@@ -175,9 +175,9 @@ describe("byggQuiz + ordITexten", () => {
 
   it("en fråga per mening, i textens ordning, med fallback när taggen saknas", () => {
     const quiz = byggQuiz([
-      { es: "Cada día voy a casa.", ovningsord: "cada" },
-      { es: "Mi amigo es feliz.", ovningsord: "" }, // otaggad — hittas ändå
-      { es: "Hola otra vez.", ovningsord: "" },
+      { es: "Cada día voy a casa." },
+      { es: "Mi amigo es feliz." }, // otaggad — hittas ändå
+      { es: "Hola otra vez." },
     ], kandidater);
     expect(quiz.map((q) => q.kandidat.es)).toEqual(["cada", "feliz"]);
     expect(quiz[1].mening).toBe("Mi amigo es feliz.");
@@ -185,15 +185,15 @@ describe("byggQuiz + ordITexten", () => {
 
   it("samma kandidat quizzas aldrig två gånger", () => {
     const quiz = byggQuiz([
-      { es: "Cada día.", ovningsord: "cada" },
-      { es: "Cada noche.", ovningsord: "cada" },
+      { es: "Cada día." },
+      { es: "Cada noche." },
     ], kandidater);
     expect(quiz).toHaveLength(1);
   });
 
   it("två kandidater i samma mening ger två frågor", () => {
     const quiz = byggQuiz([
-      { es: "Cada día es feliz.", ovningsord: "cada" },
+      { es: "Cada día es feliz." },
     ], kandidater);
     expect(quiz.map((q) => q.kandidat.es).sort()).toEqual(["cada", "feliz"]);
     expect(quiz[0].mening).toBe("Cada día es feliz.");
@@ -209,23 +209,30 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
   };
 
   it("valideraText: otillåtna ord och kandidatkravet", () => {
-    const ok = valideraText(underlag, 1, [{ es: "Cada casa es la casa.", ovningsord: "cada" }]);
+    const ok = valideraText(underlag, 1, [{ es: "Cada casa es la casa." }]);
     expect(ok).toMatchObject({ godkand: true, brott: [], anvanda: ["cada"] });
-    const brott = valideraText(underlag, 1, [{ es: "Cada perro corre.", ovningsord: "cada" }]);
+    const brott = valideraText(underlag, 1, [{ es: "Cada perro corre." }]);
     expect(brott.godkand).toBe(false);
     expect(brott.brott.sort()).toEqual(["corre", "perro"]);
-    const utanKandidat = valideraText(underlag, 1, [{ es: "La casa es la casa.", ovningsord: "" }]);
+    const utanKandidat = valideraText(underlag, 1, [{ es: "La casa es la casa." }]);
     expect(utanKandidat).toMatchObject({ godkand: false, anvanda: [] });
   });
 
-  it("systemprompten bär nivåvärdena och verbgluet", () => {
-    const s = lasSystemPrompt({ meningar: 5, anvand: 4 });
+  it("prompten är EN text: nivåspann, verbglue, rubriker och exemplet sist", () => {
+    const s = lasPrompt(underlag, { meningar: 5, anvand: 4 });
     expect(s).toContain("4–5 meningar");
-    expect(s).toContain("exakt 4 kandidatord");
+    expect(s).toContain("2–4 av KANDIDATORDEN");
     expect(s).toContain("es, son, está, están, hay");
-    expect(s).toContain("titel");
-    expect(s).toContain("SVENSKA");
-    expect(s).toContain("förnamn");
+    expect(s).toContain("## Ordlistor");
+    expect(s).toContain("## Svarsformat");
+    expect(s.trim().endsWith('"kandidatord": ["llega", "cada", …] }')).toBe(true);
+    expect(s).not.toContain("Juan, María, Pedro"); // inga namnexempel
+    expect(s.indexOf("## Exempel på svar")).toBeGreaterThan(s.indexOf("## Svarsformat"));
+  });
+
+  it("splitMeningar delar på meningsslut och behåller skiljetecknen", () => {
+    expect(splitMeningar("¡Hola! ¿Cómo estás? Bien. Adiós…").map((m) => m.es))
+      .toEqual(["¡Hola!", "¿Cómo estás?", "Bien.", "Adiós…"]);
   });
 
   function fakeSb(svar: string[]): { sb: SupabaseClient; invoke: ReturnType<typeof vi.fn> } {
@@ -233,25 +240,49 @@ describe("valideraText + hamtaText (klienten äger regler och omförsök)", () =
     return { sb: { functions: { invoke } } as unknown as SupabaseClient, invoke };
   }
 
-  it("hamtaText: underkänt försök ger omförsök med felen i prompten", async () => {
-    const daligt = JSON.stringify({ titelSv: "Test", meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
-    const bra = JSON.stringify({ titelSv: "Hemma hos oss", meningar: [{ es: "Cada casa es la casa.", ovningsord: "cada" }] });
+  it("hamtaText: löpande text splittas, underkänt försök ger omförsök med felen i prompten", async () => {
+    const daligt = JSON.stringify({ titelSv: "Test", text: "Cada perro corre.", kandidatord: ["cada"] });
+    const bra = JSON.stringify({ titelSv: "Hemma hos oss", text: "Cada casa es la casa. El hombre es feliz…", kandidatord: ["cada"] });
     const { sb, invoke } = fakeSb([daligt, bra]);
-    const text = await hamtaText(sb, underlag, { meningar: 3, anvand: 1 });
-    expect(text.meningar[0].es).toBe("Cada casa es la casa.");
+    const text = await hamtaText(sb, { ...underlag, vitlista: [...underlag.vitlista, "feliz"] }, { meningar: 3, anvand: 1 });
+    expect(text.meningar.map((m) => m.es)).toEqual(["Cada casa es la casa.", "El hombre es feliz…"]);
     expect(text.titel).toBe("Hemma hos oss"); // svenska titeln följer med ut
+    expect(text.kandidatord).toEqual(["cada"]);
     expect(invoke).toHaveBeenCalledTimes(2);
     const andra = invoke.mock.calls[1][1].body;
     expect(andra.user).toContain("Otillåtna ord: perro, corre");
-    expect(andra.system).toBe(invoke.mock.calls[0][1].body.system);
+    expect(andra.system).toBeUndefined(); // allt är EN prompt numera
+  });
+
+  it("hamtaText: deklarerad okänd böjning av kandidatord fäller inte texten", async () => {
+    const u = {
+      kan: [], nastan: [],
+      kandidater: [{ id: "llegar|v", es: "llegar", sv: "anlända" }],
+      vitlista: ["la", "casa", "es"],
+    };
+    const svar = JSON.stringify({ titelSv: "Framme", text: "La casa llegó.", kandidatord: ["llegó"] });
+    const { sb } = fakeSb([svar]);
+    const text = await hamtaText(sb, u, { meningar: 3, anvand: 1 });
+    expect(text.meningar[0].es).toBe("La casa llegó.");
   });
 
   it("hamtaText: tre underkända försök ger fel — hellre lucka än fel text", async () => {
-    const daligt = JSON.stringify({ titelSv: "Test", meningar: [{ es: "Cada perro corre.", ovningsord: "cada" }] });
+    const daligt = JSON.stringify({ titelSv: "Test", text: "Cada perro corre.", kandidatord: ["cada"] });
     const { sb, invoke } = fakeSb([daligt, daligt, daligt]);
     await expect(hamtaText(sb, underlag, { meningar: 3, anvand: 1 }))
       .rejects.toThrow(/håller sig till dina ord/);
     expect(invoke).toHaveBeenCalledTimes(3);
+  });
+
+  it("kopplaKandidatord: känd yta eller verbstam — okopplat skyddar inget", () => {
+    const kandidater = [
+      { id: "llegar|v", es: "llegar", sv: "anlända" },
+      { id: "cada|determiner", es: "cada", sv: "varje" },
+    ];
+    const map = kopplaKandidatord(kandidater, ["llegó", "cada", "perro"], (k) => [k.es]);
+    expect(map.get("llegar|v")).toEqual(["llegó"]);
+    expect(map.get("cada|determiner")).toEqual(["cada"]);
+    expect([...map.values()].flat()).not.toContain("perro");
   });
 });
 
@@ -273,7 +304,7 @@ describe("formacceptans — kandidatverb får böjas", () => {
     const store = verbStore();
     const kandidater = [{ id: "ser|v", es: "ser", sv: "vara" }];
     const ytor = (k: typeof kandidater[number]) => kandidatYtor(store, k);
-    const meningar = [{ es: "Mi amigo es feliz.", ovningsord: "es" }];
+    const meningar = [{ es: "Mi amigo es feliz." }];
     const u = { kan: [], nastan: [], kandidater, vitlista: ["mi", "amigo", "es", "feliz"] };
     expect(valideraText(u, 1, meningar, ytor)).toMatchObject({ godkand: true, anvanda: ["ser"] });
     const quiz = byggQuiz(meningar, kandidater, ytor);
@@ -284,7 +315,7 @@ describe("formacceptans — kandidatverb får böjas", () => {
 
   it("utan formacceptans räknas den böjda formen inte", () => {
     const kandidater = [{ id: "ser|v", es: "ser", sv: "vara" }];
-    const meningar = [{ es: "Mi amigo es feliz.", ovningsord: "es" }];
+    const meningar = [{ es: "Mi amigo es feliz." }];
     const u = { kan: [], nastan: [], kandidater, vitlista: ["mi", "amigo", "es", "feliz"] };
     expect(valideraText(u, 1, meningar).godkand).toBe(false);
   });

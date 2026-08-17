@@ -14,13 +14,18 @@ export const LAS_UNLOCK = 100; // Turista — där låses läsningen upp
 
 export interface LasParametrar { meningar: number; anvand: number }
 
-/** Textlängd per resa-nivå (docs/research-lasforstaelse.md). */
+/** Textlängd per resa-nivå (docs/research-lasforstaelse.md). Max 6 meningar — längre blev prov, inte läsning. */
 export function lasNiva(score: number): LasParametrar {
-  if (score >= 2000) return { meningar: 8, anvand: 6 };
+  if (score >= 2000) return { meningar: 6, anvand: 6 };
   if (score >= 1000) return { meningar: 6, anvand: 5 };
   if (score >= 500) return { meningar: 5, anvand: 4 };
   if (score >= 200) return { meningar: 4, anvand: 3 };
   return { meningar: 3, anvand: 2 };
+}
+
+/** Kandidatkravets golv: ett spann (t.ex. 4–6) ger berättarfrihet — exakt antal gav prov-texter. */
+export function ordLo(p: LasParametrar): number {
+  return Math.min(p.anvand, Math.max(2, p.anvand - 2));
 }
 
 export interface LasKandidat { id: string; es: string; sv: string }
@@ -32,7 +37,19 @@ export interface LasUnderlag {
   kandidater: LasKandidat[];
   vitlista: string[];
 }
-export interface LasMening { es: string; ovningsord: string }
+export interface LasMening { es: string }
+
+/**
+ * Modellen levererar löpande text — appen delar i meningar själv (quizet
+ * visar meningen där ordet står). Enkel spanska: punkt/!/?/… avslutar.
+ */
+export function splitMeningar(text: string): LasMening[] {
+  return text
+    .split(/(?<=[.!?…])\s+/u)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((es) => ({ es }));
+}
 export interface LasFraga {
   kandidat: LasKandidat;
   mening: string;
@@ -228,44 +245,77 @@ export function byggQuiz(
 const LAS_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["titelSv", "meningar"],
+  required: ["titelSv", "text", "kandidatord"],
   properties: {
     titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska) — utan kandidatordens betydelser" },
-    meningar: {
+    text: { type: "string", description: "Hela texten på spanska, löpande" },
+    kandidatord: {
       type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["es", "ovningsord"],
-        properties: { es: { type: "string" }, ovningsord: { type: "string" } },
-      },
+      items: { type: "string" },
+      description: "Kandidatorden du använde, i exakt den form de står i texten",
     },
   },
 };
 
-export function lasSystemPrompt(p: LasParametrar): string {
-  const lo = Math.max(2, p.meningar - 1);
-  return `Du skriver en kort text på enkel spanska till en svensk som lär sig språket — ${lo}–${p.meningar} meningar som hör ihop. Det kan vara en liten historia, en konversation eller en blandning; välj det som blir mest levande.
-
-Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att det ska flyta naturligt. Ett ord utanför listorna och hen tappar meningen; småorden ${SMAORD.filter((x) => !["unos", "unas"].includes(x)).join(", ")} samt ${VERBGLUE.join(", ")} är alltid ok, liksom regelbunden plural och femininum. Vanliga spanska förnamn (Juan, María, Pedro …) går också bra.
-
-Väv in exakt ${p.anvand} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
-
-Ge texten en talande titel som sätter scenen. Titeln skrivs på SVENSKA — det är den enda delen som ska vara på svenska, och den behöver inte hålla sig till ordlistorna. Men avslöja ingenting: kandidatordens svenska betydelser får inte förekomma i titeln — läsaren förhörs på dem efteråt.
-
-Svara i JSON: { "titelSv": "...", "meningar": [{ "es", "ovningsord" }] }.`;
-}
-
-export function lasUserPrompt(u: LasUnderlag, anvand: number): string {
+/** Hela läsprompten som EN text — instruktion, ordlistor, format och exempel sist. */
+export function lasPrompt(u: LasUnderlag, p: LasParametrar): string {
+  const menLo = Math.max(2, p.meningar - 1);
+  const spann = ordLo(p) === p.anvand ? `${p.anvand}` : `${ordLo(p)}–${p.anvand}`;
   const kand = u.kandidater.map((k) => `${k.es} (${k.sv})`).join("\n");
-  return `KAN (sitter säkert — verb med de former du får använda i parentes):
+  return `Skriv en kort text på enkel spanska för en svensk som lär sig språket: ${menLo}–${p.meningar} meningar som hänger ihop — en liten historia, en konversation eller en blandning, det som blir mest levande.
+
+Använd orden i KAN-listan och väv in ${spann} av KANDIDATORDEN — inte fler, läsaren förhörs på dem efter läsningen. NÄSTAN KAN-orden finns om flytet kräver dem. Alltid ok är ${SMAORD.filter((x) => !["unos", "unas"].includes(x)).join(", ")}, ${VERBGLUE.join(", ")}, regelbunden plural och femininum samt vanliga spanska förnamn. Alla andra ord är förbjudna — ett okänt ord och läsaren tappar tråden.
+
+Verb använder du helst i formerna som står i parentes. Behöver berättelsen en annan böjning av ett kandidatord går det bra — men håll det på en nivå du tror att läsaren förstår.
+
+Titeln skrivs på svenska: talande, sätter scenen, står fri från ordlistorna. Avslöja bara inte kandidatordens betydelser — läsaren förhörs på dem efteråt.
+
+## Ordlistor
+
+### KAN (verb med sina former i parentes)
 ${u.kan.join(", ")}
 
-NÄSTAN KAN (om du behöver dem):
+### NÄSTAN KAN
 ${u.nastan.join(", ")}
 
-KANDIDATORD — övas nu (väv in exakt ${anvand}; verb får böjas):
-${kand}`;
+### KANDIDATORD (med svensk betydelse)
+${kand}
+
+## Svarsformat
+
+JSON med tre fält: "titelSv" (titeln), "text" (hela texten på spanska), "kandidatord" (de kandidatord du använde, i exakt den form de står i texten).
+
+## Exempel på svar
+
+{ "titelSv": "Mötet på torget", "text": "María llega al mercado y ve a Juan. …", "kandidatord": ["llega", "cada", …] }`;
+}
+
+/**
+ * Koppla modellens deklarerade former till sina kandidater: känd yta först,
+ * annars verbstam (llegó → llegar). Okopplade deklarationer skyddar inget.
+ */
+export function kopplaKandidatord(
+  kandidater: LasKandidat[],
+  deklarerade: string[],
+  ytor: (k: LasKandidat) => string[],
+): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  const stam = (es: string) => es.toLowerCase().replace(/(ar|er|ir)(se)?$/, "");
+  for (const ra of deklarerade) {
+    const form = ra.trim().toLowerCase();
+    if (!form) continue;
+    const agare =
+      kandidater.find((k) => ytor(k).some((y) => y.toLowerCase() === form)) ??
+      kandidater.find((k) => {
+        const s = stam(k.es);
+        return s.length >= 3 && s !== k.es.toLowerCase() && form.startsWith(s);
+      });
+    if (!agare) continue;
+    const list = map.get(agare.id) ?? [];
+    if (!list.includes(form)) list.push(form);
+    map.set(agare.id, list);
+  }
+  return map;
 }
 
 function tokenisera(text: string): string[] {
@@ -274,22 +324,31 @@ function tokenisera(text: string): string[] {
 
 export interface LasValidering { brott: string[]; anvanda: string[]; godkand: boolean }
 
-/** Håller sig texten till vitlistan och använder den nog många kandidater? */
+/**
+ * Håller sig texten till vitlistan och använder den nog många kandidater?
+ * `minAnvand` är kandidatgolvet (spannets nedre kant). `extra` är deklarerade
+ * kandidatböjningar kopplade till sina ägare (kandidat-id → former) — de
+ * fäller inte texten och räknas som användning.
+ */
 export function valideraText(
   u: LasUnderlag,
-  anvand: number,
+  minAnvand: number,
   meningar: LasMening[],
   ytor: (k: LasKandidat) => string[] = (k) => [k.es],
+  extra: Map<string, string[]> = new Map(),
 ): LasValidering {
   const ok = new Set(u.vitlista.map((t) => t.toLowerCase()));
+  const tillat = new Set([...extra.values()].flat().map((t) => t.toLowerCase()));
   const brott = new Set<string>();
   for (const m of meningar) {
-    for (const tok of tokenisera(m.es)) if (!ok.has(tok)) brott.add(tok);
+    for (const tok of tokenisera(m.es)) if (!ok.has(tok) && !tillat.has(tok)) brott.add(tok);
   }
   const text = meningar.map((m) => m.es).join(" ");
   // kandidatverb godtas i valfri egen form — "llegar" räknas som använt av "llega"
-  const anvanda = u.kandidater.filter((k) => ytor(k).some((y) => ordITexten(y, text))).map((k) => k.es);
-  return { brott: [...brott], anvanda, godkand: brott.size === 0 && anvanda.length >= anvand };
+  const anvanda = u.kandidater
+    .filter((k) => [...ytor(k), ...(extra.get(k.id) ?? [])].some((y) => ordITexten(y, text)))
+    .map((k) => k.es);
+  return { brott: [...brott], anvanda, godkand: brott.size === 0 && anvanda.length >= minAnvand };
 }
 
 /**
@@ -297,7 +356,7 @@ export function valideraText(
  * med klienten). Appen validerar och försöker om (max 3) med felen som
  * feedback — hellre lucka än fel text.
  */
-export interface LasText { titel: string; meningar: LasMening[] }
+export interface LasText { titel: string; meningar: LasMening[]; kandidatord: string[] }
 
 export async function hamtaText(
   sb: SupabaseClient,
@@ -305,17 +364,17 @@ export async function hamtaText(
   p: LasParametrar,
   ytor: (k: LasKandidat) => string[] = (k) => [k.es],
 ): Promise<LasText> {
-  const system = lasSystemPrompt(p);
-  const bas = lasUserPrompt(u, p.anvand);
-  let meningar: LasMening[] | null = null;
-  let titel = "";
+  const bas = lasPrompt(u, p);
+  let senaste: { meningar: LasMening[]; deklarerade: string[] } | null = null;
   for (let forsok = 1; forsok <= 3; forsok++) {
-    const forra: LasValidering | null = meningar ? valideraText(u, p.anvand, meningar, ytor) : null;
-    const extra: string = forra
-      ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${forra.brott.join(", ") || "-"}. Använda kandidatord: ${forra.anvanda.length} av minst ${p.anvand}. Skriv om och håll dig strikt till listorna.`
-      : "";
+    let feedback = "";
+    if (senaste) {
+      const koppling = kopplaKandidatord(u.kandidater, senaste.deklarerade, ytor);
+      const forra = valideraText(u, ordLo(p), senaste.meningar, ytor, koppling);
+      feedback = `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${forra.brott.join(", ") || "-"}. Använda kandidatord: ${forra.anvanda.length} av minst ${ordLo(p)}. Skriv om och håll dig strikt till listorna.`;
+    }
     const { data, error } = await sb.functions.invoke<{ text?: string; fel?: string }>("prompt", {
-      body: { system, user: bas + extra, schema: LAS_SCHEMA, effort: "medium" },
+      body: { user: bas + feedback, schema: LAS_SCHEMA, effort: "medium" },
     });
     if (error) {
       let msg = "Kunde inte hämta texten — prova igen om en stund.";
@@ -327,14 +386,22 @@ export async function hamtaText(
       throw new Error(msg);
     }
     if (data?.fel) throw new Error(String(data.fel));
-    let svar: { titelSv?: unknown; meningar?: LasMening[] };
+    let svar: { titelSv?: unknown; text?: unknown; kandidatord?: unknown };
     try {
       svar = JSON.parse(String(data?.text ?? "")) as typeof svar;
     } catch { continue; /* trasig JSON räknas som misslyckat försök */ }
-    if (!Array.isArray(svar.meningar)) continue;
-    meningar = svar.meningar;
-    titel = typeof svar.titelSv === "string" ? svar.titelSv : "";
-    if (valideraText(u, p.anvand, meningar, ytor).godkand) return { titel, meningar };
+    if (typeof svar.text !== "string" || !svar.text.trim()) continue;
+    const meningar = splitMeningar(svar.text);
+    const deklarerade = Array.isArray(svar.kandidatord) ? svar.kandidatord.map(String) : [];
+    senaste = { meningar, deklarerade };
+    const koppling = kopplaKandidatord(u.kandidater, deklarerade, ytor);
+    if (valideraText(u, ordLo(p), meningar, ytor, koppling).godkand) {
+      return {
+        titel: typeof svar.titelSv === "string" ? svar.titelSv : "",
+        meningar,
+        kandidatord: deklarerade,
+      };
+    }
   }
   throw new Error("Kunde inte skriva en text som håller sig till dina ord — försök igen.");
 }

@@ -161,35 +161,49 @@ function ytorFor(id) {
   return ytor.filter(Boolean);
 }
 
-function validera(meningar) {
+function validera(meningar, deklarerade = []) {
   const ok = byggVitlista();
+  const extra = kopplaDeklarerade(deklarerade);
+  const tillat = new Set([...extra.values()].flat());
   const brott = new Set();
   for (const m of meningar) {
-    for (const tok of tokenisera(m.es)) if (!ok.has(tok)) brott.add(tok);
+    for (const tok of tokenisera(m)) if (!ok.has(tok) && !tillat.has(tok)) brott.add(tok);
   }
-  const text = " " + meningar.map((m) => m.es).join(" ").toLowerCase() + " ";
+  const text = " " + meningar.join(" ").toLowerCase() + " ";
   const finns = (y) =>
     new RegExp(`(^|[^a-záéíóúñü])${y.toLowerCase()}([^a-záéíóúñü]|$)`).test(text);
-  // formacceptans: kandidatverbet räknas i valfri av sina egna former
-  const anvanda = kandidater.filter((id) => ytorFor(id).some(finns));
-  return { brott: [...brott], anvanda, forFa: anvanda.length < N_OVNING };
+  // formacceptans: kandidatverbet räknas i valfri egen form + deklarerade böjningar
+  const anvanda = kandidater.filter((id) =>
+    [...ytorFor(id), ...(extra.get(id) ?? [])].some(finns));
+  return { brott: [...brott], anvanda, forFa: anvanda.length < ORD_LO };
 }
 
-// ---------- prompten ----------
-function systemPrompt() {
-  const lo = Math.max(2, N_MENINGAR - 1);
-  return `Du skriver en kort text på enkel spanska till en svensk som lär sig språket — ${lo}–${N_MENINGAR} meningar som hör ihop. Det kan vara en liten historia, en konversation eller en blandning; välj det som blir mest levande.
+// ---------- prompten (speglar lasPrompt i appen — EN text) ----------
+const ORD_LO = Math.min(N_OVNING, Math.max(2, N_OVNING - 2));
 
-Håll dig till orden läsaren KAN plus KANDIDATORDEN — de senare övar hen på just nu och blir förhörd på efter läsningen. NÄSTAN KAN-orden finns där om du behöver dem för att det ska flyta naturligt. Ett ord utanför listorna och hen tappar meningen; småorden el, la, los, las, un, una, a, al, del, no samt es, son, está, están, hay är alltid ok, liksom regelbunden plural och femininum. Vanliga spanska förnamn (Juan, María, Pedro …) går också bra.
+function heleprompten() {
+  const menLo = Math.max(2, N_MENINGAR - 1);
+  const spann = ORD_LO === N_OVNING ? `${N_OVNING}` : `${ORD_LO}–${N_OVNING}`;
+  return `Skriv en kort text på enkel spanska för en svensk som lär sig språket: ${menLo}–${N_MENINGAR} meningar som hänger ihop — en liten historia, en konversation eller en blandning, det som blir mest levande.
 
-Väv in exakt ${N_OVNING} kandidatord — fler gör texten till ett prov i stället för en läsupplevelse, så låt resten vara.
+Använd orden i KAN-listan och väv in ${spann} av KANDIDATORDEN — inte fler, läsaren förhörs på dem efter läsningen. NÄSTAN KAN-orden finns om flytet kräver dem. Alltid ok är el, la, los, las, un, una, a, al, del, no, es, son, está, están, hay, regelbunden plural och femininum samt vanliga spanska förnamn. Alla andra ord är förbjudna — ett okänt ord och läsaren tappar tråden.
 
-Ge texten en talande titel som sätter scenen. Titeln skrivs på SVENSKA — det är den enda delen som ska vara på svenska, och den behöver inte hålla sig till ordlistorna. Men avslöja ingenting: kandidatordens svenska betydelser får inte förekomma i titeln — läsaren förhörs på dem efteråt.
+Verb använder du helst i formerna som står i parentes. Behöver berättelsen en annan böjning av ett kandidatord går det bra — men håll det på en nivå du tror att läsaren förstår.
 
-Svara i JSON: { "titelSv": "...", "meningar": [{ "es", "ovningsord" }] }.`;
+Titeln skrivs på svenska: talande, sätter scenen, står fri från ordlistorna. Avslöja bara inte kandidatordens betydelser — läsaren förhörs på dem efteråt.
+
+${ordlistor()}
+
+## Svarsformat
+
+JSON med tre fält: "titelSv" (titeln), "text" (hela texten på spanska), "kandidatord" (de kandidatord du använde, i exakt den form de står i texten).
+
+## Exempel på svar
+
+{ "titelSv": "Mötet på torget", "text": "María llega al mercado y ve a Juan. …", "kandidatord": ["llega", "cada", …] }`;
 }
 
-function userPrompt() {
+function ordlistor() {
   // varje ord i sin nivå; verb tar med sina presensformer i parentes
   const niva = { kan: [], nastan: [] };
   for (const id of introducerade) {
@@ -209,28 +223,54 @@ function userPrompt() {
     }
   }
   const kand = kandidater.map((id) => `${ytform(id)} (${gloss(id)})`).join("\n");
-  return `KAN (sitter säkert — verb med de former du får använda i parentes):\n${blanda(niva.kan).join(", ")}
+  return `## Ordlistor
 
-NÄSTAN KAN (om du behöver dem):\n${blanda(niva.nastan).join(", ")}
+### KAN (verb med sina former i parentes)
+${blanda(niva.kan).join(", ")}
 
-KANDIDATORD — övas nu (väv in exakt ${N_OVNING}, verb får böjas):\n${kand}`;
+### NÄSTAN KAN
+${blanda(niva.nastan).join(", ")}
+
+### KANDIDATORD (med svensk betydelse)
+${kand}`;
+}
+
+function splitMeningar(text) {
+  return text.split(/(?<=[.!?…])\s+/u).map((t) => t.trim()).filter(Boolean);
+}
+
+/** Koppla deklarerade former till kandidater: känd yta eller verbstam (speglar appen). */
+function kopplaDeklarerade(deklarerade) {
+  const map = new Map();
+  const stam = (es) => es.toLowerCase().replace(/(ar|er|ir)(se)?$/, "");
+  for (const ra of deklarerade) {
+    const form = String(ra).trim().toLowerCase();
+    if (!form) continue;
+    const agare =
+      kandidater.find((id) => ytorFor(id).some((y) => y.toLowerCase() === form)) ??
+      kandidater.find((id) => {
+        const es = ytform(id).toLowerCase();
+        const st = stam(es);
+        return st.length >= 3 && st !== es && form.startsWith(st);
+      });
+    if (!agare) continue;
+    map.set(agare, [...(map.get(agare) ?? []), form]);
+  }
+  return map;
 }
 
 // ---------- körning ----------
 const schema = {
   type: "object",
   additionalProperties: false,
-  required: ["titelSv", "meningar"],
+  required: ["titelSv", "text", "kandidatord"],
   properties: {
     titelSv: { type: "string", description: "Talande titel på SVENSKA (aldrig spanska) — utan kandidatordens betydelser" },
-    meningar: {
+    text: { type: "string", description: "Hela texten på spanska, löpande" },
+    kandidatord: {
       type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["es", "ovningsord"],
-        properties: { es: { type: "string" }, ovningsord: { type: "string" } },
-      },
+      items: { type: "string" },
+      description: "Kandidatorden du använde, i exakt den form de står i texten",
     },
   },
 };
@@ -238,8 +278,7 @@ const schema = {
 console.log(`Profil: ${introducerade.length} mötta · ${kanIds.length} kan · kandidater: ${kandidater.map((id) => ytform(id)).join(", ")}`);
 
 if (flag("torr") || flag("visa-prompt")) {
-  console.log("\n===== SYSTEM =====\n" + systemPrompt());
-  console.log("\n===== USER =====\n" + userPrompt());
+  console.log("\n===== PROMPT =====\n" + heleprompten());
   if (flag("torr")) process.exit(0);
 }
 
@@ -249,12 +288,13 @@ if (!process.env.ANTHROPIC_API_KEY) {
 }
 
 const client = new Anthropic();
-let meningar = null;
+let senaste = null; // { meningar, deklarerade }
 let kostnad = 0;
 
 for (let forsok = 1; forsok <= 3; forsok++) {
-  const extra = meningar
-    ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${validera(meningar).brott.join(", ") || "-"}. Använda kandidatord: ${validera(meningar).anvanda.length} av minst ${N_OVNING}. Skriv om och håll dig strikt till listan.`
+  const forra = senaste ? validera(senaste.meningar, senaste.deklarerade) : null;
+  const feedback = forra
+    ? `\n\nDitt förra försök bröt mot reglerna. Otillåtna ord: ${forra.brott.join(", ") || "-"}. Använda kandidatord: ${forra.anvanda.length} av minst ${ORD_LO}. Skriv om och håll dig strikt till listorna.`
     : "";
   const outputConfig = { format: { type: "json_schema", schema } };
   const effort = arg("effort");
@@ -262,9 +302,8 @@ for (let forsok = 1; forsok <= 3; forsok++) {
   const res = await client.messages.create({
     model: MODELL,
     max_tokens: 6000,
-    system: systemPrompt(),
     output_config: outputConfig,
-    messages: [{ role: "user", content: userPrompt() + extra }],
+    messages: [{ role: "user", content: heleprompten() + feedback }],
   });
   kostnad += (res.usage.input_tokens * 3 + res.usage.output_tokens * 15) / 1e6;
   if (res.stop_reason === "refusal") {
@@ -277,18 +316,21 @@ for (let forsok = 1; forsok <= 3; forsok++) {
     process.exit(1);
   }
   const svar = JSON.parse(textBlock.text);
-  meningar = svar.meningar;
+  const meningar = splitMeningar(String(svar.text ?? ""));
+  const deklarerade = Array.isArray(svar.kandidatord) ? svar.kandidatord : [];
+  senaste = { meningar, deklarerade };
   console.log(`\n»${svar.titelSv}«`);
 
-  const { brott, anvanda, forFa } = validera(meningar);
+  const { brott, anvanda, forFa } = validera(meningar, deklarerade);
   console.log(`\n--- försök ${forsok} ---`);
-  for (const m of meningar) console.log(`  ${m.es}${m.ovningsord ? `   [${m.ovningsord}]` : ""}`);
+  for (const m of meningar) console.log(`  ${m}`);
+  console.log(`  deklarerade: ${deklarerade.join(", ") || "-"}`);
   console.log(`  valda kandidater: ${anvanda.map(ytform).join(", ") || "-"}`);
   if (!brott.length && !forFa) {
     console.log(`\n✅ GODKÄND av validatorn · ~${(kostnad * 9.5 * 100).toFixed(1)} öre`);
     process.exit(0);
   }
-  console.log(`❌ otillåtna: ${brott.join(", ") || "-"}${forFa ? ` · för få kandidatord (${anvanda.length}/${N_OVNING})` : ""}`);
+  console.log(`❌ otillåtna: ${brott.join(", ") || "-"}${forFa ? ` · för få kandidatord (${anvanda.length}/${ORD_LO})` : ""}`);
 }
 console.log("\nUnderkänd efter 3 försök — hellre lucka än fel.");
 process.exit(1);
