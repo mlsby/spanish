@@ -371,6 +371,9 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       if (spelad) lage!.spelade.add(l.n); else lage!.spelade.delete(l.n);
       void sparaLektionslage(deps.sb, l.n, lage!.pos.get(l.n) ?? 0, spelad);
       void uppdateraBoost(deps.store, deps.sb, BASE);
+      // klar med den man lyssnar på -> hoppa direkt till nästa ospelade
+      const nasta = spelad ? nastaOspelad(l.n) : null;
+      if (nasta) { valjAktuell(nasta.n, spelarNu()); return; }
       byggFokus(); byggLista();
     };
     const nastaKn = el.querySelector<HTMLButtonElement>("#lyNasta");
@@ -444,6 +447,9 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       byggFokus(); byggLista();
     };
     oppenRad = radEl;
+    // lyft raden till scrollområdets topp så hela utfället syns
+    const rulle = $("lyRulle");
+    rulle.scrollTo({ top: radEl.offsetTop - rulle.offsetTop, behavior: "smooth" });
   }
 
   function stangRad(): void {
@@ -453,9 +459,14 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
   }
 
   // ---------- sök ----------
-  $("lySokKn").onclick = () => { $("lySokFalt").classList.add("pa"); $<HTMLInputElement>("lySokIn").focus(); };
+  $("lySokKn").onclick = () => {
+    $("lySokFalt").classList.add("pa");
+    $("lyFokus").hidden = true; // spelaren lämnar plats åt träffarna
+    $<HTMLInputElement>("lySokIn").focus();
+  };
   $("lySokStang").onclick = () => {
     $("lySokFalt").classList.remove("pa");
+    $("lyFokus").hidden = false;
     $<HTMLInputElement>("lySokIn").value = "";
     byggLista();
   };
@@ -485,6 +496,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
     rulle.scrollTop = 0;
     rulle.querySelectorAll<HTMLButtonElement>(".lytraff").forEach((b) => b.onclick = () => {
       $("lySokFalt").classList.remove("pa");
+      $("lyFokus").hidden = false;
       $<HTMLInputElement>("lySokIn").value = "";
       valjAktuell(Number(b.dataset.n), false);
     });
