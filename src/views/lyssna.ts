@@ -28,11 +28,35 @@ const KLAR_KEY = (n: number) => `lyssna-klar-${n}`;
 const SENAST_KEY = "lyssna-senast";
 const FART_KEY = "lyssna-fart";
 
+/** Mjuk paus: sessionen hålls vid liv så länge — låsskärmens play funkar hela fönstret. */
+const MJUK_FONSTER_MS = 10 * 60 * 1000;
+
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+/**
+ * iOS suspenderar webbprocessen strax efter en riktig paus och då dör
+ * låsskärmens play-knapp. Mjuk paus spelar därför en tyst loop istället —
+ * sessionen lever, processen får köra, och play funkar från låsskärmen.
+ */
+function tystLoopUrl(): string {
+  const sr = 8000, n = sr; // 1 s tystnad, 8-bit PCM
+  const buf = new ArrayBuffer(44 + n);
+  const v = new DataView(buf);
+  const w = (o: number, str: string) => [...str].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  w(0, "RIFF"); v.setUint32(4, 36 + n, true); w(8, "WAVE"); w(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+  w(36, "data"); v.setUint32(40, n, true);
+  new Uint8Array(buf, 44).fill(128); // 8-bit: 128 = tystnad
+  return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+}
 
 let kurs: Kurs | null = null;
 let audio: HTMLAudioElement | null = null;
 let aktiv: Lektion | null = null;
+let tystUrl: string | null = null;
+/** Satt under mjuk paus: positionen att återuppta på + timern som gör riktig paus. */
+let mjuk: { pos: number; timer: number } | null = null;
 
 /** Signerad URL — bucketen är privat, RLS släpper bara in inloggade. */
 async function signadUrl(sb: SupabaseClient, fil: string): Promise<string> {
@@ -110,75 +134,170 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
   const spNu = el.querySelector<HTMLElement>("#spNu")!;
   const spTot = el.querySelector<HTMLElement>("#spTot")!;
 
+  const spelarNu = () => audio !== null && !audio.paused && mjuk === null;
+
   function uppdateraKnapp(): void {
-    const spelar = audio !== null && !audio.paused;
-    spPlay.textContent = spelar ? "❚❚" : "►";
-    spPlay.setAttribute("aria-label", spelar ? "Pausa" : "Spela");
+    spPlay.textContent = spelarNu() ? "❚❚" : "►";
+    spPlay.setAttribute("aria-label", spelarNu() ? "Pausa" : "Spela");
   }
 
-  const togglaPlay = () => { if (audio) { audio.paused ? void audio.play() : audio.pause(); } };
+  /** Låsskärmens förloppsindikator + scrubbing. */
+  function posState(pos: number): void {
+    if (!("mediaSession" in navigator) || !aktiv) return;
+    try {
+      navigator.mediaSession.setPositionState({
+        duration: aktiv.sek,
+        position: Math.min(pos, aktiv.sek),
+        playbackRate: mjuk ? 1 : (audio?.playbackRate ?? 1),
+      });
+    } catch { /* trasig position får aldrig stoppa uppspelningen */ }
+  }
 
-  async function valjLektion(l: Lektion): Promise<void> {
-    aktiv = l;
-    spPlay.onclick = togglaPlay; // resume-läget kan ha lånat knappen — ta tillbaka den
-    localStorage.setItem(SENAST_KEY, String(l.n));
+  function visaLektionIUi(l: Lektion, pos: number): void {
     spelare.hidden = false;
     spTitel.textContent = `Lektion ${l.n}`;
     spTot.textContent = fmt(l.sek);
     spSok.max = String(l.sek);
+    spSok.value = String(pos);
+    spNu.textContent = fmt(pos);
     el.querySelectorAll(".lektion").forEach((b) =>
       b.classList.toggle("senast", (b as HTMLElement).dataset.n === String(l.n)));
-
-    audio?.pause();
-    audio ??= new Audio();
-    try {
-      audio.src = await signadUrl(deps.sb, l.fil);
-    } catch (e) {
-      spTitel.textContent = `Lektion ${l.n} — kunde inte hämtas (${e instanceof Error ? e.message : e})`;
-      return;
-    }
-    audio.currentTime = Number(localStorage.getItem(POS_KEY(l.n)) ?? "0");
-    audio.playbackRate = Number(localStorage.getItem(FART_KEY) ?? "1");
-
-    audio.ontimeupdate = () => {
-      if (!aktiv || !audio) return;
-      spSok.value = String(audio.currentTime);
-      spNu.textContent = fmt(audio.currentTime);
-      localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(audio.currentTime)));
-      // 95 % räknas som lyssnad — sista sekunderna är utro
-      if (audio.currentTime > aktiv.sek * 0.95) localStorage.setItem(KLAR_KEY(aktiv.n), "1");
-    };
-    audio.onplay = uppdateraKnapp;
-    audio.onpause = uppdateraKnapp;
-
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: `Lektion ${l.n}`,
         artist: "Complete Spanish · Language Transfer",
         album: "Glosa",
       });
-      navigator.mediaSession.setActionHandler("play", () => void audio?.play());
-      navigator.mediaSession.setActionHandler("pause", () => audio?.pause());
-      navigator.mediaSession.setActionHandler("seekbackward", () => spBak.click());
-      navigator.mediaSession.setActionHandler("seekforward", () => spFram.click());
-      navigator.mediaSession.setActionHandler("seekto", (e) => {
-        if (audio && e.seekTime != null) audio.currentTime = e.seekTime;
-      });
     }
-    void audio.play().catch(() => uppdateraKnapp()); // autoplay-stopp är ok — play-knappen finns
+  }
+
+  /** Riktig paus — efter mjuka fönstret. Härifrån krävs app-öppning (iOS suspenderar). */
+  function hardPaus(): void {
+    if (mjuk) { window.clearTimeout(mjuk.timer); mjuk = null; }
+    audio?.pause();
     uppdateraKnapp();
   }
 
-  spPlay.onclick = togglaPlay;
-  spBak.onclick = () => { if (audio) audio.currentTime = Math.max(0, audio.currentTime - 15); };
-  spFram.onclick = () => { if (audio && aktiv) audio.currentTime = Math.min(aktiv.sek, audio.currentTime + 15); };
-  spSok.oninput = () => { if (audio) audio.currentTime = Number(spSok.value); };
+  /** Mjuk paus: byt till tyst loop och håll sessionen vid liv i 10 min. */
+  function mjukPaus(): void {
+    if (!audio || !aktiv || mjuk) return;
+    const pos = Math.min(audio.currentTime, aktiv.sek);
+    localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(pos)));
+    mjuk = { pos, timer: window.setTimeout(hardPaus, MJUK_FONSTER_MS) };
+    tystUrl ??= tystLoopUrl();
+    audio.loop = true;
+    audio.src = tystUrl;
+    void audio.play().catch(hardPaus); // kan tyst loop inte spela är riktig paus ärligare
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+    posState(pos);
+    uppdateraKnapp();
+  }
+
+  /** Spela aktiv lektion från pos — signerar alltid om (länken kan ha hunnit gå ut). */
+  async function spelaFran(pos: number): Promise<void> {
+    if (!audio || !aktiv) return;
+    if (mjuk) { window.clearTimeout(mjuk.timer); mjuk = null; }
+    audio.loop = false;
+    try {
+      audio.src = await signadUrl(deps.sb, aktiv.fil);
+    } catch (e) {
+      spTitel.textContent = `Lektion ${aktiv.n} — kunde inte hämtas (${e instanceof Error ? e.message : e})`;
+      return;
+    }
+    audio.currentTime = pos;
+    audio.playbackRate = Number(localStorage.getItem(FART_KEY) ?? "1");
+    await audio.play().catch(() => { /* autoplay-stopp är ok — play-knappen finns */ });
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+    posState(pos);
+    uppdateraKnapp();
+  }
+
+  function toggla(): void {
+    if (!aktiv) return;
+    if (!audio) { void valjLektion(aktiv); return; } // första trycket efter sidladdning
+    if (mjuk) { void spelaFran(mjuk.pos); return; }
+    if (!audio.paused) { mjukPaus(); return; }
+    void spelaFran(Math.min(audio.currentTime, aktiv.sek));
+  }
+
+  /** Nuvarande lyssningsposition oavsett läge. */
+  const posNu = (): number => (mjuk ? mjuk.pos : Math.min(audio?.currentTime ?? 0, aktiv?.sek ?? 0));
+
+  function sokTill(pos: number): void {
+    if (!aktiv) return;
+    const p = Math.max(0, Math.min(pos, aktiv.sek));
+    if (mjuk) {
+      mjuk.pos = p; // spola under mjuk paus flyttar bara märket
+      localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(p)));
+    } else if (audio) {
+      audio.currentTime = p;
+    }
+    spSok.value = String(p);
+    spNu.textContent = fmt(p);
+    posState(p);
+  }
+
+  async function valjLektion(l: Lektion, autoplay = true): Promise<void> {
+    if (mjuk) { window.clearTimeout(mjuk.timer); mjuk = null; }
+    aktiv = l;
+    localStorage.setItem(SENAST_KEY, String(l.n));
+    const pos = Number(localStorage.getItem(POS_KEY(l.n)) ?? "0");
+    visaLektionIUi(l, pos);
+
+    if (!audio) {
+      audio = new Audio();
+      audio.ontimeupdate = () => {
+        if (!aktiv || !audio || mjuk) return; // tysta loopens tid är inte lektionens
+        spSok.value = String(audio.currentTime);
+        spNu.textContent = fmt(audio.currentTime);
+        localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(audio.currentTime)));
+        // 95 % räknas som lyssnad — sista sekunderna är utro
+        if (audio.currentTime > aktiv.sek * 0.95) localStorage.setItem(KLAR_KEY(aktiv.n), "1");
+        posState(audio.currentTime);
+      };
+      audio.onplay = uppdateraKnapp;
+      audio.onpause = uppdateraKnapp;
+      // lektionen tog slut: ladda nästa i mjuk paus — låsskärmens play startar den direkt
+      audio.onended = () => {
+        if (!aktiv || mjuk) return;
+        localStorage.setItem(KLAR_KEY(aktiv.n), "1");
+        const nasta = kurs?.lektioner.find((x) => x.n === aktiv!.n + 1);
+        if (!nasta) { uppdateraKnapp(); return; }
+        aktiv = nasta;
+        localStorage.setItem(SENAST_KEY, String(nasta.n));
+        localStorage.setItem(POS_KEY(nasta.n), "0");
+        visaLektionIUi(nasta, 0);
+        mjuk = { pos: 0, timer: window.setTimeout(hardPaus, MJUK_FONSTER_MS) };
+        tystUrl ??= tystLoopUrl();
+        audio!.loop = true;
+        audio!.src = tystUrl;
+        void audio!.play().catch(hardPaus);
+        if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+        posState(0);
+        uppdateraKnapp();
+      };
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler("play", () => { if (!spelarNu()) toggla(); });
+        navigator.mediaSession.setActionHandler("pause", () => { if (spelarNu()) toggla(); });
+        navigator.mediaSession.setActionHandler("seekbackward", () => sokTill(posNu() - 15));
+        navigator.mediaSession.setActionHandler("seekforward", () => sokTill(posNu() + 15));
+        navigator.mediaSession.setActionHandler("seekto", (e) => { if (e.seekTime != null) sokTill(e.seekTime); });
+      }
+    }
+    if (autoplay) await spelaFran(pos);
+  }
+
+  spPlay.onclick = toggla;
+  spBak.onclick = () => sokTill(posNu() - 15);
+  spFram.onclick = () => sokTill(posNu() + 15);
+  spSok.oninput = () => sokTill(Number(spSok.value));
   el.querySelectorAll<HTMLButtonElement>("[data-fart]").forEach((b) => {
     b.onclick = () => {
       const fart = Number(b.dataset.fart);
-      if (audio) audio.playbackRate = fart;
+      if (audio && !mjuk) audio.playbackRate = fart;
       localStorage.setItem(FART_KEY, String(fart));
       el.querySelectorAll("[data-fart]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      posState(posNu());
     };
   });
   el.querySelectorAll<HTMLButtonElement>(".lektion").forEach((b) => {
@@ -188,18 +307,13 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
     };
   });
 
-  // återuppta senaste lektionen i spelaren (utan autoplay) om en fanns
+  // visa senaste lektionen i spelaren (utan autoplay) så resume är ett tryck bort
   if (senast) {
     const l = kurs.lektioner.find((x) => x.n === senast);
     if (l) {
-      spelare.hidden = false;
-      spTitel.textContent = `Lektion ${l.n}`;
-      spTot.textContent = fmt(l.sek);
-      spSok.max = String(l.sek);
-      spSok.value = localStorage.getItem(POS_KEY(l.n)) ?? "0";
-      spNu.textContent = fmt(Number(spSok.value));
-      const starta = () => void valjLektion(l);
-      spPlay.onclick = starta; // första trycket laddar; valjLektion tar sedan över handlarna
+      aktiv = l;
+      visaLektionIUi(l, Number(localStorage.getItem(POS_KEY(l.n)) ?? "0"));
+      uppdateraKnapp();
     }
   }
 }
