@@ -25,6 +25,10 @@ const PULS_MS = 5000;
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
+// textglyfer (►/❚❚) renderas ojämnt på iOS — riktiga ikoner istället
+const PLAY_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
+const PAUS_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>`;
+
 /**
  * iOS suspenderar webbprocessen strax efter en riktig paus och då dör
  * låsskärmens play-knapp. Mjuk paus spelar därför tystnad istället.
@@ -145,14 +149,17 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
     const l = lekt(lage!.aktuell);
     const pos = lage!.pos.get(l.n) ?? 0;
     const nasta = nastaOspelad(l.n);
+    const spelad = lage!.spelade.has(l.n);
     $("lyFokus").innerHTML = `<div class="lyfokus">
-      <div class="lyetikett">${lage!.spelade.has(l.n) ? "Spelad" : "Nu"} · Lektion ${l.n} · ${fmt(l.sek)}</div>
+      <div class="lyetikettrad">
+        <span class="lyetikett">${spelad ? "Spelad" : "Nu"} · Lektion ${l.n} · ${fmt(l.sek)}</span>
+        <button type="button" class="lytystkn" id="lyMark">${spelad ? "avmarkera spelad" : "markera spelad"}</button>
+      </div>
       <div class="lyfokustitel">Lektion ${l.n}</div>
       <div class="lyfokusmeta">${l.ord.length} ord · ${l.fraser.length} fraser</div>
-      <div class="lyfokusom">${esc(l.om)}</div>
       <div class="lykontroller">
         <button type="button" class="lyhopp" id="lyBak" aria-label="Spola tillbaka 15 sekunder">−15</button>
-        <button type="button" class="lyplay" id="lyPlay" aria-label="Spela">►</button>
+        <button type="button" class="lyplay" id="lyPlay" aria-label="Spela">${PLAY_SVG}</button>
         <button type="button" class="lyhopp" id="lyFram" aria-label="Spola fram 15 sekunder">+15</button>
       </div>
       <div class="lytidrad">
@@ -162,6 +169,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       </div>
       <div class="lyfot">
         <button type="button" class="lyfart" id="lyFart">${fart()}×</button>
+        <button type="button" class="lypill" id="lyOm" aria-pressed="false">Om</button>
         ${l.ord.length ? `<button type="button" class="lypill" id="lyOrd" aria-pressed="false">Ord</button>` : ""}
         ${l.fraser.length ? `<button type="button" class="lypill" id="lyFraser" aria-pressed="false">Fraser</button>` : ""}
         <button type="button" class="lypill" id="lyTxKn">Transkript</button>
@@ -177,7 +185,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
   function uppdateraKnapp(): void {
     const p = el.querySelector<HTMLButtonElement>("#lyPlay");
     if (!p) return;
-    p.textContent = spelarNu() ? "❚❚" : "►";
+    p.innerHTML = spelarNu() ? PAUS_SVG : PLAY_SVG;
     p.setAttribute("aria-label", spelarNu() ? "Pausa" : "Spela");
   }
 
@@ -353,10 +361,18 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       posState(posNu());
     };
     kopplaVaxel($("lyPanel"), [
+      [el.querySelector("#lyOm"), `<div class="lyfokusom">${esc(l.om)}</div>`],
       [el.querySelector("#lyOrd"), listaHtml(l.ord)],
       [el.querySelector("#lyFraser"), listaHtml(l.fraser)],
     ]);
     $("lyTxKn").onclick = () => void oppnaTx(l.n);
+    $("lyMark").onclick = () => {
+      const spelad = !lage!.spelade.has(l.n);
+      if (spelad) lage!.spelade.add(l.n); else lage!.spelade.delete(l.n);
+      void sparaLektionslage(deps.sb, l.n, lage!.pos.get(l.n) ?? 0, spelad);
+      void uppdateraBoost(deps.store, deps.sb, BASE);
+      byggFokus(); byggLista();
+    };
     const nastaKn = el.querySelector<HTMLButtonElement>("#lyNasta");
     if (nastaKn) nastaKn.onclick = () => valjAktuell(Number(nastaKn.dataset.n), false);
   }

@@ -506,7 +506,9 @@ html.kbd .answerbar .send{width:38px;height:38px}
 }
 
 /* ===== Lyssna: fast spelare över scrollbar lektionslista ===== */
-.lyssna{height:100%;display:flex;flex-direction:column;overflow:hidden}
+/* tabbaren bär redan safe-area — utan denna blir det dubbelt gap under listan */
+#screen-lyssna{padding-bottom:0}
+.lyssna{height:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .lytopp{position:relative;display:flex;align-items:center;gap:12px;padding:18px 16px 12px;border-bottom:1px solid var(--line);flex-shrink:0}
 .lytitel{font-family:var(--serif);font-size:22px;font-weight:600;flex:1}
 .lykvar{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -519,10 +521,11 @@ html.kbd .answerbar .send{width:38px;height:38px}
 
 #lyFokus{border-bottom:1px solid var(--line);flex-shrink:0}
 .lyfokus{margin:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 12px}
+.lyetikettrad{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .lyetikett{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--brons);font-weight:600}
 .lyfokustitel{font-family:var(--serif);font-size:20px;font-weight:600;margin:2px 0 0}
 .lyfokusmeta{font-size:11.5px;color:var(--muted);margin:0 0 6px;font-variant-numeric:tabular-nums}
-.lyfokusom{font-size:13px;line-height:1.55;color:var(--muted)}
+.lyfokusom{font-size:13px;line-height:1.55;color:var(--muted);padding-bottom:2px}
 .lykontroller{display:flex;align-items:center;justify-content:center;gap:22px;margin:14px 0 4px}
 .lyplay{width:56px;height:56px;border-radius:50%;border:none;background:var(--accent-strong);color:var(--accent-on);font-size:19px;display:grid;place-items:center}
 .lyhopp{width:42px;height:42px;border-radius:50%;background:none;border:1px solid var(--line);font-size:10.5px;font-weight:600;color:var(--muted)}
@@ -565,7 +568,6 @@ html.kbd .answerbar .send{width:38px;height:38px}
 
 .lytx{position:absolute;inset:0;background:var(--app);z-index:6;transform:translateY(102%);transition:transform .3s cubic-bezier(.3,.8,.3,1);display:flex;flex-direction:column}
 .lytx.pa{transform:none}
-.lyssna{position:relative}
 .lytxhuvud{padding:16px 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
 .lytxhuvud button{border:none;background:none;color:var(--muted)}
 .lytxtitel{font-family:var(--serif);font-size:17px;font-weight:600;flex:1}
