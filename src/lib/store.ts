@@ -293,10 +293,17 @@ export class Store {
     return !!pc && pc.fsrs.reps >= 1 && pc.fsrs.stability >= 1;
   }
 
+  /** Lyssna-kursens boost: ordId:n ur spelade lektioner introduceras före frekvenskön. */
+  private lyssnaPrio: string[] = [];
+  setLyssnaPrio(ids: string[]): void {
+    this.lyssnaPrio = ids;
+  }
+
   /**
-   * Nästa `count` enheter ur den förenade introduktionskön: nya ord i
-   * frekvensordning, upplåsta böjningar via sin korpus-slot (tengo slår de
-   * flesta substantiv). Max en ny form per verb och dag. Ändrar ingenting.
+   * Nästa `count` enheter ur den förenade introduktionskön: lyssna-boostade
+   * ord först (lektioner du spelat), sedan nya ord i frekvensordning,
+   * upplåsta böjningar via sin korpus-slot (tengo slår de flesta substantiv).
+   * Max en ny form per verb och dag. Ändrar ingenting.
    */
   nextIntroUnits(count: number, now: Date = new Date()): IntroUnit[] {
     if (count <= 0) return [];
@@ -311,21 +318,30 @@ export class Store {
     const formQueue = this.forms
       .filter((f) => !this.card(f.id, "es2sv") && this.formUnlocked(f) && !parentToday.has(f.parent))
       .sort((a, b) => a.slot - b.slot || a.r - b.r);
+    const prioQueue = this.lyssnaPrio
+      .map((id) => this.byId.get(id))
+      .filter((w): w is Word => w !== undefined);
     const out: IntroUnit[] = [];
-    let fi = 0, wi = 0;
+    const picked = new Set<string>();
+    let fi = 0, wi = 0, pi = 0;
     while (out.length < count) {
-      while (wi < this.words.length && this.card(this.words[wi].id, "es2sv")) wi++;
+      while (pi < prioQueue.length && (this.card(prioQueue[pi].id, "es2sv") || picked.has(prioQueue[pi].id))) pi++;
+      while (wi < this.words.length && (this.card(this.words[wi].id, "es2sv") || picked.has(this.words[wi].id))) wi++;
       while (fi < formQueue.length && parentToday.has(formQueue[fi].parent)) fi++;
       const nf = formQueue[fi];
-      const nw = this.words[wi];
+      const boost = pi < prioQueue.length;
+      const nw = boost ? prioQueue[pi] : this.words[wi];
+      // boostade ord går före böjningsformer — de kommer ur en lektion du nyss hört
+      const nwRank = boost ? 0 : nw?.rank;
       if (!nf && !nw) break;
-      if (nf && (!nw || nf.slot <= nw.rank)) {
+      if (nf && (!nw || nf.slot <= nwRank!)) {
         out.push({ kind: "form", form: nf });
         parentToday.add(nf.parent); // max 1 per verb även inom samma omgång
         fi++;
       } else {
-        out.push({ kind: "word", word: nw });
-        wi++;
+        out.push({ kind: "word", word: nw! });
+        picked.add(nw!.id);
+        if (boost) pi++; else wi++;
       }
     }
     return out;

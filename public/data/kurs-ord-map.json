@@ -1,0 +1,2119 @@
+{
+ "schema": 1,
+ "genererad": "2026-08-18",
+ "beskrivning": "Lektionsord (kurs.json) -> ordbasens ordId. status: fras=flerordsuttryck (bor under lektionens fraser), filtrera=metaord.",
+ "karta": {
+  "2|normal": {
+   "ordId": "normal|adj"
+  },
+  "2|metal": {
+   "ordId": "metal|n"
+  },
+  "2|es": {
+   "ordId": "ser|v"
+  },
+  "2|legal": {
+   "ordId": "legal|adj"
+  },
+  "2|ilegal": {
+   "ordId": "ilegal|adj"
+  },
+  "2|liberal": {
+   "ordId": "liberal|adj"
+  },
+  "2|natural": {
+   "ordId": "natural|adj"
+  },
+  "2|no": {
+   "ordId": "no|adv"
+  },
+  "2|ideal": {
+   "ordId": "ideal|adj"
+  },
+  "2|fatal": {
+   "ordId": "fatal|adj"
+  },
+  "2|natal": {
+   "ordId": "natal|adj"
+  },
+  "2|colonial": {
+   "ordId": "colonial|adj"
+  },
+  "2|cultural": {
+   "ordId": "cultural|adj"
+  },
+  "2|anual": {
+   "ordId": "anual|adj"
+  },
+  "2|dental": {
+   "ordId": "dental|adj"
+  },
+  "2|diente": {
+   "ordId": "diente|n"
+  },
+  "2|festival": {
+   "ordId": "festival|n"
+  },
+  "2|personal": {
+   "ordId": "personal|adj"
+  },
+  "2|total": {
+   "ordId": "total|adj"
+  },
+  "2|verbal": {
+   "ordId": "verbal|adj"
+  },
+  "2|verbo": {
+   "status": "filtrera"
+  },
+  "3|importante": {
+   "ordId": "importante|adj"
+  },
+  "3|diferente": {
+   "ordId": "diferente|adj"
+  },
+  "3|constante": {
+   "ordId": "constante|adj"
+  },
+  "3|-mente": {
+   "status": "filtrera"
+  },
+  "3|constantemente": {
+   "ordId": "constantemente|adv"
+  },
+  "3|legalmente": {
+   "ordId": "legalmente|adv"
+  },
+  "3|ilegalmente": {
+   "ordId": "ilegalmente|adv"
+  },
+  "3|real": {
+   "ordId": "real|adj"
+  },
+  "3|realmente": {
+   "ordId": "realmente|adv"
+  },
+  "3|normalmente": {
+   "ordId": "normalmente|adv"
+  },
+  "3|globalmente": {
+   "ordId": "globalmente|adv"
+  },
+  "3|general": {
+   "ordId": "general|adj"
+  },
+  "3|generalmente": {
+   "ordId": "generalmente|adv"
+  },
+  "3|original": {
+   "ordId": "original|adj"
+  },
+  "3|originalmente": {
+   "ordId": "originalmente|adv"
+  },
+  "3|digital": {
+   "ordId": "digital|adj"
+  },
+  "3|naturalmente": {
+   "ordId": "naturalmente|adv"
+  },
+  "3|posible": {
+   "ordId": "posible|adj"
+  },
+  "3|probable": {
+   "ordId": "probable|adj"
+  },
+  "3|probablemente": {
+   "ordId": "probablemente|adv"
+  },
+  "3|posiblemente": {
+   "ordId": "posiblemente|adv"
+  },
+  "3|flexible": {
+   "ordId": "flexible|adj"
+  },
+  "4|urgente": {
+   "ordId": "urgente|adj"
+  },
+  "4|urgentemente": {
+   "ordId": "urgentemente|adv"
+  },
+  "4|quiero": {
+   "ordId": "querer|v"
+  },
+  "4|opinión": {
+   "ordId": "opinión|n"
+  },
+  "4|pasión": {
+   "ordId": "pasión|n"
+  },
+  "4|organización": {
+   "ordId": "organización|n"
+  },
+  "4|preparación": {
+   "ordId": "preparación|n"
+  },
+  "4|preparar": {
+   "ordId": "preparar|v"
+  },
+  "4|generación": {
+   "ordId": "generación|n"
+  },
+  "4|generar": {
+   "ordId": "generar|v"
+  },
+  "4|confirmación": {
+   "ordId": "confirmación|n"
+  },
+  "4|confirmar": {
+   "ordId": "confirmar|v"
+  },
+  "4|firmar": {
+   "ordId": "firmar|v"
+  },
+  "4|conversación": {
+   "ordId": "conversación|n"
+  },
+  "4|confrontación": {
+   "ordId": "confrontación|n"
+  },
+  "4|complicación": {
+   "ordId": "complicación|n"
+  },
+  "4|complicar": {
+   "ordId": "complicar|v"
+  },
+  "4|cooperación": {
+   "ordId": "cooperación|n"
+  },
+  "4|cooperar": {
+   "ordId": "cooperar|v"
+  },
+  "4|cancelación": {
+   "ordId": "cancelación|n"
+  },
+  "4|cancelar": {
+   "ordId": "cancelar|v"
+  },
+  "4|exploración": {
+   "ordId": "exploración|n"
+  },
+  "4|explorar": {
+   "ordId": "explorar|v"
+  },
+  "4|me": {
+   "ordId": "me|pron"
+  },
+  "5|yo": {
+   "ordId": "yo|pron"
+  },
+  "5|celebración": {
+   "ordId": "celebración|n"
+  },
+  "5|celebrar": {
+   "ordId": "celebrar|v"
+  },
+  "5|ilustrar": {
+   "ordId": "ilustrar|v"
+  },
+  "5|luz": {
+   "ordId": "luz|n"
+  },
+  "5|informar": {
+   "ordId": "informar|v"
+  },
+  "5|información": {
+   "ordId": "información|n"
+  },
+  "5|obligación": {
+   "ordId": "obligación|n"
+  },
+  "5|obligar": {
+   "ordId": "obligar|v"
+  },
+  "5|provocar": {
+   "ordId": "provocar|v"
+  },
+  "5|lo": {
+   "ordId": "lo|pron"
+  },
+  "5|regular": {
+   "ordId": "regular|adj"
+  },
+  "5|arroz": {
+   "ordId": "arroz|n"
+  },
+  "5|pero": {
+   "ordId": "pero|conj"
+  },
+  "5|perro": {
+   "ordId": "perro|n"
+  },
+  "5|salvación": {
+   "ordId": "salvación|n"
+  },
+  "5|salvar": {
+   "ordId": "salvar|v"
+  },
+  "5|situación": {
+   "ordId": "situación|n"
+  },
+  "5|situar": {
+   "ordId": "situar|v"
+  },
+  "5|participación": {
+   "ordId": "participación|n"
+  },
+  "5|participar": {
+   "ordId": "participar|v"
+  },
+  "5|creación": {
+   "ordId": "creación|n"
+  },
+  "5|crear": {
+   "ordId": "crear|v"
+  },
+  "5|experimentación": {
+   "ordId": "experimentación|n"
+  },
+  "5|experimentar": {
+   "ordId": "experimentar|v"
+  },
+  "5|experiencia": {
+   "ordId": "experiencia|n"
+  },
+  "5|experimento": {
+   "ordId": "experimento|n"
+  },
+  "5|diferencia": {
+   "ordId": "diferencia|n"
+  },
+  "5|influencia": {
+   "ordId": "influencia|n"
+  },
+  "5|existencia": {
+   "ordId": "existencia|n"
+  },
+  "5|consistencia": {
+   "ordId": "consistencia|n"
+  },
+  "5|inconsistencia": {
+   "ordId": "inconsistencia|n"
+  },
+  "5|incongruencia": {
+   "ordId": "incongruencia|n"
+  },
+  "6|intentar": {
+   "ordId": "intentar|v"
+  },
+  "6|intento": {
+   "ordId": "intento|n"
+  },
+  "6|hospital": {
+   "ordId": "hospital|n"
+  },
+  "6|horrible": {
+   "ordId": "horrible|adj"
+  },
+  "6|habitual": {
+   "ordId": "habitual|adj"
+  },
+  "6|habitualmente": {
+   "ordId": "habitualmente|adv"
+  },
+  "6|ahora": {
+   "ordId": "ahora|adv"
+  },
+  "6|a": {
+   "ordId": "a|prep"
+  },
+  "6|hora": {
+   "ordId": "hora|n"
+  },
+  "6|pero": {
+   "ordId": "pero|conj"
+  },
+  "6|ir": {
+   "ordId": "ir|v"
+  },
+  "6|voy": {
+   "ordId": "ir|v"
+  },
+  "6|vamos": {
+   "ordId": "ir|v"
+  },
+  "6|visitar": {
+   "ordId": "visitar|v"
+  },
+  "6|visible": {
+   "ordId": "visible|adj"
+  },
+  "6|viral": {
+   "ordId": "viral|adj"
+  },
+  "6|virus": {
+   "ordId": "virus|n"
+  },
+  "6|conveniente": {
+   "ordId": "conveniente|adj"
+  },
+  "7|continuar": {
+   "ordId": "continuar|v"
+  },
+  "7|demostrar": {
+   "ordId": "demostrar|v"
+  },
+  "7|mostrar": {
+   "ordId": "mostrar|v"
+  },
+  "7|algo": {
+   "ordId": "algo|pron"
+  },
+  "7|los": {
+   "ordId": "los|pron"
+  },
+  "7|ver": {
+   "ordId": "ver|v"
+  },
+  "7|intentar": {
+   "ordId": "intentar|v"
+  },
+  "7|pasar": {
+   "ordId": "pasar|v"
+  },
+  "7|formalmente": {
+   "ordId": "formalmente|adv"
+  },
+  "8|la": {
+   "ordId": "la|pron"
+  },
+  "8|casa": {
+   "ordId": "casa|n"
+  },
+  "8|quiere": {
+   "ordId": "querer|v"
+  },
+  "8|por qué": {
+   "status": "fras"
+  },
+  "8|venir": {
+   "ordId": "venir|v"
+  },
+  "8|debo": {
+   "ordId": "deber|v"
+  },
+  "8|identificar": {
+   "ordId": "identificar|v"
+  },
+  "8|las": {
+   "ordId": "las|pron"
+  },
+  "8|los": {
+   "ordId": "los|pron"
+  },
+  "9|saber": {
+   "ordId": "saber|v"
+  },
+  "9|si": {
+   "ordId": "si|conj"
+  },
+  "9|sí": {
+   "ordId": "sí|pron"
+  },
+  "9|justificación": {
+   "ordId": "justificación|n"
+  },
+  "9|justificar": {
+   "ordId": "justificar|v"
+  },
+  "9|explicación": {
+   "ordId": "explicación|n"
+  },
+  "9|explicar": {
+   "ordId": "explicar|v"
+  },
+  "9|inexplicable": {
+   "ordId": "inexplicable|adj"
+  },
+  "9|algo": {
+   "ordId": "algo|pron"
+  },
+  "10|comer": {
+   "ordId": "comer|v"
+  },
+  "10|tarde": {
+   "ordId": "tarde|adv"
+  },
+  "10|más": {
+   "ordId": "más|adv"
+  },
+  "10|más tarde": {
+   "status": "fras"
+  },
+  "10|mañana": {
+   "ordId": "mañana|n"
+  },
+  "10|con": {
+   "ordId": "con|prep"
+  },
+  "10|tener": {
+   "ordId": "tener|v"
+  },
+  "10|obtener": {
+   "ordId": "obtener|v"
+  },
+  "10|sostener": {
+   "ordId": "sostener|v"
+  },
+  "10|mantener": {
+   "ordId": "mantener|v"
+  },
+  "10|entretener": {
+   "ordId": "entretener|v"
+  },
+  "10|entre": {
+   "ordId": "entre|prep"
+  },
+  "11|tolerar": {
+   "ordId": "tolerar|v"
+  },
+  "11|tuitear": {
+   "ordId": "tuitear|v"
+  },
+  "11|facebuquear": {
+   "ordId": "facebuquear|v"
+  },
+  "11|googlear": {
+   "ordId": "googlear|v"
+  },
+  "11|eliminar": {
+   "ordId": "eliminar|v"
+  },
+  "11|durar": {
+   "ordId": "durar|v"
+  },
+  "11|mucho": {
+   "ordId": "mucho|adv"
+  },
+  "11|exagerar": {
+   "ordId": "exagerar|v"
+  },
+  "11|masticar": {
+   "ordId": "masticar|v"
+  },
+  "11|morder": {
+   "ordId": "morder|v"
+  },
+  "11|colaborar": {
+   "ordId": "colaborar|v"
+  },
+  "11|hablar": {
+   "ordId": "hablar|v"
+  },
+  "12|vender": {
+   "ordId": "vender|v"
+  },
+  "12|eléctrico / eléctrica": {
+   "ordId": "eléctrico|adj"
+  },
+  "12|generoso / generosa": {
+   "ordId": "generoso|adj"
+  },
+  "12|común": {
+   "ordId": "común|adj"
+  },
+  "12|oportuno / oportuna": {
+   "ordId": "oportuno|adj"
+  },
+  "12|claro / clara": {
+   "ordId": "claro|adj"
+  },
+  "12|la persona": {
+   "ordId": "persona|n"
+  },
+  "12|sincero / sincera": {
+   "ordId": "sincero|adj"
+  },
+  "12|nos": {
+   "ordId": "nos|pron"
+  },
+  "13|hacer": {
+   "ordId": "hacer|v"
+  },
+  "13|qué": {
+   "ordId": "qué|pron"
+  },
+  "13|puedo": {
+   "ordId": "poder|v"
+  },
+  "13|salir": {
+   "ordId": "salir|v"
+  },
+  "13|salgo": {
+   "ordId": "salir|v"
+  },
+  "13|esperar": {
+   "ordId": "esperar|v"
+  },
+  "13|boca": {
+   "ordId": "boca|n"
+  },
+  "13|vocabulario": {
+   "ordId": "vocabulario|n"
+  },
+  "13|necesario": {
+   "ordId": "necesario|adj"
+  },
+  "13|contrario": {
+   "ordId": "contrario|adj"
+  },
+  "14|saber": {
+   "ordId": "saber|v"
+  },
+  "14|sé": {
+   "ordId": "saber|v"
+  },
+  "14|él": {
+   "ordId": "él|pron"
+  },
+  "14|ella": {
+   "ordId": "ella|pron"
+  },
+  "14|yo": {
+   "ordId": "yo|pron"
+  },
+  "14|salir": {
+   "ordId": "salir|v"
+  },
+  "14|salgo": {
+   "ordId": "salir|v"
+  },
+  "14|tener que": {
+   "status": "fras"
+  },
+  "14|cuándo": {
+   "ordId": "cuándo|adv"
+  },
+  "14|poner": {
+   "ordId": "poner|v"
+  },
+  "14|pongo": {
+   "ordId": "poner|v"
+  },
+  "14|suponer": {
+   "ordId": "suponer|v"
+  },
+  "14|supongo": {
+   "ordId": "suponer|v"
+  },
+  "14|imponer": {
+   "ordId": "imponer|v"
+  },
+  "14|exponer": {
+   "ordId": "exponer|v"
+  },
+  "14|oponer": {
+   "ordId": "oponer|v"
+  },
+  "14|opongo": {
+   "ordId": "oponer|v"
+  },
+  "14|intentar": {
+   "ordId": "intentar|v"
+  },
+  "14|poder": {
+   "ordId": "poder|v"
+  },
+  "14|puedo": {
+   "ordId": "poder|v"
+  },
+  "15|pasar": {
+   "ordId": "pasar|v"
+  },
+  "15|tiempo": {
+   "ordId": "tiempo|n"
+  },
+  "15|concierto": {
+   "ordId": "concierto|n"
+  },
+  "15|noviembre": {
+   "ordId": "noviembre|n"
+  },
+  "15|pensar": {
+   "ordId": "pensar|v"
+  },
+  "15|más tarde": {
+   "status": "fras"
+  },
+  "15|entender": {
+   "ordId": "entender|v"
+  },
+  "15|comprender": {
+   "ordId": "comprender|v"
+  },
+  "15|perder": {
+   "ordId": "perder|v"
+  },
+  "16|comenzar": {
+   "ordId": "comenzar|v"
+  },
+  "16|empezar": {
+   "ordId": "empezar|v"
+  },
+  "16|el poder": {
+   "ordId": "poder|v"
+  },
+  "16|puerto": {
+   "ordId": "puerto|n"
+  },
+  "16|rico / rica": {
+   "ordId": "rico|adj"
+  },
+  "16|fuerza": {
+   "ordId": "fuerza|n"
+  },
+  "16|escuela": {
+   "ordId": "escuela|n"
+  },
+  "16|cuerpo": {
+   "ordId": "cuerpo|n"
+  },
+  "16|nuevo / nueva": {
+   "ordId": "nuevo|adj"
+  },
+  "16|pueblo": {
+   "ordId": "pueblo|n"
+  },
+  "16|población": {
+   "ordId": "población|n"
+  },
+  "16|la muerte": {
+   "ordId": "muerte|n"
+  },
+  "16|muerto / muerta": {
+   "ordId": "muerto|adj"
+  },
+  "16|dormir": {
+   "ordId": "dormir|v"
+  },
+  "16|dormirse": {
+   "ordId": "dormir|v"
+  },
+  "16|encontrar": {
+   "ordId": "encontrar|v"
+  },
+  "16|un encuentro": {
+   "ordId": "encuentro|n"
+  },
+  "16|mostrar": {
+   "ordId": "mostrar|v"
+  },
+  "16|una muestra": {
+   "ordId": "muestra|n"
+  },
+  "17|perder": {
+   "ordId": "perder|v"
+  },
+  "17|colgar": {
+   "ordId": "colgar|v"
+  },
+  "17|tomar": {
+   "ordId": "tomar|v"
+  },
+  "17|azúcar": {
+   "ordId": "azúcar|n"
+  },
+  "17|arroz": {
+   "ordId": "arroz|n"
+  },
+  "17|álgebra": {
+   "ordId": "álgebra|n"
+  },
+  "17|aceite": {
+   "ordId": "aceite|n"
+  },
+  "17|aceituna": {
+   "ordId": "aceituna|n"
+  },
+  "17|alfombra": {
+   "ordId": "alfombra|n"
+  },
+  "17|almohada": {
+   "ordId": "almohada|n"
+  },
+  "17|bebida": {
+   "ordId": "bebida|n"
+  },
+  "17|cerrar": {
+   "ordId": "cerrar|v"
+  },
+  "18|preferir": {
+   "ordId": "preferir|v"
+  },
+  "18|vivir": {
+   "ordId": "vivir|v"
+  },
+  "18|aquí": {
+   "ordId": "aquí|adv"
+  },
+  "18|acá": {
+   "ordId": "acá|adv"
+  },
+  "18|dónde": {
+   "ordId": "dónde|adv"
+  },
+  "18|entender": {
+   "ordId": "entender|v"
+  },
+  "18|siempre": {
+   "ordId": "siempre|adv"
+  },
+  "19|bien": {
+   "ordId": "bien|adv"
+  },
+  "19|bueno": {
+   "ordId": "bueno|interj"
+  },
+  "19|ir": {
+   "ordId": "ir|v"
+  },
+  "19|noche": {
+   "ordId": "noche|n"
+  },
+  "19|esta noche": {
+   "status": "fras"
+  },
+  "19|carne": {
+   "ordId": "carne|n"
+  },
+  "19|y": {
+   "ordId": "y|conj"
+  },
+  "19|alcohol": {
+   "ordId": "alcohol|n"
+  },
+  "20|pronto": {
+   "ordId": "pronto|adv"
+  },
+  "20|ver": {
+   "ordId": "ver|v"
+  },
+  "20|veo": {
+   "ordId": "ver|v"
+  },
+  "20|nos": {
+   "ordId": "nos|pron"
+  },
+  "20|la semana que viene": {
+   "status": "fras"
+  },
+  "21|haber": {
+   "ordId": "haber|v"
+  },
+  "21|he": {
+   "ordId": "haber|v"
+  },
+  "21|hemos": {
+   "ordId": "haber|v"
+  },
+  "21|ha": {
+   "ordId": "haber|v"
+  },
+  "21|has": {
+   "ordId": "haber|v"
+  },
+  "21|han": {
+   "ordId": "haber|v"
+  },
+  "21|por": {
+   "ordId": "por|prep"
+  },
+  "21|tiempo": {
+   "ordId": "tiempo|n"
+  },
+  "21|anticipar": {
+   "ordId": "anticipar|v"
+  },
+  "21|celebrar": {
+   "ordId": "celebrar|v"
+  },
+  "22|terminar": {
+   "ordId": "terminar|v"
+  },
+  "22|terminado": {
+   "ordId": "terminar|v"
+  },
+  "22|perdido": {
+   "ordId": "perdido|adj"
+  },
+  "22|nosotros": {
+   "ordId": "nosotros|pron"
+  },
+  "22|nosotras": {
+   "ordId": "nosotros|pron"
+  },
+  "22|tú": {
+   "ordId": "tú|pron"
+  },
+  "22|usted": {
+   "ordId": "usted|pron"
+  },
+  "22|ellos": {
+   "ordId": "ellos|pron"
+  },
+  "22|ellas": {
+   "ordId": "ellas|pron"
+  },
+  "23|el problema": {
+   "ordId": "problema|n"
+  },
+  "23|el sistema": {
+   "ordId": "sistema|n"
+  },
+  "23|el programa": {
+   "ordId": "programa|n"
+  },
+  "23|el aroma": {
+   "ordId": "aroma|n"
+  },
+  "23|el panorama": {
+   "ordId": "panorama|n"
+  },
+  "23|el clima": {
+   "ordId": "clima|n"
+  },
+  "23|sentir": {
+   "ordId": "sentir|v"
+  },
+  "24|dar": {
+   "ordId": "dar|v"
+  },
+  "24|doy": {
+   "ordId": "dar|v"
+  },
+  "24|ustedes": {
+   "ordId": "ustedes|pron"
+  },
+  "25|la cocina": {
+   "ordId": "cocina|n"
+  },
+  "25|cocinar": {
+   "ordId": "cocinar|v"
+  },
+  "25|ocho": {
+   "ordId": "ocho|num"
+  },
+  "25|nueve": {
+   "ordId": "nueve|num"
+  },
+  "25|diez": {
+   "ordId": "diez|num"
+  },
+  "25|quedar": {
+   "ordId": "quedar|v"
+  },
+  "25|quedarse": {
+   "ordId": "quedar|v"
+  },
+  "25|hasta": {
+   "ordId": "hasta|prep"
+  },
+  "26|siete": {
+   "ordId": "siete|num"
+  },
+  "26|llamar": {
+   "ordId": "llamar|v"
+  },
+  "26|cómo": {
+   "ordId": "cómo|adv"
+  },
+  "27|situación": {
+   "ordId": "situación|n"
+  },
+  "27|global": {
+   "ordId": "global|adj"
+  },
+  "27|digital": {
+   "ordId": "digital|adj"
+  },
+  "27|coche": {
+   "ordId": "coche|n"
+  },
+  "27|carro": {
+   "ordId": "carro|n"
+  },
+  "27|auto": {
+   "ordId": "auto|n"
+  },
+  "27|máquina": {
+   "ordId": "máquina|n"
+  },
+  "27|automóvil": {
+   "ordId": "automóvil|n"
+  },
+  "27|grande": {
+   "ordId": "grande|adj"
+  },
+  "27|rojo": {
+   "ordId": "rojo|adj"
+  },
+  "27|en": {
+   "ordId": "en|prep"
+  },
+  "28|caro": {
+   "ordId": "caro|adj"
+  },
+  "28|profesor": {
+   "ordId": "profesor|n"
+  },
+  "28|profesora": {
+   "ordId": "profesor|n"
+  },
+  "28|doctor": {
+   "ordId": "doctor|n"
+  },
+  "28|doctora": {
+   "ordId": "doctor|n"
+  },
+  "28|adictivo": {
+   "ordId": "adictivo|adj"
+  },
+  "28|positivo": {
+   "ordId": "positivo|adj"
+  },
+  "28|intuitivo": {
+   "ordId": "intuitivo|adj"
+  },
+  "28|muy": {
+   "ordId": "muy|adv"
+  },
+  "28|atractivo": {
+   "ordId": "atractivo|adj"
+  },
+  "28|creativo": {
+   "ordId": "creativo|adj"
+  },
+  "28|agresivo": {
+   "ordId": "agresivo|adj"
+  },
+  "28|negativo": {
+   "ordId": "negativo|adj"
+  },
+  "28|intensivo": {
+   "ordId": "intensivo|adj"
+  },
+  "28|nativo": {
+   "ordId": "nativo|adj"
+  },
+  "29|ser": {
+   "ordId": "ser|v"
+  },
+  "29|estar": {
+   "ordId": "estar|v"
+  },
+  "29|estoy": {
+   "ordId": "estar|v"
+  },
+  "29|está": {
+   "ordId": "estar|v"
+  },
+  "29|están": {
+   "ordId": "estar|v"
+  },
+  "29|estás": {
+   "ordId": "estar|v"
+  },
+  "29|estamos": {
+   "ordId": "estar|v"
+  },
+  "29|cansado / cansada": {
+   "ordId": "cansado|adj"
+  },
+  "29|muerto / muerta": {
+   "ordId": "muerto|adj"
+  },
+  "30|cómo": {
+   "ordId": "cómo|adv"
+  },
+  "30|dónde": {
+   "ordId": "dónde|adv"
+  },
+  "30|más tarde": {
+   "status": "fras"
+  },
+  "30|deber": {
+   "ordId": "deber|v"
+  },
+  "30|quedar": {
+   "ordId": "quedar|v"
+  },
+  "30|quedarse": {
+   "ordId": "quedar|v"
+  },
+  "31|español": {
+   "ordId": "español|adj"
+  },
+  "31|España": {
+   "ordId": "España|n"
+  },
+  "31|estudiante": {
+   "ordId": "estudiante|n"
+  },
+  "31|escuela": {
+   "ordId": "escuela|n"
+  },
+  "31|especial": {
+   "ordId": "especial|adj"
+  },
+  "31|espacial": {
+   "ordId": "espacial|adj"
+  },
+  "31|estricto": {
+   "ordId": "estricto|adj"
+  },
+  "31|espectacular": {
+   "ordId": "espectacular|adj"
+  },
+  "31|ser": {
+   "ordId": "ser|v"
+  },
+  "31|el ser humano": {
+   "status": "fras"
+  },
+  "31|el humano": {
+   "ordId": "humano|adj"
+  },
+  "31|dar": {
+   "ordId": "dar|v"
+  },
+  "31|doy": {
+   "ordId": "dar|v"
+  },
+  "31|soy": {
+   "ordId": "ser|v"
+  },
+  "31|eres": {
+   "ordId": "ser|v"
+  },
+  "31|somos": {
+   "ordId": "ser|v"
+  },
+  "32|aburrido": {
+   "ordId": "aburrido|adj"
+  },
+  "32|de": {
+   "ordId": "de|prep"
+  },
+  "32|liberar": {
+   "ordId": "liberar|v"
+  },
+  "32|libre": {
+   "ordId": "libre|adj"
+  },
+  "32|persona": {
+   "ordId": "persona|n"
+  },
+  "32|casado": {
+   "ordId": "casado|adj"
+  },
+  "32|ocupado": {
+   "ordId": "ocupado|adj"
+  },
+  "32|preocupado": {
+   "ordId": "preocupado|adj"
+  },
+  "33|listo / lista": {
+   "ordId": "listo|adj"
+  },
+  "33|tan": {
+   "ordId": "tan|adv"
+  },
+  "33|bueno / buena": {
+   "ordId": "bueno|interj"
+  },
+  "33|feliz": {
+   "ordId": "feliz|adj"
+  },
+  "33|felicidad": {
+   "ordId": "felicidad|n"
+  },
+  "34|desayunar": {
+   "ordId": "desayunar|v"
+  },
+  "34|el desayuno": {
+   "ordId": "desayuno|n"
+  },
+  "34|vender": {
+   "ordId": "vender|v"
+  },
+  "35|la sinceridad": {
+   "ordId": "sinceridad|n"
+  },
+  "35|sincero / sincera": {
+   "ordId": "sincero|adj"
+  },
+  "35|siendo": {
+   "ordId": "ser|v"
+  },
+  "35|honesto / honesta": {
+   "ordId": "honesto|adj"
+  },
+  "35|pronto": {
+   "ordId": "pronto|adv"
+  },
+  "35|la semana que viene": {
+   "status": "fras"
+  },
+  "36|comeré": {
+   "ordId": "comer|v"
+  },
+  "36|iré": {
+   "ordId": "ir|v"
+  },
+  "36|encontraré": {
+   "ordId": "encontrar|v"
+  },
+  "36|me quedaré": {
+   "ordId": "quedar|v"
+  },
+  "36|prepararé": {
+   "ordId": "preparar|v"
+  },
+  "36|esperaré": {
+   "ordId": "esperar|v"
+  },
+  "36|organizará": {
+   "ordId": "organizar|v"
+  },
+  "36|organizarán": {
+   "ordId": "organizar|v"
+  },
+  "36|estaré": {
+   "ordId": "estar|v"
+  },
+  "36|será": {
+   "ordId": "ser|v"
+  },
+  "37|dar": {
+   "ordId": "dar|v"
+  },
+  "37|algo": {
+   "ordId": "algo|pron"
+  },
+  "37|cuenta": {
+   "ordId": "cuenta|n"
+  },
+  "37|darse cuenta": {
+   "status": "fras"
+  },
+  "37|realizar": {
+   "ordId": "realizar|v"
+  },
+  "37|la cocina": {
+   "ordId": "cocina|n"
+  },
+  "37|cocinar": {
+   "ordId": "cocinar|v"
+  },
+  "37|la tarta": {
+   "ordId": "tarta|n"
+  },
+  "38|se": {
+   "ordId": "se|pron"
+  },
+  "38|quedarse": {
+   "ordId": "quedar|v"
+  },
+  "38|darse cuenta": {
+   "status": "fras"
+  },
+  "39|con": {
+   "ordId": "con|prep"
+  },
+  "39|mí": {
+   "ordId": "mí|pron"
+  },
+  "39|ti": {
+   "ordId": "ti|pron"
+  },
+  "39|hacer": {
+   "ordId": "hacer|v"
+  },
+  "39|el favor": {
+   "ordId": "favor|n"
+  },
+  "39|decir": {
+   "ordId": "decir|v"
+  },
+  "39|comprar": {
+   "ordId": "comprar|v"
+  },
+  "40|enamorarse": {
+   "ordId": "enamorar|v"
+  },
+  "40|soñar": {
+   "ordId": "soñar|v"
+  },
+  "40|conmigo": {
+   "ordId": "conmigo|adv"
+  },
+  "40|contigo": {
+   "ordId": "contigo|pron"
+  },
+  "40|depender": {
+   "ordId": "depender|v"
+  },
+  "40|si": {
+   "ordId": "si|conj"
+  },
+  "41|bailar": {
+   "ordId": "bailar|v"
+  },
+  "41|más tarde": {
+   "status": "fras"
+  },
+  "41|tiempo": {
+   "ordId": "tiempo|n"
+  },
+  "41|transformar": {
+   "ordId": "transformar|v"
+  },
+  "41|contaminar": {
+   "ordId": "contaminar|v"
+  },
+  "41|imaginar": {
+   "ordId": "imaginar|v"
+  },
+  "42|gustar": {
+   "ordId": "gustar|v"
+  },
+  "42|decir": {
+   "ordId": "decir|v"
+  },
+  "42|algo": {
+   "ordId": "algo|pron"
+  },
+  "42|si": {
+   "ordId": "si|conj"
+  },
+  "43|dar": {
+   "ordId": "dar|v"
+  },
+  "44|el sistema": {
+   "ordId": "sistema|n"
+  },
+  "44|el paradigma": {
+   "ordId": "paradigma|n"
+  },
+  "44|el esquema": {
+   "ordId": "esquema|n"
+  },
+  "44|el diagrama": {
+   "ordId": "diagrama|n"
+  },
+  "44|el planeta": {
+   "ordId": "planeta|n"
+  },
+  "44|este / esta": {
+   "ordId": "este|determiner"
+  },
+  "44|ese / esa": {
+   "ordId": "ese|determiner"
+  },
+  "44|la mano": {
+   "ordId": "mano|n"
+  },
+  "44|manejar": {
+   "ordId": "manejar|v"
+  },
+  "44|la foto (la fotografía)": {
+   "ordId": "foto|n"
+  },
+  "44|la moto (la motocicleta)": {
+   "ordId": "moto|n"
+  },
+  "44|tomar": {
+   "ordId": "tomar|v"
+  },
+  "44|la cámara": {
+   "ordId": "cámara|n"
+  },
+  "45|interesar": {
+   "ordId": "interesar|v"
+  },
+  "45|parecer": {
+   "ordId": "parecer|v"
+  },
+  "45|sal": {
+   "ordId": "sal|n"
+  },
+  "45|un poco": {
+   "ordId": "poco|adv"
+  },
+  "45|suponer": {
+   "ordId": "suponer|v"
+  },
+  "45|oponer": {
+   "ordId": "oponer|v"
+  },
+  "45|imponer": {
+   "ordId": "imponer|v"
+  },
+  "46|esperar": {
+   "ordId": "esperar|v"
+  },
+  "46|intentar": {
+   "ordId": "intentar|v"
+  },
+  "47|la cena": {
+   "ordId": "cena|n"
+  },
+  "47|cenar": {
+   "ordId": "cenar|v"
+  },
+  "47|quemar": {
+   "ordId": "quemar|v"
+  },
+  "47|el sol": {
+   "ordId": "sol|n"
+  },
+  "47|romper": {
+   "ordId": "romper|v"
+  },
+  "47|todo el tiempo": {
+   "status": "fras"
+  },
+  "47|este / estos": {
+   "ordId": "este|determiner"
+  },
+  "47|ese / esos": {
+   "ordId": "ese|determiner"
+  },
+  "48|cómo": {
+   "ordId": "cómo|adv"
+  },
+  "48|dos": {
+   "ordId": "dos|num"
+  },
+  "48|uno": {
+   "ordId": "uno|num"
+  },
+  "49|llamar": {
+   "ordId": "llamar|v"
+  },
+  "49|ayer": {
+   "ordId": "ayer|adv"
+  },
+  "49|cuatro": {
+   "ordId": "cuatro|num"
+  },
+  "50|por": {
+   "ordId": "por|prep"
+  },
+  "50|la razón": {
+   "ordId": "razón|n"
+  },
+  "50|el día": {
+   "ordId": "día|n"
+  },
+  "50|los días": {
+   "ordId": "día|n"
+  },
+  "50|todos los días": {
+   "status": "fras"
+  },
+  "50|tres": {
+   "ordId": "tres|num"
+  },
+  "50|trabajar": {
+   "ordId": "trabajar|v"
+  },
+  "51|cambiar": {
+   "ordId": "cambiar|v"
+  },
+  "51|creer": {
+   "ordId": "creer|v"
+  },
+  "51|discutir": {
+   "ordId": "discutir|v"
+  },
+  "51|forma": {
+   "ordId": "forma|n"
+  },
+  "51|actual": {
+   "ordId": "actual|adj"
+  },
+  "51|actualmente": {
+   "ordId": "actualmente|adv"
+  },
+  "51|argüir": {
+   "ordId": "argüir|v"
+  },
+  "52|resolver": {
+   "ordId": "resolver|v"
+  },
+  "52|explicar": {
+   "ordId": "explicar|v"
+  },
+  "52|explicación": {
+   "ordId": "explicación|n"
+  },
+  "52|curso": {
+   "ordId": "curso|n"
+  },
+  "52|salud": {
+   "ordId": "salud|n"
+  },
+  "52|saludable": {
+   "ordId": "saludable|adj"
+  },
+  "52|nadar": {
+   "ordId": "nadar|v"
+  },
+  "52|interesante": {
+   "ordId": "interesante|adj"
+  },
+  "52|irritar": {
+   "ordId": "irritar|v"
+  },
+  "52|irritante": {
+   "ordId": "irritante|adj"
+  },
+  "52|frustrar": {
+   "ordId": "frustrar|v"
+  },
+  "52|frustrante": {
+   "ordId": "frustrante|adj"
+  },
+  "52|menguar": {
+   "ordId": "menguar|v"
+  },
+  "52|luna": {
+   "ordId": "luna|n"
+  },
+  "52|lunes": {
+   "ordId": "lunes|n"
+  },
+  "52|martes": {
+   "ordId": "martes|n"
+  },
+  "52|miércoles": {
+   "ordId": "miércoles|n"
+  },
+  "52|jueves": {
+   "ordId": "jueves|n"
+  },
+  "52|viernes": {
+   "ordId": "viernes|n"
+  },
+  "52|viviente": {
+   "ordId": "viviente|adj"
+  },
+  "52|saliente": {
+   "ordId": "saliente|adj"
+  },
+  "53|ya": {
+   "ordId": "ya|adv"
+  },
+  "53|buscar": {
+   "ordId": "buscar|v"
+  },
+  "54|cerrar": {
+   "ordId": "cerrar|v"
+  },
+  "54|la puerta": {
+   "ordId": "puerta|n"
+  },
+  "54|la película": {
+   "ordId": "película|n"
+  },
+  "54|cansar": {
+   "ordId": "cansar|v"
+  },
+  "54|la persona": {
+   "ordId": "persona|n"
+  },
+  "54|la silla": {
+   "ordId": "silla|n"
+  },
+  "54|mojar": {
+   "ordId": "mojar|v"
+  },
+  "54|mojado / mojada": {
+   "ordId": "mojado|adj"
+  },
+  "55|complicar": {
+   "ordId": "complicar|v"
+  },
+  "55|complicado": {
+   "ordId": "complicado|adj"
+  },
+  "55|roto": {
+   "ordId": "roto|adj"
+  },
+  "55|morir": {
+   "ordId": "morir|v"
+  },
+  "55|muerto": {
+   "ordId": "muerto|adj"
+  },
+  "55|abrir": {
+   "ordId": "abrir|v"
+  },
+  "55|abierto": {
+   "ordId": "abierto|adj"
+  },
+  "55|dicho": {
+   "ordId": "dicho|adj"
+  },
+  "55|hecho": {
+   "ordId": "hecho|adj"
+  },
+  "55|huir": {
+   "ordId": "huir|v"
+  },
+  "55|hembra": {
+   "ordId": "hembra|n"
+  },
+  "55|hierro": {
+   "ordId": "hierro|n"
+  },
+  "55|ferrocarril": {
+   "ordId": "ferrocarril|n"
+  },
+  "55|hondo": {
+   "ordId": "hondo|adj"
+  },
+  "55|humo": {
+   "ordId": "humo|n"
+  },
+  "56|Estados Unidos": {
+   "status": "fras"
+  },
+  "56|unir": {
+   "ordId": "unir|v"
+  },
+  "56|la chica": {
+   "ordId": "chico|n"
+  },
+  "56|el chico": {
+   "ordId": "chico|n"
+  },
+  "56|cuál": {
+   "ordId": "cuál|pron"
+  },
+  "56|quién": {
+   "ordId": "quién|pron"
+  },
+  "56|quiénes": {
+   "ordId": "quién|pron"
+  },
+  "57|junto / juntos / juntas": {
+   "ordId": "junto|adj"
+  },
+  "57|fácil": {
+   "ordId": "fácil|adj"
+  },
+  "57|complicado": {
+   "ordId": "complicado|adj"
+  },
+  "57|así": {
+   "ordId": "así|adv"
+  },
+  "57|organizar": {
+   "ordId": "organizar|v"
+  },
+  "58|hablé": {
+   "ordId": "hablar|v"
+  },
+  "58|habló": {
+   "ordId": "hablar|v"
+  },
+  "58|enviar": {
+   "ordId": "enviar|v"
+  },
+  "58|envié": {
+   "ordId": "enviar|v"
+  },
+  "58|envió": {
+   "ordId": "enviar|v"
+  },
+  "58|todavía": {
+   "ordId": "todavía|adv"
+  },
+  "58|ayer": {
+   "ordId": "ayer|adv"
+  },
+  "58|olvidar": {
+   "ordId": "olvidar|v"
+  },
+  "58|el olvido": {
+   "ordId": "olvido|n"
+  },
+  "58|olvidé": {
+   "ordId": "olvidar|v"
+  },
+  "58|olvidó": {
+   "ordId": "olvidar|v"
+  },
+  "59|nada": {
+   "ordId": "nada|pron"
+  },
+  "59|nadie": {
+   "ordId": "nadie|pron"
+  },
+  "59|durar": {
+   "ordId": "durar|v"
+  },
+  "59|minuto": {
+   "ordId": "minuto|n"
+  },
+  "59|durante": {
+   "ordId": "durante|prep"
+  },
+  "59|media hora": {
+   "status": "fras"
+  },
+  "59|sin": {
+   "ordId": "sin|prep"
+  },
+  "59|parar": {
+   "ordId": "parar|v"
+  },
+  "59|par": {
+   "ordId": "par|n"
+  },
+  "59|comparar": {
+   "ordId": "comparar|v"
+  },
+  "59|separar": {
+   "ordId": "separar|v"
+  },
+  "60|a menudo": {
+   "status": "fras"
+  },
+  "60|desesperado": {
+   "ordId": "desesperado|adj"
+  },
+  "61|sonar": {
+   "ordId": "sonar|v"
+  },
+  "61|el teléfono": {
+   "ordId": "teléfono|n"
+  },
+  "61|llegar": {
+   "ordId": "llegar|v"
+  },
+  "61|quedarse": {
+   "ordId": "quedar|v"
+  },
+  "61|aparecer": {
+   "ordId": "aparecer|v"
+  },
+  "63|acordarse": {
+   "ordId": "acordar|v"
+  },
+  "64|hace": {
+   "ordId": "hacer|v"
+  },
+  "64|responder": {
+   "ordId": "responder|v"
+  },
+  "64|siete": {
+   "ordId": "siete|num"
+  },
+  "64|el mes": {
+   "ordId": "mes|n"
+  },
+  "64|anoche": {
+   "ordId": "anoche|adv"
+  },
+  "65|nadie más": {
+   "status": "fras"
+  },
+  "65|nada más": {
+   "status": "fras"
+  },
+  "65|vez": {
+   "ordId": "vez|n"
+  },
+  "65|una vez": {
+   "ordId": "vez|n"
+  },
+  "65|otra vez": {
+   "status": "fras"
+  },
+  "65|una vez más": {
+   "status": "fras"
+  },
+  "65|a la vez": {
+   "status": "fras"
+  },
+  "65|nuestro / nuestra": {
+   "ordId": "nuestro|determiner"
+  },
+  "65|su": {
+   "ordId": "su|determiner"
+  },
+  "65|propio / propia": {
+   "ordId": "propio|adj"
+  },
+  "65|ojo": {
+   "ordId": "ojo|n"
+  },
+  "66|doler": {
+   "ordId": "doler|v"
+  },
+  "66|la pierna": {
+   "ordId": "pierna|n"
+  },
+  "66|el dolor": {
+   "ordId": "dolor|n"
+  },
+  "66|la cabeza": {
+   "ordId": "cabeza|n"
+  },
+  "66|dolor de cabeza": {
+   "status": "fras"
+  },
+  "66|solo": {
+   "ordId": "solo|adv"
+  },
+  "67|salud": {
+   "ordId": "salud|n"
+  },
+  "67|limón": {
+   "ordId": "limón|n"
+  },
+  "68|hombre": {
+   "ordId": "hombre|n"
+  },
+  "68|este / esta / estos / estas": {
+   "ordId": "este|determiner"
+  },
+  "68|ese / esa / esos / esas": {
+   "ordId": "ese|determiner"
+  },
+  "68|esto / eso": {
+   "ordId": "esto|pron"
+  },
+  "68|creer": {
+   "ordId": "creer|v"
+  },
+  "68|tan": {
+   "ordId": "tan|adv"
+  },
+  "68|todo el día": {
+   "status": "fras"
+  },
+  "68|cuánto / cuánta / cuántos / cuántas": {
+   "ordId": "cuánto|determiner"
+  },
+  "70|lo que": {
+   "status": "fras"
+  },
+  "70|necesidad": {
+   "ordId": "necesidad|n"
+  },
+  "70|necesitar": {
+   "ordId": "necesitar|v"
+  },
+  "70|faltar": {
+   "ordId": "faltar|v"
+  },
+  "70|la falta": {
+   "ordId": "falta|n"
+  },
+  "70|hace falta": {
+   "status": "fras"
+  },
+  "70|pronto": {
+   "ordId": "pronto|adv"
+  },
+  "70|preferir": {
+   "ordId": "preferir|v"
+  },
+  "71|contar": {
+   "ordId": "contar|v"
+  },
+  "71|un cuento": {
+   "ordId": "cuento|n"
+  },
+  "71|contar con": {
+   "status": "fras"
+  },
+  "71|el hombre": {
+   "ordId": "hombre|n"
+  },
+  "71|el profesor / la profesora": {
+   "ordId": "profesor|n"
+  },
+  "71|al": {
+   "ordId": "al|prep"
+  },
+  "72|ahí": {
+   "ordId": "ahí|adv"
+  },
+  "72|allí": {
+   "ordId": "allí|adv"
+  },
+  "72|olvidar": {
+   "ordId": "olvidar|v"
+  },
+  "72|olvidarse": {
+   "ordId": "olvidar|v"
+  },
+  "72|callar": {
+   "ordId": "callar|v"
+  },
+  "72|callarse": {
+   "ordId": "callar|v"
+  },
+  "73|junto": {
+   "ordId": "junto|adj"
+  },
+  "73|vaya": {
+   "ordId": "ir|v"
+  },
+  "74|elegir": {
+   "ordId": "elegir|v"
+  },
+  "74|elección": {
+   "ordId": "elección|n"
+  },
+  "74|encontrarse": {
+   "ordId": "encontrar|v"
+  },
+  "74|volver": {
+   "ordId": "volver|v"
+  },
+  "74|revolver": {
+   "ordId": "revolver|v"
+  },
+  "74|hecho": {
+   "ordId": "hecho|adj"
+  },
+  "74|también": {
+   "ordId": "también|adv"
+  },
+  "75|seguir": {
+   "ordId": "seguir|v"
+  },
+  "75|conseguir": {
+   "ordId": "conseguir|v"
+  },
+  "75|perseguir": {
+   "ordId": "perseguir|v"
+  },
+  "75|o sea": {
+   "status": "fras"
+  },
+  "76|hay": {
+   "ordId": "haber|v"
+  },
+  "76|alguien": {
+   "ordId": "alguien|pron"
+  },
+  "76|había": {
+   "ordId": "haber|v"
+  },
+  "77|fuerte": {
+   "ordId": "fuerte|adj"
+  },
+  "77|lindo": {
+   "ordId": "lindo|adj"
+  },
+  "77|preguntar": {
+   "ordId": "preguntar|v"
+  },
+  "77|responder": {
+   "ordId": "responder|v"
+  },
+  "77|necesario": {
+   "ordId": "necesario|adj"
+  },
+  "77|pronto": {
+   "ordId": "pronto|adv"
+  },
+  "78|gratis": {
+   "ordId": "gratis|adj"
+  },
+  "78|espectacular": {
+   "ordId": "espectacular|adj"
+  },
+  "79|dejar": {
+   "ordId": "dejar|v"
+  },
+  "79|el mensaje": {
+   "ordId": "mensaje|n"
+  },
+  "79|esencial": {
+   "ordId": "esencial|adj"
+  },
+  "79|espacial": {
+   "ordId": "espacial|adj"
+  },
+  "79|ojalá": {
+   "ordId": "ojalá|adv"
+  },
+  "79|ojo": {
+   "ordId": "ojo|n"
+  },
+  "80|quemar": {
+   "ordId": "quemar|v"
+  },
+  "80|la cena": {
+   "ordId": "cena|n"
+  },
+  "80|acabar": {
+   "ordId": "acabar|v"
+  },
+  "80|la batería": {
+   "ordId": "batería|n"
+  },
+  "81|la puerta": {
+   "ordId": "puerta|n"
+  },
+  "81|volver a (+ verb)": {
+   "status": "fras"
+  },
+  "81|ocurrir": {
+   "ordId": "ocurrir|v"
+  },
+  "81|suceder": {
+   "ordId": "suceder|v"
+  },
+  "82|relevante": {
+   "ordId": "relevante|adj"
+  },
+  "82|era": {
+   "ordId": "ser|v"
+  },
+  "82|creíble": {
+   "ordId": "creíble|adj"
+  },
+  "82|increíble": {
+   "ordId": "increíble|adj"
+  },
+  "82|espectacular": {
+   "ordId": "espectacular|adj"
+  },
+  "84|traer": {
+   "ordId": "traer|v"
+  },
+  "84|extraer": {
+   "ordId": "extraer|v"
+  },
+  "84|atraer": {
+   "ordId": "atraer|v"
+  },
+  "84|contraer": {
+   "ordId": "contraer|v"
+  },
+  "84|distraer": {
+   "ordId": "distraer|v"
+  },
+  "84|distraerse": {
+   "ordId": "distraer|v"
+  },
+  "84|oír": {
+   "ordId": "oír|v"
+  },
+  "86|tendré": {
+   "ordId": "tener|v"
+  },
+  "86|vendré": {
+   "ordId": "venir|v"
+  },
+  "86|vendría": {
+   "ordId": "venir|v"
+  },
+  "86|pondré": {
+   "ordId": "poner|v"
+  },
+  "86|pondría": {
+   "ordId": "poner|v"
+  },
+  "86|saldré": {
+   "ordId": "salir|v"
+  },
+  "86|saldría": {
+   "ordId": "salir|v"
+  },
+  "86|haré": {
+   "ordId": "hacer|v"
+  },
+  "86|haría": {
+   "ordId": "hacer|v"
+  },
+  "86|diré": {
+   "ordId": "decir|v"
+  },
+  "86|diría": {
+   "ordId": "decir|v"
+  },
+  "86|podría": {
+   "ordId": "poder|v"
+  },
+  "87|tuve": {
+   "ordId": "tener|v"
+  },
+  "87|tuvo": {
+   "ordId": "tener|v"
+  },
+  "87|estuve": {
+   "ordId": "estar|v"
+  },
+  "87|estuvo": {
+   "ordId": "estar|v"
+  },
+  "87|dije": {
+   "ordId": "decir|v"
+  },
+  "87|dijo": {
+   "ordId": "decir|v"
+  },
+  "88|el traje": {
+   "ordId": "traje|n"
+  },
+  "88|el vino": {
+   "ordId": "vino|n"
+  },
+  "89|demasiado": {
+   "ordId": "demasiado|adv"
+  },
+  "89|de más": {
+   "status": "fras"
+  },
+  "89|ala": {
+   "ordId": "ala|n"
+  },
+  "89|aula": {
+   "ordId": "aula|n"
+  },
+  "89|alfombra": {
+   "ordId": "alfombra|n"
+  },
+  "89|almohada": {
+   "ordId": "almohada|n"
+  },
+  "89|alguno / algún": {
+   "ordId": "alguno|determiner"
+  },
+  "89|ninguno / ningún": {
+   "ordId": "ninguno|determiner"
+  },
+  "90|hispanohablante": {
+   "ordId": "hispanohablante|n"
+  },
+  "90|vos": {
+   "ordId": "vos|pron"
+  },
+  "90|vosotros": {
+   "ordId": "vosotros|pron"
+  },
+  "90|perfeccionar": {
+   "ordId": "perfeccionar|v"
+  }
+ }
+}

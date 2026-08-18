@@ -505,39 +505,78 @@ html.kbd .answerbar .send{width:38px;height:38px}
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
 
-/* ===== Lyssna: kurslektioner + spelare ===== */
-.lyssna{display:flex;flex-direction:column;gap:14px;padding:18px 16px 24px}
-.lyssnahuvud .stor{font-family:var(--serif);font-size:26px}
-.lyssnahuvud .omtext{margin:2px 0 0}
+/* ===== Lyssna: fast spelare över scrollbar lektionslista ===== */
+.lyssna{height:100%;display:flex;flex-direction:column;overflow:hidden}
+.lytopp{position:relative;display:flex;align-items:center;gap:12px;padding:18px 16px 12px;border-bottom:1px solid var(--line);flex-shrink:0}
+.lytitel{font-family:var(--serif);font-size:22px;font-weight:600;flex:1}
+.lykvar{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lysokkn{width:34px;height:34px;display:grid;place-items:center;color:var(--muted);border:none;background:none;border-radius:50%}
+.lysokfalt{position:absolute;inset:0;background:var(--app);display:none;align-items:center;gap:10px;padding:0 16px}
+.lysokfalt.pa{display:flex}
+.lysokfalt input{flex:1;border:none;background:none;font-size:16px;color:inherit}
+.lysokfalt input:focus{outline:none}
+.lysokfalt button{border:none;background:none;color:var(--muted)}
 
-.spelare{background:var(--card);border:1px solid var(--line);border-radius:16px;
-  padding:14px 16px;display:flex;flex-direction:column;gap:10px;
-  position:sticky;top:0;z-index:2;box-shadow:0 6px 18px rgba(43,36,30,.08)}
-.spelartitel{font-family:var(--serif);font-size:17px}
-.spelarrad{display:flex;align-items:center;justify-content:center;gap:22px}
-.spplay{width:62px;height:62px;border-radius:50%;border:none;
-  background:var(--accent-strong);color:var(--accent-on);font-size:22px;
-  display:grid;place-items:center}
-.sphopp{width:46px;height:46px;border-radius:50%;background:none;
-  border:1px solid var(--line);font-size:12px;font-weight:600}
-.spelartid{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);
-  font-variant-numeric:tabular-nums}
-.spelartid input[type=range]{flex:1;accent-color:var(--accent-strong)}
-.spelarfart{display:flex;gap:6px;justify-content:center}
-.spelarfart button{border:1px solid var(--line);background:none;border-radius:999px;
-  padding:4px 12px;font-size:12px}
-.spelarfart button[aria-pressed="true"]{background:var(--accent-strong);
-  color:var(--accent-on);border-color:var(--accent-strong)}
+#lyFokus{border-bottom:1px solid var(--line);flex-shrink:0}
+.lyfokus{margin:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 12px}
+.lyetikett{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--brons);font-weight:600}
+.lyfokustitel{font-family:var(--serif);font-size:20px;font-weight:600;margin:2px 0 0}
+.lyfokusmeta{font-size:11.5px;color:var(--muted);margin:0 0 6px;font-variant-numeric:tabular-nums}
+.lyfokusom{font-size:13px;line-height:1.55;color:var(--muted)}
+.lykontroller{display:flex;align-items:center;justify-content:center;gap:22px;margin:14px 0 4px}
+.lyplay{width:56px;height:56px;border-radius:50%;border:none;background:var(--accent-strong);color:var(--accent-on);font-size:19px;display:grid;place-items:center}
+.lyhopp{width:42px;height:42px;border-radius:50%;background:none;border:1px solid var(--line);font-size:10.5px;font-weight:600;color:var(--muted)}
+.lytidrad{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lytidrad input[type=range]{flex:1;accent-color:var(--accent-strong)}
+.lyfot{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.lyfart{font-size:11.5px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--muted);background:none;margin-right:auto}
+.lypill{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:6px 13px;color:var(--muted);background:none}
+.lypill[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--brons);color:var(--ink)}
+.lypanel{margin-top:12px}
+.lyfokus .lypanel{max-height:180px;overflow-y:auto}
+.lypanel[hidden]{display:none}
+.lynasta{display:block;width:100%;text-align:left;margin-top:12px;padding:10px 0 0;border:none;border-top:1px solid var(--line);background:none;font-size:12.5px;color:var(--muted)}
 
-.lektionlista{display:flex;flex-direction:column;gap:8px}
-.lektion{display:flex;align-items:center;gap:12px;text-align:left;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-.lektion.senast{border-color:var(--accent-strong)}
-.leknr{font-family:var(--serif);font-size:18px;color:var(--muted);min-width:26px;
-  font-variant-numeric:tabular-nums}
-.lekmitt{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.lekom{font-size:13px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;
-  -webkit-box-orient:vertical;overflow:hidden}
-.lekmeta{font-size:11px;color:var(--muted)}
-.lekstatus{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:30px;text-align:right}
-.lekstatus.klar{color:var(--good);font-size:14px}
+.lyrulle{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.lyrad{width:100%;text-align:left;display:flex;align-items:center;gap:14px;padding:13px 16px;border:none;background:none;border-bottom:1px solid var(--rule)}
+.lyrad .nr{font-family:var(--serif);font-size:16px;color:var(--muted);min-width:78px;font-variant-numeric:tabular-nums}
+.lyrad .meta{flex:1;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lyrad .st{font-size:13px;color:var(--good);min-width:20px;text-align:right}
+.lyrad.nu .nr{color:var(--ink);font-weight:600}
+.lyrad.nu .st{color:var(--brons)}
+.lyrad.oppen{border-bottom:none;background:var(--card)}
+.lyrad.oppen .nr{color:var(--ink);font-weight:600}
+.lyutfall{border-bottom:1px solid var(--rule);padding:0 16px 16px;background:var(--card)}
+.lyutfall .om{font-size:13.5px;line-height:1.6;margin:2px 0 12px}
+.lyutfall .knappar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lyspelakn{background:var(--accent-strong);color:var(--accent-on);border:none;border-radius:999px;padding:8px 18px;font-size:13px}
+.lytystkn{font-size:12px;color:var(--muted);background:none;border:none;text-decoration:underline;text-underline-offset:3px;margin-left:auto}
+.lyordrad{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:13px;align-items:baseline;border-bottom:1px solid var(--rule)}
+.lyordrad .es{font-family:var(--serif);font-style:italic}
+.lyordrad .en{color:var(--muted);text-align:right}
+
+.lygrupp{padding:14px 16px 4px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lytraff{display:flex;width:100%;text-align:left;gap:10px;padding:9px 16px;align-items:baseline;border:none;background:none;border-bottom:1px solid var(--rule)}
+.lytraff .es{font-family:var(--serif);font-style:italic}
+.lytraff .en{color:var(--muted);font-size:13px;flex:1}
+.lytraff .var{font-size:11px;color:var(--brons);white-space:nowrap}
+.lytraff mark{background:none;color:var(--brons);font-weight:600}
+.lytomtraff{padding:30px 16px;color:var(--muted);font-size:13px;text-align:center}
+
+.lytx{position:absolute;inset:0;background:var(--app);z-index:6;transform:translateY(102%);transition:transform .3s cubic-bezier(.3,.8,.3,1);display:flex;flex-direction:column}
+.lytx.pa{transform:none}
+.lyssna{position:relative}
+.lytxhuvud{padding:16px 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.lytxhuvud button{border:none;background:none;color:var(--muted)}
+.lytxtitel{font-family:var(--serif);font-size:17px;font-weight:600;flex:1}
+.lytxsok{padding:10px 16px;border-bottom:1px solid var(--line)}
+.lytxsok input{width:100%;border:none;background:none;font-size:13px;color:inherit}
+.lytxsok input:focus{outline:none}
+.lytxrulle{flex:1;overflow-y:auto;padding:10px 16px 40px}
+.lyseg{display:flex;gap:12px;padding:7px 8px;border-radius:10px;cursor:pointer;align-items:baseline}
+.lyseg.nu{background:var(--accent-soft)}
+.lyseg .t{font-size:10px;color:var(--muted);min-width:34px;font-variant-numeric:tabular-nums}
+.lyseg .vem{font-size:9.5px;font-weight:700;min-width:14px}
+.lyseg .vem.T{color:var(--accent)} .lyseg .vem.S{color:var(--brons)}
+.lyseg .text{font-size:13.5px;line-height:1.5;flex:1}
+.lyseg mark{background:none;color:var(--brons);font-weight:700}
