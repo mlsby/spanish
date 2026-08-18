@@ -444,6 +444,9 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       byggFokus(); byggLista();
     };
     oppenRad = radEl;
+    // lyft raden till scrollområdets topp så hela utfället syns
+    const rulle = $("lyRulle");
+    rulle.scrollTo({ top: radEl.offsetTop - rulle.offsetTop, behavior: "smooth" });
   }
 
   function stangRad(): void {
