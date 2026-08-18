@@ -62,6 +62,7 @@ let aktiv: Lektion | null = null;
 let tystUrl: string | null = null;
 let mjuk: { pos: number; timer: number; puls: number } | null = null;
 let molnTimer = 0; // debounce för positions-synk
+let audioLektion = 0; // vilken lektion audio.src faktiskt bär — vakt mot skrivningar över lektionsgränser
 
 export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<void> {
   if (!deps.inloggad()) {
@@ -260,6 +261,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       if (t) t.textContent = `Lektion ${aktiv.n} — kunde inte hämtas (${e instanceof Error ? e.message : e})`;
       return;
     }
+    audioLektion = aktiv.n;
     audio!.currentTime = pos;
     audio!.playbackRate = fart();
     if ("mediaSession" in navigator) {
@@ -315,6 +317,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
     audio = new Audio();
     audio.ontimeupdate = () => {
       if (!aktiv || !audio || mjuk) return;
+      if (audioLektion !== aktiv.n) return; // gammalt ljud hinner ticka under lektionsbyte
       const sok = el.querySelector<HTMLInputElement>("#lySok");
       const nu = el.querySelector("#lyNu");
       if (sok && aktiv.n === lage!.aktuell) { sok.value = String(audio.currentTime); }
@@ -335,7 +338,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
     audio.onpause = uppdateraKnapp;
     // lektionen tog slut: nästa ospelade armas i mjuk paus — låsskärmens play startar den
     audio.onended = () => {
-      if (!aktiv || mjuk) return;
+      if (!aktiv || mjuk || audioLektion !== aktiv.n) return;
       lage!.spelade.add(aktiv.n);
       void sparaLektionslage(deps.sb, aktiv.n, aktiv.sek, true);
       void uppdateraBoost(deps.store, deps.sb, BASE);
@@ -388,6 +391,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
   /** Byt aktuell lektion; autoplay startar den direkt. */
   function valjAktuell(n: number, autoplay: boolean): void {
     slappMjuk();
+    audio?.pause(); // stoppa gamla lektionens ljud INNAN bytet — annars tickar det in i nya
     lage!.aktuell = n;
     aktiv = lekt(n);
     void sparaAktuell(deps.sb, n);
