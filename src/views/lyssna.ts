@@ -20,8 +20,10 @@ const FARTER = [1, 1.25, 1.5, 0.75];
 
 /** Mjuk paus: sessionen hålls vid liv så länge — låsskärmens play funkar hela fönstret. */
 const MJUK_FONSTER_MS = 10 * 60 * 1000;
-const TYST_MARGINAL_S = 30;
-const PULS_MS = 5000;
+// gles puls + bred marginal: varje omparkering väcker Now Playing-ytan,
+// så färre ingrepp = mindre synligt flimmer på låsskärmen
+const TYST_MARGINAL_S = 60;
+const PULS_MS = 30_000;
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -196,7 +198,8 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       navigator.mediaSession.setPositionState({
         duration: aktiv.sek,
         position: Math.min(pos, aktiv.sek),
-        playbackRate: mjuk ? 1 : (audio?.playbackRate ?? 1),
+        // 0 under mjuk paus — annars animerar låsskärmen tiden och ser spelande ut
+        playbackRate: mjuk ? 0 : (audio?.playbackRate ?? 1),
       });
     } catch { /* trasig position får aldrig stoppa uppspelningen */ }
   }
@@ -231,6 +234,9 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
         if (!audio || !mjuk) return;
         if (mjuk.pos + TYST_MARGINAL_S > (audio.duration || 0)) parkeraITystnad(mjuk.pos);
         else audio.currentTime = mjuk.pos;
+        // seeken väcker Now Playing som läser elementets tillstånd (spelar) —
+        // återhävda paus-övertaget i samma tick så flimret korrigeras direkt
+        if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
         posState(mjuk.pos);
       }, PULS_MS),
     };
@@ -334,7 +340,11 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
       posState(audio.currentTime);
       foljTx();
     };
-    audio.onplay = uppdateraKnapp;
+    audio.onplay = () => {
+      // tystnadens playing-event får inte flippa låsskärmen till "spelar"
+      if (mjuk && "mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+      uppdateraKnapp();
+    };
     audio.onpause = uppdateraKnapp;
     // lektionen tog slut: nästa ospelade armas i mjuk paus — låsskärmens play startar den
     audio.onended = () => {
