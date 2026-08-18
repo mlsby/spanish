@@ -35,11 +35,14 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
 
 /**
  * iOS suspenderar webbprocessen strax efter en riktig paus och då dör
- * låsskärmens play-knapp. Mjuk paus spelar därför en tyst loop istället —
+ * låsskärmens play-knapp. Mjuk paus spelar därför tystnad istället —
  * sessionen lever, processen får köra, och play funkar från låsskärmen.
+ *
+ * Låsskärmen visar ljudELEMENTETS tid, så tystnaden måste vara lång nog
+ * att kunna stå PÅ paus-positionen — annars visas tystnadsfilens 0:00.
  */
-function tystLoopUrl(): string {
-  const sr = 8000, n = sr; // 1 s tystnad, 8-bit PCM
+function tystnadUrl(sekunder: number): string {
+  const sr = 8000, n = sr * Math.ceil(sekunder); // 8-bit mono PCM = 8 kB/s
   const buf = new ArrayBuffer(44 + n);
   const v = new DataView(buf);
   const w = (o: number, str: string) => [...str].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
@@ -51,12 +54,25 @@ function tystLoopUrl(): string {
   return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
 }
 
+/** Marginal ovanpå paus-positionen så pulsen alltid hinner dra tillbaka tiden. */
+const TYST_MARGINAL_S = 30;
+const PULS_MS = 5000;
+
 let kurs: Kurs | null = null;
 let audio: HTMLAudioElement | null = null;
 let aktiv: Lektion | null = null;
 let tystUrl: string | null = null;
-/** Satt under mjuk paus: positionen att återuppta på + timern som gör riktig paus. */
-let mjuk: { pos: number; timer: number } | null = null;
+/** Satt under mjuk paus: positionen att återuppta på, fönstertimern och pulsen som parkerar tiden. */
+let mjuk: { pos: number; timer: number; puls: number } | null = null;
+
+/** Byt tystnadskälla och parkera elementet på pos — släpper gamla bufferten. */
+function parkeraITystnad(pos: number): void {
+  if (!audio) return;
+  if (tystUrl) URL.revokeObjectURL(tystUrl);
+  tystUrl = tystnadUrl(pos + TYST_MARGINAL_S);
+  audio.src = tystUrl;
+  audio.currentTime = pos;
+}
 
 /** Signerad URL — bucketen är privat, RLS släpper bara in inloggade. */
 async function signadUrl(sb: SupabaseClient, fil: string): Promise<string> {
@@ -172,31 +188,51 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
   }
 
   /** Riktig paus — efter mjuka fönstret. Härifrån krävs app-öppning (iOS suspenderar). */
+  function slappMjuk(): void {
+    if (!mjuk) return;
+    window.clearTimeout(mjuk.timer);
+    window.clearInterval(mjuk.puls);
+    mjuk = null;
+  }
+
   function hardPaus(): void {
-    if (mjuk) { window.clearTimeout(mjuk.timer); mjuk = null; }
+    slappMjuk();
     audio?.pause();
     uppdateraKnapp();
   }
 
-  /** Mjuk paus: byt till tyst loop och håll sessionen vid liv i 10 min. */
-  function mjukPaus(): void {
-    if (!audio || !aktiv || mjuk) return;
-    const pos = Math.min(audio.currentTime, aktiv.sek);
-    localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(pos)));
-    mjuk = { pos, timer: window.setTimeout(hardPaus, MJUK_FONSTER_MS) };
-    tystUrl ??= tystLoopUrl();
-    audio.loop = true;
-    audio.src = tystUrl;
-    void audio.play().catch(hardPaus); // kan tyst loop inte spela är riktig paus ärligare
+  /** Mjuk paus: parkera i tystnad på paus-positionen och håll sessionen vid liv i 10 min. */
+  function armaMjuk(pos: number): void {
+    if (!audio) return;
+    mjuk = {
+      pos,
+      timer: window.setTimeout(hardPaus, MJUK_FONSTER_MS),
+      // parkera tiden på pos igen och igen — låsskärmen ska stå still där
+      puls: window.setInterval(() => {
+        if (!audio || !mjuk) return;
+        if (mjuk.pos + TYST_MARGINAL_S > (audio.duration || 0)) parkeraITystnad(mjuk.pos); // scrubbad förbi bufferten
+        else audio.currentTime = mjuk.pos;
+        posState(mjuk.pos);
+      }, PULS_MS),
+    };
+    parkeraITystnad(pos);
+    void audio.play().catch(hardPaus); // kan tystnaden inte spela är riktig paus ärligare
     if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
     posState(pos);
     uppdateraKnapp();
   }
 
+  function mjukPaus(): void {
+    if (!audio || !aktiv || mjuk) return;
+    const pos = Math.min(audio.currentTime, aktiv.sek);
+    localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(pos)));
+    armaMjuk(pos);
+  }
+
   /** Spela aktiv lektion från pos — signerar alltid om (länken kan ha hunnit gå ut). */
   async function spelaFran(pos: number): Promise<void> {
     if (!audio || !aktiv) return;
-    if (mjuk) { window.clearTimeout(mjuk.timer); mjuk = null; }
+    slappMjuk();
     audio.loop = false;
     try {
       audio.src = await signadUrl(deps.sb, aktiv.fil);
@@ -227,8 +263,12 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
     if (!aktiv) return;
     const p = Math.max(0, Math.min(pos, aktiv.sek));
     if (mjuk) {
-      mjuk.pos = p; // spola under mjuk paus flyttar bara märket
+      mjuk.pos = p; // spola under mjuk paus flyttar märket — och parkerar om tystnaden där
       localStorage.setItem(POS_KEY(aktiv.n), String(Math.floor(p)));
+      if (audio) {
+        if (p + TYST_MARGINAL_S > (audio.duration || 0)) parkeraITystnad(p);
+        else audio.currentTime = p;
+      }
     } else if (audio) {
       audio.currentTime = p;
     }
@@ -238,7 +278,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
   }
 
   async function valjLektion(l: Lektion, autoplay = true): Promise<void> {
-    if (mjuk) { window.clearTimeout(mjuk.timer); mjuk = null; }
+    slappMjuk();
     aktiv = l;
     localStorage.setItem(SENAST_KEY, String(l.n));
     const pos = Number(localStorage.getItem(POS_KEY(l.n)) ?? "0");
@@ -267,14 +307,7 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
         localStorage.setItem(SENAST_KEY, String(nasta.n));
         localStorage.setItem(POS_KEY(nasta.n), "0");
         visaLektionIUi(nasta, 0);
-        mjuk = { pos: 0, timer: window.setTimeout(hardPaus, MJUK_FONSTER_MS) };
-        tystUrl ??= tystLoopUrl();
-        audio!.loop = true;
-        audio!.src = tystUrl;
-        void audio!.play().catch(hardPaus);
-        if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
-        posState(0);
-        uppdateraKnapp();
+        armaMjuk(0);
       };
       if ("mediaSession" in navigator) {
         navigator.mediaSession.setActionHandler("play", () => { if (!spelarNu()) toggla(); });
