@@ -13,6 +13,7 @@ import { PassView } from "./views/pass";
 import { LasView } from "./views/las";
 import { renderOrdlista } from "./views/ordlista";
 import { renderTopplista } from "./views/topplista";
+import { renderLyssna } from "./views/lyssna";
 
 // pass-skärmen finns kvar men har ingen flik — dit kommer man via Starta-knapparna
 const TABS = [
@@ -25,6 +26,11 @@ const TABS = [
     id: "ordlista", label: "Ordlista",
     icon: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 4h13a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 4v14a2 2 0 0 0 2 2"/><path d="M10 9h6M10 13h4"/></svg>',
     iconOn: '<svg class="icf" viewBox="0 0 24 24"><path class="fl" d="M5 4h13a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 4v14a2 2 0 0 0 2 2"/></svg>',
+  },
+  {
+    id: "lyssna", label: "Lyssna",
+    icon: '<svg class="ico" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg>',
+    iconOn: '<svg class="icf" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0"/><rect class="fl" x="3" y="13" width="4" height="7" rx="2"/><rect class="fl" x="17" y="13" width="4" height="7" rx="2"/></svg>',
   },
   {
     id: "topplista", label: "Topplista",
@@ -97,6 +103,7 @@ async function boot(): Promise<void> {
     <div class="screen" id="screen-pass" hidden></div>
     <div class="screen" id="screen-las" hidden></div>
     <div class="screen" id="screen-ordlista" hidden></div>
+    <div class="screen" id="screen-lyssna" hidden></div>
     <div class="screen" id="screen-topplista" hidden></div>
     <nav class="tabbar" aria-label="Flikar">
       ${TABS.map(
@@ -109,6 +116,7 @@ async function boot(): Promise<void> {
     pass: root.querySelector("#screen-pass")!,
     las: root.querySelector("#screen-las")!,
     ordlista: root.querySelector("#screen-ordlista")!,
+    lyssna: root.querySelector("#screen-lyssna")!,
     topplista: root.querySelector("#screen-topplista")!,
   };
   const tabButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-tab]")];
@@ -126,6 +134,7 @@ async function boot(): Promise<void> {
     });
     if (id === "idag") renderIdagTab();
     if (id === "ordlista") renderOrdlista(screens.ordlista, store, social);
+    if (id === "lyssna") void renderLyssna(screens.lyssna, { sb, inloggad: () => sync.session !== null });
     if (id === "topplista") void renderTopplista(screens.topplista, { social, uid: sync.session?.user.id ?? null });
     if (id === "pass") { pass.refreshIdle(); pass.focusInput(); }
   }
