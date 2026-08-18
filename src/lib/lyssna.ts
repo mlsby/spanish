@@ -83,20 +83,31 @@ export async function hamtaLage(sb: SupabaseClient): Promise<LyssnaLage> {
   return lage;
 }
 
+/** RLS kräver att user_id skickas med explicit — utan den nekas upserten tyst. */
+async function uid(sb: SupabaseClient): Promise<string | null> {
+  return (await sb.auth.getSession()).data.session?.user.id ?? null;
+}
+
 export async function sparaLektionslage(
   sb: SupabaseClient, lektion: number, pos: number, spelad: boolean
 ): Promise<void> {
-  await sb.from("lyssna").upsert(
-    { lektion, pos: Math.floor(pos), spelad, updated_at: new Date().toISOString() },
+  const user_id = await uid(sb);
+  if (!user_id) return;
+  const { error } = await sb.from("lyssna").upsert(
+    { user_id, lektion, pos: Math.floor(pos), spelad, updated_at: new Date().toISOString() },
     { onConflict: "user_id,lektion" }
   );
+  if (error) console.error("lyssna-synk:", error.message);
 }
 
 export async function sparaAktuell(sb: SupabaseClient, n: number): Promise<void> {
-  await sb.from("lyssna").upsert(
-    { lektion: PEKARE, pos: n, spelad: false, updated_at: new Date().toISOString() },
+  const user_id = await uid(sb);
+  if (!user_id) return;
+  const { error } = await sb.from("lyssna").upsert(
+    { user_id, lektion: PEKARE, pos: n, spelad: false, updated_at: new Date().toISOString() },
     { onConflict: "user_id,lektion" }
   );
+  if (error) console.error("lyssna-synk:", error.message);
 }
 
 /**
