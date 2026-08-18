@@ -267,6 +267,11 @@ export async function renderLyssna(el: HTMLElement, deps: LyssnaDeps): Promise<v
         title: `Lektion ${aktiv.n}`,
         artist: "Complete Spanish · Language Transfer",
         album: "Glosa",
+        // explicit fullbleed-bild — annars ramar iOS in favicon med vit platta
+        artwork: [
+          { src: new URL(`${BASE}icon-512.png`, location.origin).href, sizes: "512x512", type: "image/png" },
+          { src: new URL(`${BASE}icon-1024.png`, location.origin).href, sizes: "1024x1024", type: "image/png" },
+        ],
       });
     }
     await audio!.play().catch(() => { /* autoplay-stopp är ok — play-knappen finns */ });
