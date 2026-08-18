@@ -14,6 +14,7 @@ import { LasView } from "./views/las";
 import { renderOrdlista } from "./views/ordlista";
 import { renderTopplista } from "./views/topplista";
 import { renderLyssna } from "./views/lyssna";
+import { uppdateraBoost } from "./lib/lyssna";
 
 // pass-skärmen finns kvar men har ingen flik — dit kommer man via Starta-knapparna
 const TABS = [
@@ -61,6 +62,10 @@ async function boot(): Promise<void> {
 
   const sb = createSupabase();
   const sync = new CloudSync(store, sb);
+  // lyssna-boosten: spelade lektioners ord prioriteras i introduktionskön
+  sb.auth.onAuthStateChange((_e, session) => {
+    if (session) void uppdateraBoost(store, sb, import.meta.env.BASE_URL);
+  });
   store.onDirty = (kind, key) => sync.markDirty(kind, key);
   store.snapshotToday();
 
@@ -134,7 +139,7 @@ async function boot(): Promise<void> {
     });
     if (id === "idag") renderIdagTab();
     if (id === "ordlista") renderOrdlista(screens.ordlista, store, social);
-    if (id === "lyssna") void renderLyssna(screens.lyssna, { sb, inloggad: () => sync.session !== null });
+    if (id === "lyssna") void renderLyssna(screens.lyssna, { sb, store, inloggad: () => sync.session !== null });
     if (id === "topplista") void renderTopplista(screens.topplista, { social, uid: sync.session?.user.id ?? null });
     if (id === "pass") { pass.refreshIdle(); pass.focusInput(); }
   }
