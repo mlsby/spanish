@@ -273,6 +273,16 @@ export class PassView {
       this.card.querySelector<HTMLTextAreaElement>("#mnemInput")?.focus();
       return;
     }
+    if (act === "avsta") {
+      // "öva inte på det här ordet mer" — inget betyg, enheten göms ur övningarna
+      const p = s.pending;
+      if (!p) return;
+      const namn = p.form ? p.form.es : p.word.es;
+      if (!window.confirm(`Öva inte mer på "${namn}"? Ordet göms ur övningarna — ångra i ordlistan.`)) return;
+      s.avsta();
+      this.efterKort();
+      return;
+    }
     if (act === "next") { this.saveMnemIfAny(); this.advance(); }
     else if (act === "save") {
       const ta = this.card.querySelector<HTMLTextAreaElement>("#mnemInput");
@@ -302,12 +312,19 @@ export class PassView {
   private advance(): void {
     const s = this.session;
     if (!s) return;
+    s.commit();
+    this.efterKort();
+  }
+
+  /** Gemensam svans när aktuellt kort lämnat kön — efter commit eller avstående. */
+  private efterKort(): void {
+    const s = this.session;
+    if (!s) return;
     this.clearTimer();
     this.gaveUp = false;
     this.showMnem = false;
     this.pendingSno = null;
     this.friendRules = [];
-    s.commit();
     if (s.finished) {
       clearPass(); // övningen slutförd — inget att återuppta
       this.store.snapshotToday();
@@ -437,6 +454,10 @@ export class PassView {
     return `<p class="tapnote" id="tapnote">${this.store.data.settings.autoNext
       ? "håll för paus · Enter för nästa" : "Enter för nästa"}</p>`;
   }
+  /** Diskret utväg i facit: avstå ordet helt — för glosor som inte känns relevanta. */
+  private avstaHtml(): string {
+    return `<p class="avstarad"><button type="button" class="linkbtn" data-act="avsta">öva inte på det här ordet mer</button></p>`;
+  }
   private mnemBox(wordId: string): string {
     const m = this.store.userWord(wordId).mnem;
     if (!m) return "";
@@ -518,7 +539,7 @@ export class PassView {
         return `${this.cdHtml("var(--good)")}          <p class="verdict v-good">${IC_OK}Rätt</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, false)}${this.alsoLine(p)}${this.mnemBox(p.word.id)}
-          ${this.tapHtml()}`;
+          ${this.tapHtml()}${this.avstaHtml()}`;
       case "hard":
         return `${this.cdHtml("var(--warn)")}          <p class="verdict v-warn">${IC_OK}Rätt — litet stavfel</p>
           <h2 class="head">${esc(this.facit(p))}</h2>
@@ -531,7 +552,7 @@ export class PassView {
             : p.card.dir === "es2sv"
               ? `<p class="fine">Svenskt stavfel — räknas som rätt.</p>`
               : `<p class="fine">Räknas som tuffare repetition — kortet kommer tillbaka lite tidigare.</p>`}
-          ${this.tapHtml()}`;
+          ${this.tapHtml()}${this.avstaHtml()}`;
       case "override":
         return `${this.cdHtml("var(--warn)")}          <p class="verdict v-warn">${IC_OK}Ändrat: rätt</p>
           ${this.promptLine(p)}
@@ -551,7 +572,8 @@ export class PassView {
             : `${this.mnemBox(p.word.id) /* har man en regel visas den ALLTID vid fel */}
               <div class="btnrow" style="margin-top:8px">
                 <button type="button" class="btn ghost" data-act="togglemnem">✎ ${this.store.userWord(p.word.id).mnem ? "Ändra regel" : "Minnesregel"}</button>
-                <button type="button" class="btn" data-act="next">Gå vidare</button></div>`}`;
+                <button type="button" class="btn" data-act="next">Gå vidare</button></div>`}
+          ${this.avstaHtml()}`;
       case "forced":
         return `<p class="verdict v-bad">${IC_X}${this.gaveUp ? "Visste inte" : "Fel"} — andra missen</p>
           ${this.gaveUp ? "" : `<p class="wrote">du skrev <s>${esc(p.raw)}</s>
@@ -560,7 +582,8 @@ export class PassView {
           <h2 class="head">${esc(this.facit(p))}</h2>
           ${this.parentLine(p)}${this.hintLine(p.word)}${this.exLine(p, true)}${this.alsoLine(p)}
           <p class="mustnote">Skriv din egen minnesregel för att gå vidare</p>
-          ${this.mnemForm(p, true)}`;
+          ${this.mnemForm(p, true)}
+          ${this.avstaHtml()}`;
     }
     return "";
   }

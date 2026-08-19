@@ -15,7 +15,7 @@ interface CardRow {
   word_id: string; dir: Dir; fsrs: CardRec["fsrs"];
   fail_count: number; introduced_at: string; updated_at: string;
 }
-interface UserWordRow { word_id: string; syn: string[]; mnem: string; updated_at: string }
+interface UserWordRow { word_id: string; syn: string[]; mnem: string; skip?: boolean; updated_at: string }
 interface SettingsRow { new_per_day: number; updated_at: string }
 interface SnapshotRow { day: string; kan: number; lar: number }
 
@@ -56,7 +56,10 @@ export function mergeCloudIntoLocal(data: AppData, cloud: CloudRows): number {
   for (const r of cloud.userWords) {
     const local = data.userWords[r.word_id];
     if (!local || newerThan(r.updated_at, local.updatedAt)) {
-      data.userWords[r.word_id] = { syn: r.syn, mnem: r.mnem, updatedAt: r.updated_at };
+      data.userWords[r.word_id] = {
+        syn: r.syn, mnem: r.mnem, updatedAt: r.updated_at,
+        ...(r.skip ? { skip: true } : {}),
+      };
       adopted++;
     }
   }
@@ -217,6 +220,19 @@ export class CloudSync {
     return out;
   }
 
+  /**
+   * Finns skip-kolumnen i molnet än? Migration 0004 kan släpa efter en deploy —
+   * tills den körts synkas avstådda ord inte (lokalt funkar de ändå).
+   */
+  private skipKolumn: boolean | null = null;
+  private async harSkipKolumn(): Promise<boolean> {
+    if (this.skipKolumn === null) {
+      const { error } = await this.sb.from("user_words").select("skip").limit(1);
+      this.skipKolumn = !error;
+    }
+    return this.skipKolumn;
+  }
+
   private async pullAll(): Promise<CloudRows> {
     // user_words är läsbar för alla inloggade (kompisregler) sedan 0002 —
     // egna pulls MÅSTE därför filtrera på user_id, annars adopteras andras
@@ -225,9 +241,11 @@ export class CloudSync {
     const uid = this.uid();
     const own = (q: any) => q.eq("user_id", uid);
     const since = new Date(Date.now() - 120 * 24 * 3600 * 1000).toISOString();
+    const uwSelect = (await this.harSkipKolumn())
+      ? "word_id,syn,mnem,skip,updated_at" : "word_id,syn,mnem,updated_at";
     const [cards, userWords, snapshots, reviewRows] = await Promise.all([
       this.pageAll<CardRow>("cards", "word_id,dir,fsrs,fail_count,introduced_at,updated_at", own),
-      this.pageAll<UserWordRow>("user_words", "word_id,syn,mnem,updated_at", own),
+      this.pageAll<UserWordRow>("user_words", uwSelect, own),
       this.pageAll<SnapshotRow>("snapshots", "day,kan,lar", own),
       this.pageAll<{ ts: string }>("reviews", "ts", (q) => own(q).gte("ts", since)),
     ]);
@@ -247,6 +265,16 @@ export class CloudSync {
     return {
       user_id: this.uid(), word_id: rec.wordId, dir: rec.dir, fsrs: rec.fsrs,
       fail_count: rec.failCount, introduced_at: rec.introducedAt, updated_at: cardStamp(rec),
+    };
+  }
+
+  /** user_words-rad — skip skickas bara när kolumnen finns (migration 0004). */
+  private userWordRow(wordId: string, medSkip: boolean) {
+    const uw = this.store.data.userWords[wordId];
+    return {
+      user_id: this.uid(), word_id: wordId, syn: uw.syn, mnem: uw.mnem,
+      ...(medSkip ? { skip: !!uw.skip } : {}),
+      updated_at: uw.updatedAt ?? new Date().toISOString(),
     };
   }
 
@@ -288,12 +316,11 @@ export class CloudSync {
 
   private async pushEverything(): Promise<void> {
     const d = this.store.data;
+    const medSkip = await this.harSkipKolumn();
     await this.upsertChunks("cards", Object.values(d.cards).map((c) => this.cardRow(c)), "user_id,word_id,dir");
     await this.upsertChunks("user_words",
-      Object.entries(d.userWords).map(([wordId, uw]) => ({
-        user_id: this.uid(), word_id: wordId, syn: uw.syn, mnem: uw.mnem,
-        updated_at: uw.updatedAt ?? new Date().toISOString(),
-      })), "user_id,word_id");
+      Object.keys(d.userWords).map((wordId) => this.userWordRow(wordId, medSkip)),
+      "user_id,word_id");
     await this.pushSettings();
     await this.upsertChunks("snapshots", this.snapshotRows(Object.keys(d.snapshots)), "user_id,day");
     await this.pushReviews();
@@ -313,11 +340,9 @@ export class CloudSync {
         this.dirtyCards.clear();
       }
       if (this.dirtyWords.size) {
-        const rows = [...this.dirtyWords].filter((w) => d.userWords[w]).map((wordId) => ({
-          user_id: this.uid(), word_id: wordId, syn: d.userWords[wordId].syn,
-          mnem: d.userWords[wordId].mnem,
-          updated_at: d.userWords[wordId].updatedAt ?? new Date().toISOString(),
-        }));
+        const medSkip = await this.harSkipKolumn();
+        const rows = [...this.dirtyWords].filter((w) => d.userWords[w])
+          .map((wordId) => this.userWordRow(wordId, medSkip));
         await this.upsertChunks("user_words", rows, "user_id,word_id");
         this.dirtyWords.clear();
       }

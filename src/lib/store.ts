@@ -177,6 +177,22 @@ export class Store {
     this.dirty("userWord", wordId);
   }
 
+  /** Övas inte: användaren har avstått enheten. Böjningar ärver moderverbets val. */
+  avstadd(unitId: string): boolean {
+    if (this.userWord(unitId).skip) return true;
+    const f = this.formById.get(unitId);
+    return !!f && !!this.userWord(f.parent).skip;
+  }
+
+  /** "Öva inte på det här ordet mer" (och ångra). Historiken och korten rörs inte. */
+  setAvstadd(unitId: string, on: boolean): void {
+    const uw = this.userWord(unitId);
+    if (!!uw.skip === on) return;
+    this.data.userWords[unitId] = { ...uw, skip: on, updatedAt: new Date().toISOString() };
+    this.save();
+    this.dirty("userWord", unitId);
+  }
+
   setNewFirst(v: number): void {
     this.data.settings.newFirst = v;
     this.data.settings.updatedAt = new Date().toISOString();
@@ -272,11 +288,11 @@ export class Store {
     this.dirty("card", cardKey(rec.wordId, rec.dir));
   }
 
-  /** Förfallna kort (due ≤ slutet av idag), äldst först. */
+  /** Förfallna kort (due ≤ slutet av idag), äldst först. Avstådda ord räknas inte. */
   dueCards(now: Date = new Date()): CardRec[] {
     const cutoff = endOfToday(now).getTime();
     return Object.values(this.data.cards)
-      .filter((c) => dueDate(c).getTime() <= cutoff)
+      .filter((c) => dueDate(c).getTime() <= cutoff && !this.avstadd(c.wordId))
       .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime());
   }
 
@@ -324,17 +340,20 @@ export class Store {
       if (form && dayKey(new Date(c.introducedAt)) === day) parentToday.add(form.parent);
     }
     const formQueue = this.forms
-      .filter((f) => !this.card(f.id, "es2sv") && this.formUnlocked(f) && !parentToday.has(f.parent))
+      .filter((f) => !this.card(f.id, "es2sv") && this.formUnlocked(f) &&
+                     !parentToday.has(f.parent) && !this.avstadd(f.id))
       .sort((a, b) => a.slot - b.slot || a.r - b.r);
     const prioQueue = this.lyssnaPrio
       .map((id) => this.byId.get(id))
       .filter((w): w is Word => w !== undefined);
     const out: IntroUnit[] = [];
     const picked = new Set<string>();
+    // avstådda ord introduceras aldrig — kön går vidare till nästa
+    const upptagen = (id: string) => !!this.card(id, "es2sv") || picked.has(id) || this.avstadd(id);
     let fi = 0, wi = 0, pi = 0;
     while (out.length < count) {
-      while (pi < prioQueue.length && (this.card(prioQueue[pi].id, "es2sv") || picked.has(prioQueue[pi].id))) pi++;
-      while (wi < this.words.length && (this.card(this.words[wi].id, "es2sv") || picked.has(this.words[wi].id))) wi++;
+      while (pi < prioQueue.length && upptagen(prioQueue[pi].id)) pi++;
+      while (wi < this.words.length && upptagen(this.words[wi].id)) wi++;
       while (fi < formQueue.length && parentToday.has(formQueue[fi].parent)) fi++;
       const nf = formQueue[fi];
       const boost = pi < prioQueue.length;
@@ -381,7 +400,8 @@ export class Store {
     const cutoff = now.getTime() + days * 24 * 3600 * 1000;
     let n = 0;
     for (const key in this.data.cards) {
-      if (dueDate(this.data.cards[key]).getTime() <= cutoff) n++;
+      const c = this.data.cards[key];
+      if (dueDate(c).getTime() <= cutoff && !this.avstadd(c.wordId)) n++;
     }
     return n;
   }
@@ -392,7 +412,8 @@ export class Store {
     let n = 0;
     for (const key in this.data.cards) {
       const c = this.data.cards[key];
-      if (c.dir === "es2sv" && c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff) n++;
+      if (c.dir === "es2sv" && c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff &&
+          !this.avstadd(c.wordId)) n++;
     }
     return n;
   }
@@ -420,7 +441,7 @@ export class Store {
   portionsPlan(now: Date = new Date()): PortionsPlan {
     const N = this.nivaConf().kort;
     const cutoff = endOfToday(now).getTime();
-    const alla = Object.values(this.data.cards);
+    const alla = Object.values(this.data.cards).filter((c) => !this.avstadd(c.wordId));
     const kritik = (c: CardRec) =>
       (now.getTime() - dueDate(c).getTime()) / Math.max(c.fsrs.stability, 0.1);
     const dueRep = alla
@@ -470,7 +491,7 @@ export class Store {
   glosorKlara(now: Date = new Date()): boolean {
     const cutoff = endOfToday(now).getTime();
     const harDue = Object.values(this.data.cards)
-      .some((c) => dueDate(c).getTime() <= cutoff);
+      .some((c) => dueDate(c).getTime() <= cutoff && !this.avstadd(c.wordId));
     return !harDue && (this.budgetKvar(now) === 0 || this.nextIntroUnits(1, now).length === 0);
   }
 
@@ -537,6 +558,8 @@ export class Store {
    * förfaller; "övar" lägger ordet i dagens pass; "ny" börjar om från noll.
    */
   setLevel(wordId: string, level: Level, now: Date = new Date()): void {
+    // flyttar man ett avstått ord på stegen vill man uppenbart ha tillbaka det
+    if (this.userWord(wordId).skip) this.setAvstadd(wordId, false);
     const dirs: Dir[] = ["es2sv", "sv2es"];
     if (level === "ny" && dirs.every((d) => !this.card(wordId, d))) return; // redan orört
     for (const dir of dirs) {
@@ -565,8 +588,10 @@ export class Store {
   stats() {
     // poängen räknas på NIVÅN: ny = inget svar än; lar = på väg (minst ett svar);
     // kan = sitter. Introducerade men obesvarade ord ger ingen poäng.
-    let ny = 0, lar = 0, kan = 0;
+    // Avstådda enheter står helt utanför — varken poäng eller mål.
+    let ny = 0, lar = 0, kan = 0, avstadda = 0;
     for (const w of this.words) {
+      if (this.avstadd(w.id)) { avstadda++; continue; }
       const lvl = this.wordStatus(w).level;
       if (lvl === "ny") ny++;
       else if (lvl === "kan") kan++;
@@ -574,17 +599,19 @@ export class Store {
     }
     // böjningsformerna är fullvärdiga poäng — samma nivåregler som orden
     for (const f of this.forms) {
+      if (this.avstadd(f.id)) { avstadda++; continue; }
       const lvl = this.formLevel(f);
       if (lvl === "ny") ny++;
       else if (lvl === "kan") kan++;
       else lar++;
     }
+    const total = this.words.length + this.forms.length - avstadda;
     return {
       ny, lar, kan,
       score: kan + lar, // nivåresans poäng — orden man kan + orden på väg
       started: lar + kan,
-      total: this.words.length + this.forms.length,
-      goal: this.words.length + this.forms.length, // hela basen: ord + böjningsformer
+      total,
+      goal: total, // hela basen: ord + böjningsformer, minus avstådda
     };
   }
 

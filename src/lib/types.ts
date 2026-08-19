@@ -20,6 +20,7 @@ export interface Word {
 export interface UserWord {
   syn: string[]; // användarens egna synonymtillägg (inkl. "jag hade rätt"-overrides)
   mnem: string;  // minnesregeln — alltid användarens egen text
+  skip?: boolean; // avstådd: "öva inte på det här ordet mer"
   updatedAt?: string; // för last-write-wins vid molnsynk
 }
 

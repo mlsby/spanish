@@ -119,7 +119,8 @@ export function byggUnderlag(
     dirs.set(rec.wordId, (dirs.get(rec.wordId) ?? 0) + 1);
     minS.set(rec.wordId, Math.min(minS.get(rec.wordId) ?? Infinity, rec.fsrs.stability));
   }
-  const introducerade = [...dirs.keys()];
+  // avstådda ord ska varken quizzas eller matas in i berättelserna
+  const introducerade = [...dirs.keys()].filter((id) => !store.avstadd(id));
   const kan = (id: string) =>
     (dirs.get(id) ?? 0) >= 2 && (minS.get(id) ?? 0) >= KNOWN_STABILITY_DAYS;
 

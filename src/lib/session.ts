@@ -73,7 +73,7 @@ export class Session {
     const cards: CardRec[] = [];
     for (const [wordId, dir] of state.queue) {
       const c = store.card(wordId, dir);
-      if (c && dueDate(c).getTime() <= cutoff) cards.push(c);
+      if (c && dueDate(c).getTime() <= cutoff && !store.avstadd(wordId)) cards.push(c);
     }
     const s = new Session(store, [], { dueSoonBaseline: state.baseline });
     s.queue = cards; // behåll passets ordning — den var redan syskonavståndad
@@ -140,6 +140,20 @@ export class Session {
     if (!p.firstExposure || p.grade !== "hard") return p;
     this.pending = { ...p, grade: "good", step: "override", easy: true };
     return this.pending;
+  }
+
+  /**
+   * "Öva inte på det här ordet mer": inget betyg loggas, enheten flaggas som
+   * avstådd och alla dess kort (för moderverb även böjningarnas) lämnar kön.
+   */
+  avsta(): void {
+    const card = this.pending?.card ?? this.current;
+    if (!card) return;
+    this.pending = null;
+    this.store.setAvstadd(card.wordId, true);
+    this.queue = this.queue.filter(
+      (c) => c.wordId !== card.wordId && this.store.formFor(c)?.parent !== card.wordId,
+    );
   }
 
   /**

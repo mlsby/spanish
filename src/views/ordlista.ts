@@ -204,6 +204,12 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     return `<div class="stege">${stops}</div>${tip}`;
   }
 
+  /** Avstå/ta tillbaka-länken i expansionen — flaggan sitter på enhetens eget id. */
+  function avstaHtml(id: string): string {
+    return `<button type="button" class="linkbtn avstalank" data-avsta>
+      ${store.userWord(id).skip ? "ta tillbaka ordet i övningarna" : "öva inte på det här ordet"}</button>`;
+  }
+
   /** Böjningsradens expansion: stege + härkomst + minnesregel (inga syns/exempel). */
   function formRowx(ws: WordStatus, f: VerbForm, uw: { mnem: string }): string {
     const parent = store.byId.get(f.parent);
@@ -214,24 +220,28 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       <div><div class="xl">Minnesregel — din egen</div>
         <textarea data-mnem aria-label="Minnesregel"
           placeholder="Skriv något som får formen att fastna …">${esc(uw.mnem)}</textarea></div>
-      <button type="button" class="mini" data-savemnem>Spara</button>`;
+      <button type="button" class="mini" data-savemnem>Spara</button>
+      ${avstaHtml(f.id)}`;
   }
 
   function rowHtml(ws: WordStatus): string {
     const { word } = ws;
     const uw = store.userWord(word.id);
     const open = word.id === openId;
+    const av = store.avstadd(word.id);
+    const avChip = av ? `<span class="chip-avsta">övas inte</span>` : "";
     const es = word.art ? `${word.art} ${word.es}` : word.es;
     const form = word.pos === "vform" ? store.formById.get(word.id) : undefined;
     if (form) {
       const known = ws.level === "kan";
       return `
-      <div class="row${open ? " open" : ""}" data-id="${esc(word.id)}">
+      <div class="row${open ? " open" : ""}${av ? " avstadd" : ""}" data-id="${esc(word.id)}">
         <div class="rowline">
           <button type="button" class="rowbtn" aria-expanded="${open}">
             <span class="es">${esc(word.es)}</span><span class="sv">${esc(word.sv)}</span>
             <span class="meta">
               <span class="rank">#${word.rank}</span>
+              ${avChip}
               ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
               ${radNotis(ws)}
               ${pathHtml(ws)}
@@ -252,12 +262,13 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       .join("");
     const known = ws.level === "kan";
     return `
-      <div class="row${open ? " open" : ""}" data-id="${esc(word.id)}">
+      <div class="row${open ? " open" : ""}${av ? " avstadd" : ""}" data-id="${esc(word.id)}">
         <div class="rowline">
           <button type="button" class="rowbtn" aria-expanded="${open}">
             <span class="es">${esc(es)}</span><span class="sv">${esc(word.sv)}</span>
             <span class="meta">
               <span class="rank">#${word.rank}</span>
+              ${avChip}
               ${uw.mnem ? `<span class="chip-regel">regel</span>` : ""}
               ${kompisChip(word.id)}
               ${radNotis(ws)}
@@ -285,6 +296,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
               placeholder="Skriv något som får ordet att fastna …">${esc(uw.mnem)}</textarea></div>
           <div class="frules" data-frw="${esc(word.id)}"></div>
           <button type="button" class="mini" data-savemnem>Spara</button>
+          ${avstaHtml(word.id)}
         </div>
       </div>`;
   }
@@ -476,6 +488,12 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       if (lvl === "ny" && !window.confirm(`Nollställa "${unitEs(id)}"? Ordet börjar om från Ny.`)) return;
       store.setLevel(id, lvl);
       moved = { id, text: MOVED_MSG[lvl] };
+      renderRows();
+      return;
+    }
+    if (t.closest("[data-avsta]")) {
+      // växlar enhetens EGEN flagga — ordet göms/återvänder i övningarna direkt
+      store.setAvstadd(id, !store.userWord(id).skip);
       renderRows();
       return;
     }

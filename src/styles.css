@@ -291,6 +291,9 @@ details.om summary{cursor:pointer;font-size:13.5px;font-weight:600;padding:2px 0
 .formchip{display:inline-flex;align-items:center;gap:5px}
 .formchip .dot{width:6px;height:6px}
 .linkbtn{background:none;border:0;color:var(--accent);font-size:13px;text-decoration:underline;padding:4px}
+/* "öva inte på det här ordet mer" — diskret sista utväg längst ner i facit */
+.avstarad{margin:10px 0 0;text-align:center}
+.avstarad .linkbtn{color:var(--muted);font-size:12px}
 .vetinte{text-align:center;margin:2px 0 0}
 .vetinte button{background:none;border:0;color:var(--muted);font-size:12.5px;
                 text-decoration:underline;text-decoration-thickness:1px;
@@ -394,6 +397,10 @@ html.kbd .vetinte button{padding:3px 14px}
 .row .rank{font-family:var(--mono);font-size:9.5px;color:var(--muted);opacity:.65;font-variant-numeric:tabular-nums}
 .chip-regel{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);
             background:var(--accent-soft);border:0;border-radius:99px;padding:2px 7px}
+.chip-avsta{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+            background:var(--rule);border:1px solid var(--line);border-radius:99px;padding:1px 7px}
+.row.avstadd .rowbtn{opacity:.55}
+.avstalank{align-self:flex-start;color:var(--muted);font-size:12.5px;padding:0}
 .rowx{display:none;border-top:1px solid var(--line);padding:12px 13px;flex-direction:column;gap:10px}
 .row.open .rowx{display:flex}
 .rowx .xl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
