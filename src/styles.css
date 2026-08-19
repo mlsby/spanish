@@ -118,10 +118,7 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .nivbadge{font-size:16px;margin:2px 0 4px}
 .nivbadge b{font-family:var(--serif);font-size:22px}
 .nivbadge .nivsub{color:var(--muted);font-size:13px}
-.nivrow{display:flex;align-items:baseline;gap:7px;margin:0 0 9px;font-size:15px}
-.nivrow b{font-family:var(--serif);font-size:20px}
-.nivrow .nivsub{color:var(--muted);font-size:12.5px}
-.meter.resa{display:flex}
+.meter.resa{display:flex;margin-top:6px}
 .meter.resa .seg{border-radius:0;flex:none}
 .meter.resa .seg.kan{background:var(--good);border-radius:3px 0 0 3px}
 .meter.resa .seg.lar{background:var(--pavag)}
@@ -134,6 +131,8 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .resapanel{cursor:pointer;user-select:none;-webkit-user-select:none}
 .resapanel .plabel{display:flex;justify-content:space-between;align-items:center}
 .resapil{color:var(--muted);font-size:12px}
+/* delaren mellan Nu- och Mexiko-sektionen — full bredd genom panelens padding */
+.delare{border-top:1px solid var(--line);margin:14px -16px 12px}
 .trappa{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column}
 .niv{display:flex;align-items:center;gap:10px;padding:6px;border-radius:9px;position:relative}
 .niv .pricken{width:15px;height:15px;border-radius:50%;flex:none;display:flex;align-items:center;

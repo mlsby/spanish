@@ -86,59 +86,105 @@ function heatmapHtml(days: Record<string, number>): string {
     </div>`;
 }
 
-/** Mexiko-grafen: historiken (kan + på gång) till idag, streckad prognos till resan. */
-function mexikoHtml(store: Store): string {
+/** Resan-panelen: två speglade sektioner i ett objekt — Nu (läget idag med
+ *  kan/på väg-splitten) och Resan till Mexiko (prognosen med grafen).
+ *  Statraderna delar kolumnform: ord · tid · nivå. Tryck fäller ut trappan. */
+function resanPanelHtml(store: Store): string {
+  const s = store.stats();
   const now = new Date();
-  const score = store.stats().score;
-  const kvar = dagarKvar(now);
+  const r = resaFor(s.score);
   const takt = taktPerDag(Object.values(store.data.cards), now);
-  if (!takt) {
-    return `<p class="omtext" style="margin:0">Du har <b>${score}</b> ord med dig.
-      Prognosen ritas när du övat i ${MIN_DAGAR} dagar.</p>`;
-  }
-  const prognos = prognosOrd(score, takt, now, store.words.length + store.forms.length);
-  const niva = resaFor(prognos).titel.name;
-  const serie = Object.entries(store.data.snapshots)
-    .sort(([a], [b]) => (a < b ? -1 : 1)).slice(-60)
-    .map(([, v]) => v.kan + v.lar);
-  if (!serie.length || serie[serie.length - 1] !== score) serie.push(score);
+  const prognos = takt ? prognosOrd(s.score, takt, now, store.words.length + store.forms.length) : null;
+  const rp = prognos === null ? null : resaFor(prognos);
 
-  const W = 300, H = 96, P = 6;
-  const idagX = P + (W - 2 * P) * 0.35;
-  const slutX = W - P - 14; // plats för kaktusen
-  const lo = Math.min(...serie, score);
-  const hi = Math.max(prognos, ...serie, lo + 1);
-  const yTop = 12, yBot = H - 12;
-  const y = (v: number) => yBot - ((v - lo) / (hi - lo)) * (yBot - yTop);
-  const xHist = (i: number) => serie.length > 1 ? P + (i * (idagX - P)) / (serie.length - 1) : idagX;
-  const line = serie.map((v, i) => `${i ? "L" : "M"}${xHist(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
-  const area = `${line} L${idagX.toFixed(1)} ${yBot} L${P} ${yBot} Z`;
-  const taktStr = (Math.round(takt.perDag * 10) / 10).toLocaleString("sv-SE");
-  return `
+  // --- Nu: statrad, meter mot nästa tröskel, ev. trappan ---
+  const scale = r.next ? r.next.min : Math.max(s.score, TITLAR[TITLAR.length - 1].min);
+  const kanPct = Math.min(100, (s.kan / scale) * 100);
+  const larPct = Math.min(100 - kanPct, (s.lar / scale) * 100);
+  const trappa = resaOpen
+    ? `<div class="trappa">${TITLAR.map((t, i) => {
+        const cls = i < r.nr - 1 ? "klar" : i === r.nr - 1 ? "nu" : "last";
+        const krav = cls === "nu" ? (r.next ? `${s.score}/${r.next.min}` : "MAX") : String(t.min);
+        const sub = cls === "nu" ? "du är här"
+          : rp && i === rp.nr - 1 ? "≈ din nivå i Mexiko 🏄" : t.sub;
+        return `<div class="niv ${cls}"><span class="pricken">${cls === "klar" ? "✓" : ""}</span>
+          <span class="nnamn">${t.name}</span>
+          <span class="nsub">${sub}</span>
+          <span class="nkrav">${krav}</span></div>`;
+      }).join("")}</div>`
+    : "";
+  const nu = `
+    <p class="plabel">Nu<span class="resapil">${resaOpen ? "▴" : "▾"}</span></p>
     <div class="mexrad">
-      <div><b>${score}</b><span>ord</span></div>
-      <div><b>+${nyaIdag(store.data.snapshots, score, now)}</b><span>idag</span></div>
-      <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>i Mexiko</span><span>≈ ${esc(niva)}</span></div>
+      <div><b>${s.score}</b><span>ord</span></div>
+      <div><b>+${nyaIdag(store.data.snapshots, s.score, now)}</b><span>idag</span></div>
+      <div><b>${esc(r.titel.name)}</b><span>🏅 nivå ${r.nr} av ${TITLAR.length}</span></div>
+    </div>
+    <div class="meter resa">
+      <i class="seg kan" style="width:${kanPct.toFixed(1)}%"></i><i class="seg lar" style="width:${larPct.toFixed(1)}%"></i>
+    </div>
+    <div class="resaleg">
+      <span><i class="dot kan"></i><b>${s.kan}</b> kan det</span>
+      <span><i class="dot pavag"></i><b>${s.lar}</b> på väg</span>
+      ${r.next
+        ? `<span class="tillnasta"><b>${r.kvar}</b> kvar till ${r.next.name}</span>`
+        : `<span class="tillnasta">toppen nådd — ¡Maestro!</span>`}
+    </div>
+    ${trappa}`;
+
+  // --- Resan till Mexiko: statrad + graf, eller väntetexten tills takten finns ---
+  let resan: string;
+  if (prognos === null || rp === null) {
+    resan = `<p class="omtext" style="margin:0">Du har <b>${s.score}</b> ord med dig.
+      Prognosen ritas när du övat i ${MIN_DAGAR} dagar.</p>`;
+  } else {
+    const serie = Object.entries(store.data.snapshots)
+      .sort(([a], [b]) => (a < b ? -1 : 1)).slice(-60)
+      .map(([, v]) => v.kan + v.lar);
+    if (!serie.length || serie[serie.length - 1] !== s.score) serie.push(s.score);
+
+    const W = 300, H = 96, P = 6;
+    const idagX = P + (W - 2 * P) * 0.35;
+    const slutX = W - P - 14; // plats för surfaren
+    const lo = Math.min(...serie, s.score);
+    const hi = Math.max(prognos, ...serie, lo + 1);
+    const yTop = 12, yBot = H - 12;
+    const y = (v: number) => yBot - ((v - lo) / (hi - lo)) * (yBot - yTop);
+    const xHist = (i: number) => serie.length > 1 ? P + (i * (idagX - P)) / (serie.length - 1) : idagX;
+    const line = serie.map((v, i) => `${i ? "L" : "M"}${xHist(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+    const area = `${line} L${idagX.toFixed(1)} ${yBot} L${P} ${yBot} Z`;
+    resan = `
+    <div class="mexrad">
+      <div><b>~${prognos.toLocaleString("sv-SE")}</b><span>ord</span></div>
+      <div><b>${dagarKvar(now)}</b><span>dagar kvar</span></div>
+      <div><b>${esc(rp.titel.name)}</b><span>🏄 nivå ${rp.nr} av ${TITLAR.length}</span></div>
     </div>
     <svg class="spark" viewBox="0 0 ${W} ${H}" role="img"
-         aria-label="Ord nu ${score}, prognos till Mexikoresan ~${prognos}">
+         aria-label="Ord nu ${s.score}, prognos till Mexikoresan ~${prognos}">
       <line x1="${P}" y1="${yBot}" x2="${W - P}" y2="${yBot}" stroke="var(--line)" stroke-width="1"/>
       <path d="${area}" fill="var(--accent)" opacity="0.12"/>
       <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M${idagX.toFixed(1)} ${y(score).toFixed(1)} L${slutX} ${y(prognos).toFixed(1)}"
+      <path d="M${idagX.toFixed(1)} ${y(s.score).toFixed(1)} L${slutX} ${y(prognos).toFixed(1)}"
             fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 5"
             stroke-linecap="round" opacity="0.75"/>
-      <circle cx="${idagX.toFixed(1)}" cy="${y(score).toFixed(1)}" r="4"
+      <circle cx="${idagX.toFixed(1)}" cy="${y(s.score).toFixed(1)}" r="4"
               fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>
       <circle cx="${slutX}" cy="${y(prognos).toFixed(1)}" r="3.5"
               fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
       <text x="${slutX + 4}" y="${(y(prognos) + 4.5).toFixed(1)}" font-size="13">🏄</text>
     </svg>
     <div class="sparkcap mexcap"><span>${esc(dagEtikettKort(store))}</span>
-      <span class="mitt">idag</span><span>26 dec 2026</span></div>
-    <p class="omtext" style="margin:7px 0 0">~${taktStr} nya ord/dag senaste ${takt.dagar} dagarna
-      · ${kvar} dagar kvar till avresan</p>`;
+      <span class="mitt">idag</span><span>26 dec 2026</span></div>`;
+  }
+
+  return `
+    <div class="panel resapanel" id="resaPanel" role="button" tabindex="0" aria-expanded="${resaOpen}">
+      ${nu}
+      <div class="delare"></div>
+      <p class="plabel">Resan till Mexiko 🇲🇽</p>
+      ${resan}
+    </div>`;
 }
 
 /** Startetiketten för x-axeln — första snapshot-dagen, "5 aug"-format. */
@@ -265,42 +311,7 @@ function streakRowHtml(store: Store): string {
   return `<div class="streakrow">🔥 <b>${label}</b><span class="sep">·</span><span>${hint}</span></div>`;
 }
 
-/** Nivåresan: färgad bar mot NÄSTA tröskel — tryck på panelen fäller ut hela trappan. */
-function resaPanelHtml(s: { kan: number; lar: number; score: number }): string {
-  const r = resaFor(s.score);
-  const scale = r.next ? r.next.min : Math.max(s.score, TITLAR[TITLAR.length - 1].min);
-  const kanPct = Math.min(100, (s.kan / scale) * 100);
-  const larPct = Math.min(100 - kanPct, (s.lar / scale) * 100);
-  const trappa = resaOpen
-    ? `<div class="trappa">${TITLAR.map((t, i) => {
-        const cls = i < r.nr - 1 ? "klar" : i === r.nr - 1 ? "nu" : "last";
-        const krav = cls === "nu" ? (r.next ? `${s.score}/${r.next.min}` : "MAX") : String(t.min);
-        return `<div class="niv ${cls}"><span class="pricken">${cls === "klar" ? "✓" : ""}</span>
-          <span class="nnamn">${t.name}</span>
-          <span class="nsub">${cls === "nu" ? "du är här" : t.sub}</span>
-          <span class="nkrav">${krav}</span></div>`;
-      }).join("")}</div>`
-    : "";
-  return `
-    <div class="panel resapanel" id="resaPanel" role="button" tabindex="0" aria-expanded="${resaOpen}">
-      <p class="plabel">Din resa · nivå ${r.nr} av ${TITLAR.length}<span class="resapil">${resaOpen ? "▴" : "▾"}</span></p>
-      <div class="nivrow">🏅 <b>${r.titel.name}</b><span class="nivsub">${r.titel.sub}</span></div>
-      <div class="meter resa">
-        <i class="seg kan" style="width:${kanPct.toFixed(1)}%"></i><i class="seg lar" style="width:${larPct.toFixed(1)}%"></i>
-      </div>
-      <div class="resaleg">
-        <span><i class="dot kan"></i><b>${s.kan}</b> kan det</span>
-        <span><i class="dot pavag"></i><b>${s.lar}</b> på väg</span>
-        ${r.next
-          ? `<span class="tillnasta"><b>${r.kvar}</b> kvar till ${r.next.name}</span>`
-          : `<span class="tillnasta">toppen nådd — ¡Maestro!</span>`}
-      </div>
-      ${trappa}
-    </div>`;
-}
-
 function dashboardHtml(store: Store, cloud: CloudUi): string {
-  const s = store.stats();
   // synkfel blockerar övning — då måste det synas direkt, inte först när
   // man klickar på en knapp som inte gör något
   const synkvarning = cloud.email && cloud.status === "error"
@@ -315,14 +326,10 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
       <p class="plabel">Konto &amp; molnsynk</p>
       ${kontoHtml(cloud)}
     </div>`}
-    ${resaPanelHtml(s)}
+    ${resanPanelHtml(store)}
     <div class="panel">
       <p class="plabel">Övningskalender · 15 veckor</p>
       ${heatmapHtml(store.data.days)}
-    </div>
-    <div class="panel">
-      <p class="plabel">Resan till Mexiko 🇲🇽</p>
-      ${mexikoHtml(store)}
     </div>`;
 }
 
