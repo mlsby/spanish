@@ -70,6 +70,22 @@ describe("böjningsformer: introduktion", () => {
     expect(units.some((u) => u.kind === "form" && u.form.parent === "poder|v")).toBe(false);
   });
 
+  it("formkortets facit tar moderverbets glosor i böjd form — 'jag passerar' för paso", () => {
+    // pasar-läget: huvudglosan "hända" gäller bara tredje person; synonymen
+    // "passera" måste godkännas böjd på formkortet
+    store.words.push({ id: "pasar|v", rank: 57, es: "pasar", pos: "v", sv: "hända", syn: ["passera", "tillbringa"] });
+    store.byId.set("pasar|v", store.words[store.words.length - 1]);
+    const form = { id: "pasar|v#pres.1s", parent: "pasar|v", es: "paso", person: "1s" as const, svPres: "passerar", r: 575, slot: 304 };
+    store.forms.push(form);
+    store.formById.set(form.id, form);
+    const rec = newCardRec(form.id, "es2sv", new Date());
+    const targets = store.targetsFor(rec);
+    expect(targets).toContain("jag passerar");   // formens egen glosa
+    expect(targets).toContain("jag tillbringar"); // synonym, böjd, med pronomen
+    expect(targets).toContain("passerade");       // böjd utan pronomen
+    expect(targets).toContain("hända");           // moderglosan finns också
+  });
+
   it("upplåsta former slår ord med sämre korpusläge (slot före rank)", () => {
     store.introduceUnits(2); // poder + casa
     // lås upp för hand (ingen session → ingen återbäring) för ren ordningstest

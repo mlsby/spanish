@@ -1,3 +1,4 @@
+import { svBojda } from "./grading";
 import type { Store } from "./store";
 import type { SupabaseClient } from "./supabase";
 import { applyReview, KNOWN_STABILITY_DAYS } from "./scheduler";
@@ -209,18 +210,6 @@ export function kandidatYtor(store: Store, k: LasKandidat): string[] {
   const w = store.byId.get(k.id);
   if (w?.pos !== "v") return [k.es];
   return [k.es, ...(store.lasFormer.get(k.id) ?? [])];
-}
-
-/** Svenska böjningsvarianter av en glosa — generösa: hellre godkänna "visade" än kräva "visa". */
-function svBojda(t: string): string[] {
-  const ut = [t];
-  if (t.endsWith("a")) {
-    const stam = t.slice(0, -1);
-    ut.push(t + "r", stam + "er", t + "de", t + "t", stam + "dde", stam + "tt");
-  } else {
-    ut.push(t + "r", t + "dde", t + "tt");
-  }
-  return ut;
 }
 
 /**

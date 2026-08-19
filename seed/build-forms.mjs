@@ -191,6 +191,13 @@ const SV_PRES_MANUAL = {
 };
 for (const [inf, pres] of Object.entries(SV_PRES_MANUAL)) svPresByInf.set(inf, pres); // manuellt vinner alltid
 
+// per-FORM-överstyrningar: när moderverbets huvudglosa inte funkar i alla personer
+// (pasar = "hända" gäller bara tredje person — "jag händer" är inte svenska)
+const FORM_SV_OVERRIDES = {
+  "pasar|v#pres.1s": "passerar",
+  "pasar|v#pres.1p": "passerar",
+};
+
 // ---------- bygg formkandidater ----------
 const PRONOUN = { "1s": "jag", "2s": "du", "3s": "han/hon", "1p": "vi", "3p": "de" };
 const byForm = new Map(); // esForm → [kandidater] för ambiguitetskoll
@@ -223,7 +230,8 @@ for (const v of verbs) {
     if (!r) continue; // finns inte i korpusen → inte "vanligaste böjningarna"
     // regelbundet genererade former får inte råka vara ett annat basord (jugo-fällan)
     if (!fromJehle && lemmaEs.has(es)) continue;
-    const cand = { id: `${v.id}#pres.${p}`, parent: v.id, es, person: p, svPres, r, fromJehle };
+    const candId = `${v.id}#pres.${p}`;
+    const cand = { id: candId, parent: v.id, es, person: p, svPres: FORM_SV_OVERRIDES[candId] ?? svPres, r, fromJehle };
     candidates.push(cand);
     if (!byForm.has(es)) byForm.set(es, []);
     byForm.get(es).push(cand);

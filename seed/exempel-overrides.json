@@ -1,5 +1,18 @@
 {
-  "entonces|adv": ["¡Entonces vamos!", "Då går vi!"],
-  "todavía|adv": ["Trabajo todo el día y todavía no termino.", "Jag jobbar hela dagen och är fortfarande inte klar."],
-  "llamado|adj": ["Tengo un amigo llamado Pedro.", "Jag har en vän som heter Pedro."]
+  "entonces|adv": [
+    "¡Entonces vamos!",
+    "Då går vi!"
+  ],
+  "todavía|adv": [
+    "Trabajo todo el día y todavía no termino.",
+    "Jag jobbar hela dagen och är fortfarande inte klar."
+  ],
+  "llamado|adj": [
+    "Tengo un amigo llamado Pedro.",
+    "Jag har en vän som heter Pedro."
+  ],
+  "pasar|v#pres.1s": [
+    "Paso por el parque cada mañana.",
+    "Jag passerar parken varje morgon."
+  ]
 }

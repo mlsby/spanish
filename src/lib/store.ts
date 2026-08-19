@@ -1,6 +1,6 @@
 import type { AppData, CardRec, Dir, DirtyKind, Level, Niva, ReviewRec, UserWord, VerbForm, Word } from "./types";
 import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
-import { svBestamd } from "./grading";
+import { svBestamd, svBojda } from "./grading";
 import { dueDate, isKnown, KNOWN_STABILITY_DAYS, levelCardRec, newCardRec } from "./scheduler";
 import { emptyData, LocalStorageAdapter, type StorageAdapter } from "./storage";
 import { dayKey, endOfToday } from "./time";
@@ -229,11 +229,19 @@ export class Store {
     if (form) {
       // egna synonymer ("jag hade rätt") bor på FORMENS id — inte moderverbets
       const uw = this.userWord(card.wordId);
-      // es→sv: alla pronomenvarianter är facit ("han är" OCH "hon är"), blotta verbet också
+      // es→sv: alla pronomenvarianter är facit ("han är" OCH "hon är"), blotta verbet
+      // också — och moderverbets glosor i böjd form ("jag passerar" för paso, vars
+      // huvudglosa är "händer"): synonymer ska gälla även på formkorten
       if (card.dir === "es2sv") {
+        const parent = this.byId.get(form.parent);
+        const synBojda = [parent?.sv ?? "", ...(parent?.syn ?? [])]
+          .filter(Boolean)
+          .flatMap(svBojda);
         return [
           ...PERSON_SV_SVAR[form.person].map((p) => `${p} ${form.svPres}`),
           form.svPres,
+          ...PERSON_SV_SVAR[form.person].flatMap((p) => synBojda.map((b) => `${p} ${b}`)),
+          ...synBojda,
           ...uw.syn,
         ];
       }

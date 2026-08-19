@@ -56,6 +56,18 @@ export interface GradeResult {
  * Vi känner inte till genus, så båda deklinationernas kandidater genereras;
  * de används bara för rättning (visas aldrig), så övergenerering är ofarlig.
  */
+/** Svenska böjningsvarianter av en glosa — generösa: hellre godkänna "visade" än kräva "visa". */
+export function svBojda(t: string): string[] {
+  const ut = [t];
+  if (t.endsWith("a")) {
+    const stam = t.slice(0, -1);
+    ut.push(t + "r", stam + "er", t + "de", t + "t", stam + "dde", stam + "tt");
+  } else {
+    ut.push(t + "r", t + "dde", t + "tt");
+  }
+  return ut;
+}
+
 export function svBestamd(t: string): string[] {
   if (t.includes(" ") || t.length < 2) return [];
   const out = new Set<string>();
