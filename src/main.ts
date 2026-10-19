@@ -184,7 +184,7 @@ async function boot(): Promise<void> {
   /** Ladda upp mina topplistesiffror (streak, dagar, resapoäng). */
   function pushMyStats(): void {
     if (!sync.session) return;
-    const a = activityStats(store.data.days);
+    const a = activityStats(store.data.days, new Date(), store.data.ratt);
     void social
       .pushStats({ streak: a.streak, totalDays: a.totalDays, score: store.stats().score })
       .catch(() => { /* topplistan är grädde — aldrig blockera */ });

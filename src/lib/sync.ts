@@ -25,6 +25,7 @@ export interface CloudRows {
   settings: SettingsRow | null;
   snapshots: SnapshotRow[];
   reviewTs: string[]; // tidsstämplar för kalender-merge (senaste ~120 dagarna)
+  rattTs?: string[];  // tidsstämplar för rätta svar (streakens 20 rätt)
 }
 
 /** true om a är strikt nyare än b (saknad tidsstämpel = äldst). */
@@ -87,6 +88,15 @@ export function mergeCloudIntoLocal(data: AppData, cloud: CloudRows): number {
   }
   for (const [d, n] of cloudDays) {
     if ((data.days[d] ?? 0) < n) { data.days[d] = n; adopted++; }
+  }
+  const cloudRatt = new Map<string, number>();
+  for (const ts of cloud.rattTs ?? []) {
+    const d = dayKey(new Date(ts));
+    cloudRatt.set(d, (cloudRatt.get(d) ?? 0) + 1);
+  }
+  data.ratt ??= {};
+  for (const [d, n] of cloudRatt) {
+    if ((data.ratt[d] ?? 0) < n) { data.ratt[d] = n; adopted++; }
   }
   return adopted;
 }
@@ -247,12 +257,16 @@ export class CloudSync {
       this.pageAll<CardRow>("cards", "word_id,dir,fsrs,fail_count,introduced_at,updated_at", own),
       this.pageAll<UserWordRow>("user_words", uwSelect, own),
       this.pageAll<SnapshotRow>("snapshots", "day,kan,lar", own),
-      this.pageAll<{ ts: string }>("reviews", "ts", (q) => own(q).gte("ts", since)),
+      this.pageAll<{ ts: string; grade: string }>("reviews", "ts,grade", (q) => own(q).gte("ts", since)),
     ]);
     const { data: settings, error } = await this.sb
       .from("settings").select("new_per_day,updated_at").eq("user_id", uid).maybeSingle();
     if (error) throw new Error(`settings: ${error.message}`);
-    return { cards, userWords, snapshots, settings, reviewTs: reviewRows.map((r) => r.ts) };
+    return {
+      cards, userWords, snapshots, settings,
+      reviewTs: reviewRows.map((r) => r.ts),
+      rattTs: reviewRows.filter((r) => r.grade !== "again").map((r) => r.ts),
+    };
   }
 
   // ---------- push ----------

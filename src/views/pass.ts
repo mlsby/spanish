@@ -1,6 +1,8 @@
 import { diffTarget } from "../lib/diff";
 import { clearPass, loadPass, savePass } from "../lib/passpaus";
 import { Session, type Pending, type SessionState } from "../lib/session";
+import { STREAK_MAL } from "../lib/streak";
+import { dayKey } from "../lib/time";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
 import type { CardRec } from "../lib/types";
@@ -512,12 +514,12 @@ export class PassView {
       const paused = loadPass();
       const plan = this.store.portionsPlan();
       const busy = this.syncBusy();
-      const label = busy ? "Synkar …" : paused ? "Fortsätt övningen" : "Öva";
+      const kvar = !!paused || plan.totalKort > 0;
+      const gjorda = this.store.data.days[dayKey()] ?? 0;
       return `<div class="tomt">
-        <div class="stor">${paused ? "Övning pausad" : "Ingen övning igång"}</div>
-        ${paused ? `<p>Du fortsätter där du slutade.</p>` : ""}
+        <div class="stor">${kvar ? `${gjorda} gjorda idag` : "Allt klart för idag"}</div>
         <div class="btnrow" style="max-width:250px">
-          <button class="btn" data-act="start" ${(!paused && plan.totalKort === 0) || busy ? "disabled" : ""}>${label}</button>
+          <button class="btn" data-act="start" ${!kvar || busy ? "disabled" : ""}>${busy ? "Synkar …" : "Öva"}</button>
         </div></div>`;
     }
     const p = s.pending;
@@ -614,9 +616,11 @@ export class PassView {
     this.form.hidden = this.state === "forced";
     document.getElementById("app")?.classList.toggle("pass-live", this.live);
     if (s && this.state !== "idle") {
-      const pr = s.progress();
-      this.bar.style.width = pr.total ? `${(pr.done / pr.total) * 100}%` : "100%";
-      this.count.textContent = `${s.queue.length} kort kvar`;
+      // inga kösiffror: hur mycket man gjort idag, stapeln fylls mot streakens 20 rätt
+      const idag = dayKey();
+      const ratt = this.store.data.ratt?.[idag] ?? 0;
+      this.bar.style.width = `${Math.min(1, ratt / STREAK_MAL) * 100}%`;
+      this.count.textContent = `${this.store.data.days[idag] ?? 0} gjorda`;
       const cur = s.pending?.card ?? s.current;
       if (cur) {
         this.chip.textContent = cur.dir === "es2sv" ? "spanska → svenska" : "svenska → spanska";

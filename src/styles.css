@@ -106,18 +106,11 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .picker button.on{background:var(--card);color:var(--accent);font-weight:600;
                   box-shadow:0 1px 2px rgba(0,0,0,.07)}
 /* portionens innehållsmix: repetition mot nytt */
-.mix{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:10px 6px 0}
-.mix i{display:block}
-.mix .mrep{background:var(--accent-soft)}
-.mix .mny{background:var(--pavag)}
 .finstilt{font-size:11.5px;color:var(--muted)}
 /* flippbar översättning efter läsquizet — tryck på texten växlar språk */
 .lasflip{cursor:pointer}
 .lasflip.flip{color:var(--accent);font-style:italic}
 .lasfliptips{font-size:11px;color:var(--muted);margin:6px 0 0;text-align:center}
-.nivbadge{font-size:16px;margin:2px 0 4px}
-.nivbadge b{font-family:var(--serif);font-size:22px}
-.nivbadge .nivsub{color:var(--muted);font-size:13px}
 .meter.resa{display:flex;margin-top:6px}
 .meter.resa .seg{border-radius:0;flex:none}
 .meter.resa .seg.kan{background:var(--good);border-radius:3px 0 0 3px}

@@ -116,6 +116,7 @@ export interface AppData {
   reviews: ReviewRec[];
   introduced: Record<string, number>; // dagKey -> antal nya ord introducerade
   days: Record<string, number>;       // dagKey -> antal besvarade kort (kalendern)
+  ratt: Record<string, number>;       // dagKey -> antal rätta svar (streaken)
   snapshots: Record<string, { kan: number; lar: number }>; // dagKey -> statusläge (grafen)
 }
 

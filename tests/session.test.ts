@@ -33,14 +33,15 @@ describe("portionsmotorn: Öva bygger dagens portion", () => {
     expect(plan.nyaUnits).toHaveLength(3); // hela lilla basen ryms i portionen
     expect(plan.nyaOrd).toBe(3);
     const kort = store.startPortion();
+    // ett håll per ord och dag: es→sv idag, sv→es-korten finns men väntar
     expect(kort.map((c) => `${c.wordId}:${c.dir}`)).toEqual([
       "empezar|v:es2sv", "ciudad|n:es2sv", "feliz|adj:es2sv",
-      "empezar|v:sv2es", "ciudad|n:sv2es", "feliz|adj:sv2es",
     ]);
+    expect(store.card("empezar|v", "sv2es")).toBeDefined();
     // omstart utan att ha övat: de osedda ärvs — inget staplas ovanpå
     const plan2 = store.portionsPlan();
     expect(plan2.nyaUnits).toHaveLength(0);
-    expect(plan2.unseen).toHaveLength(6);
+    expect(plan2.unseen).toHaveLength(3);
     expect(plan2.nyaOrd).toBe(3);
   });
 

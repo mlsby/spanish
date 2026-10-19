@@ -34,3 +34,13 @@ describe("activityStats (streak & dagar totalt)", () => {
     expect(activityStats(days, NOW)).toEqual({ streak: 1, totalDays: 1 });
   });
 });
+
+describe("streaken kräver 20 rätt från 2026-10-20", () => {
+  it("en dag med under 20 rätt räknas inte — tidigare dagar räknas som förut", () => {
+    const now = new Date("2026-10-21T12:00:00");
+    const days = { "2026-10-19": 3, "2026-10-20": 30, "2026-10-21": 25 };
+    expect(activityStats(days, now, { "2026-10-20": 20, "2026-10-21": 12 }).streak).toBe(2);
+    expect(activityStats(days, now, { "2026-10-20": 19, "2026-10-21": 20 }).streak).toBe(1);
+  });
+});
+

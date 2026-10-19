@@ -18,6 +18,7 @@ export function emptyData(): AppData {
     reviews: [],
     introduced: {},
     days: {},
+    ratt: {},
     snapshots: {},
   };
 }

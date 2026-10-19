@@ -75,6 +75,8 @@ export class Store {
   klassLektioner: { unidad: string; datum: string | null; ord: string[]; klar?: boolean }[] = [];
   /** Orden från lektioner markerade klara — det klassläget övar på. */
   klassOrd = new Set<string>();
+  /** Bokens svenska där den skiljer sig från Glosas: visas i klassläget, godkänns alltid. */
+  klassSv = new Map<string, string>();
   /** Anropas när lokal data ändras — synken använder den för att veta vad som ska skickas upp. */
   onDirty?: (kind: DirtyKind, key?: string) => void;
 
@@ -129,6 +131,7 @@ export class Store {
     if (!res.ok) return;
     const json = await res.json();
     this.klassLektioner = json.lektioner ?? [];
+    this.klassSv = new Map(Object.entries((json.sv ?? {}) as Record<string, string>));
     this.klassOrd = new Set(this.klassLektioner.filter((l) => l.klar)
       .flatMap((l) => l.ord.filter((id) => this.byId.has(id))));
   }
@@ -344,7 +347,8 @@ export class Store {
   targets(word: Word, dir: Dir): string[] {
     const uw = this.userWord(word.id);
     if (dir === "es2sv") {
-      const base = [word.sv, ...word.syn, ...uw.syn];
+      const k = this.klassSv.get(word.id);
+      const base = [word.sv, ...word.syn, ...(k && k !== word.sv ? [k] : []), ...uw.syn];
       // substantiv: "la verdad" i prompten lockar fram "sanningen" —
       // bestämda former accepteras (aldrig visade, bara godkända)
       if (word.pos === "n") return [...base, ...base.flatMap(svBestamd)];
@@ -385,12 +389,17 @@ export class Store {
     return this.targets(this.wordFor(card), card.dir);
   }
 
-  /** Moderordet för ett kort (formkort → föräldern, vanliga kort → ordet självt). */
+  /**
+   * Moderordet för ett kort (formkort → föräldern, vanliga kort → ordet självt).
+   * I klassläget med bokens svenska som huvudsvar; Glosas blir synonym.
+   */
   wordFor(card: CardRec): Word {
     const form = this.formById.get(card.wordId);
     const w = this.byId.get(form ? form.parent : card.wordId);
     if (!w) throw new Error(`okänt ord: ${card.wordId}`);
-    return w;
+    const k = this.klassLage() ? this.klassSv.get(w.id) : undefined;
+    if (!k || k === w.sv) return w;
+    return { ...w, sv: k, syn: [w.sv, ...w.syn.filter((x) => x !== k)] };
   }
 
   formFor(card: CardRec): VerbForm | undefined {
@@ -571,15 +580,20 @@ export class Store {
       .filter((c) => c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff)
       .sort((a, b) =>
         a.dir === b.dir ? (a.introducedAt < b.introducedAt ? -1 : 1) : a.dir === "es2sv" ? -1 : 1);
-    // en böjning per verb och dag (båda hållen): verbets övriga förfallna former
-    // väntar till kommande dagar i stället för att komma om och om igen i samma pass
-    const dagens = this.dagensForm(now);
+    // ett rätt är ett rätt: ett ord frågas åt ett håll per dag (andra hållet en
+    // annan dag), och ett oregelbundet verb ger högst en böjning per dag — resten
+    // väntar till kommande dagar i stället för att komma om och om igen
+    const { formPerVerb, ovat } = this.dagensOvning(now);
+    const valda = new Set<string>();
     const enPerVerb = (c: CardRec): boolean => {
+      if (ovat.has(c.wordId) || valda.has(c.wordId)) return false;
       const f = this.formById.get(c.wordId);
-      if (!f) return true;
-      const vald = dagens.get(f.parent);
-      if (vald && vald !== c.wordId) return false;
-      dagens.set(f.parent, c.wordId);
+      if (f) {
+        const vald = formPerVerb.get(f.parent);
+        if (vald && vald !== c.wordId) return false;
+        formPerVerb.set(f.parent, c.wordId);
+      }
+      valda.add(c.wordId);
       return true;
     };
     const repEn = rep.filter(enPerVerb);
@@ -593,16 +607,19 @@ export class Store {
     };
   }
 
-  /** Verb → den böjning som redan övats idag (senaste repetitionen under dagens datum). */
-  private dagensForm(now: Date): Map<string, string> {
+  /** Det som redan övats idag: enheter (ord/former) och per verb den böjning som tagits. */
+  private dagensOvning(now: Date): { formPerVerb: Map<string, string>; ovat: Set<string> } {
     const idag = dayKey(now);
-    const out = new Map<string, string>();
+    const formPerVerb = new Map<string, string>();
+    const ovat = new Set<string>();
     for (const key in this.data.cards) {
       const c = this.data.cards[key];
+      if (!c.fsrs.last_review || dayKey(new Date(c.fsrs.last_review)) !== idag) continue;
+      ovat.add(c.wordId);
       const f = this.formById.get(c.wordId);
-      if (f && c.fsrs.last_review && dayKey(new Date(c.fsrs.last_review)) === idag) out.set(f.parent, c.wordId);
+      if (f) formPerVerb.set(f.parent, c.wordId);
     }
-    return out;
+    return { formPerVerb, ovat };
   }
 
   /**
@@ -613,7 +630,11 @@ export class Store {
   startPortion(now: Date = new Date()): CardRec[] {
     const plan = this.portionsPlan(now);
     if (plan.rep.length || plan.unseen.length) return [...plan.rep, ...plan.unseen];
-    return this.introduceUnits(plan.nyaUnits.length, now);
+    if (!plan.nyaUnits.length) return [];
+    // nya ord får båda korten, men frågas åt ett håll idag (es→sv) — andra hållet en annan dag
+    this.introduceUnits(plan.nyaUnits.length, now);
+    const ny = this.portionsPlan(now);
+    return [...ny.rep, ...ny.unseen];
   }
 
   /** Dagens glosor klara? Inget kvar i dagens kö och nya-budgeten använd → läsövning förvald. */
@@ -631,6 +652,7 @@ export class Store {
     this.data.reviews.push(rec);
     const day = dayKey(new Date(rec.ts));
     this.data.days[day] = (this.data.days[day] ?? 0) + 1;
+    if (rec.grade !== "again") this.data.ratt[day] = (this.data.ratt[day] ?? 0) + 1;
     this.dirty("review");
   }
 

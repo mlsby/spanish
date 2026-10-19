@@ -3,7 +3,7 @@ import { dagarKvar, MIN_DAGAR, nyaIdag, prognosOrd, taktPerDag } from "../lib/pr
 import { resaFor, TITLAR } from "../lib/resa";
 import { NIVAER, type Store } from "../lib/store";
 import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
-import { activityStats } from "../lib/streak";
+import { activityStats, STREAK_MAL } from "../lib/streak";
 import { addDays, dayKey, fmtDate, weekdayMon } from "../lib/time";
 import type { SyncStatus } from "../lib/sync";
 import type { Lage, Niva } from "../lib/types";
@@ -225,64 +225,33 @@ function kontoHtml(cloud: CloudUi): string {
     </div>${err}`;
 }
 
-/** Hero-kortet: nästa övning i KORT (samma tal som övningen visar), eller klart-läget. */
-/** Nivåmärket i hjälten: 🏅 Turista · 133 ord. */
-function nivBadge(store: Store): string {
-  const s = store.stats();
-  const r = resaFor(s.score);
-  return `<div class="nivbadge">🏅 <b>${r.titel.name}</b><span class="nivsub"> · ${s.score} ord</span></div>`;
-}
-
-/** Portionens innehållsdeklaration — max en rad, inga kösiffror. */
-function deklaration(plan: { repKort: number; nyaOrd: number }): string {
-  const delar: string[] = [];
-  if (plan.repKort > 0) delar.push(`<b>${plan.repKort}</b> ${plan.repKort === 1 ? "repetition" : "repetitioner"}`);
-  if (plan.nyaOrd > 0) delar.push(`<b>${plan.nyaOrd}</b> nya ord`);
-  return delar.join(" · ");
-}
-
+/**
+ * Hero-kortet: hur mycket man gjort idag och Öva. Inga kösiffror — en pausad
+ * övning fortsätts tyst av samma knapp.
+ */
 function heroHtml(store: Store, cloud: CloudUi): string {
   const busy = cloud.status === "syncing";
-  // pausad övning? den fortsätts alltid först — där man slutade
-  const paused = loadPass();
-  if (paused && cloud.email) {
-    return `<div class="hero">
-      <p class="plabel">Övning pausad</p>
-      ${nivBadge(store)}
-      <div class="cap">du fortsätter exakt där du slutade</div>
-      <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Fortsätt övningen"}</button>
-    </div>`;
-  }
-
   if (!cloud.email) {
     return `<div class="hero">
-      <p class="plabel">Nästa övning</p>
-      ${nivBadge(store)}
       <button class="btn" id="startBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Logga in för att öva"}</button>
       <p class="omtext" style="margin:10px 0 0">Inloggning krävs innan du övar — så att allt du lär dig sparas i molnet.</p>
     </div>`;
   }
-
-  const plan = store.portionsPlan();
-  const repPct = plan.totalKort > 0 ? (plan.repKort / plan.totalKort) * 100 : 0;
-  const mix = plan.totalKort > 0
-    ? `<div class="mix">${repPct > 0 ? `<i class="mrep" style="width:${repPct.toFixed(1)}%"></i>` : ""}${repPct < 100 ? `<i class="mny" style="width:${(100 - repPct).toFixed(1)}%"></i>` : ""}</div>`
-    : "";
+  const gjorda = store.data.days[dayKey()] ?? 0;
+  const kvar = !!loadPass() || store.portionsPlan().totalKort > 0;
   return `<div class="hero">
-    <div class="big">${plan.totalKort} <small>kort</small></div>
-    <p class="cap">${deklaration(plan) || "inget att öva just nu"}</p>
-    ${mix}
-    <button class="btn" id="startBtn" ${busy || plan.totalKort === 0 ? "disabled" : ""}>${busy ? "Synkar …" : "Öva"}</button>
+    <div class="big">${gjorda} <small>gjorda idag</small></div>
+    ${kvar ? "" : `<p class="cap">allt klart för idag</p>`}
+    <button class="btn" id="startBtn" ${busy || !kvar ? "disabled" : ""}>${busy ? "Synkar …" : "Öva"}</button>
   </div>`;
 }
 
 function streakRowHtml(store: Store): string {
-  const act = activityStats(store.data.days);
-  const doneToday = (store.data.days[dayKey()] ?? 0) > 0;
+  const ratt = store.data.ratt ?? {};
+  const act = activityStats(store.data.days, new Date(), ratt);
+  const idag = ratt[dayKey()] ?? 0;
   const label = `${act.streak} ${act.streak === 1 ? "dag" : "dagar"} i rad`;
-  const hint = doneToday
-    ? "säkrad till midnatt"
-    : act.streak > 0 ? `öva idag så blir det ${act.streak + 1}` : "öva idag så tänds den";
+  const hint = idag >= STREAK_MAL ? "säkrad till midnatt" : `${idag} av ${STREAK_MAL} rätt idag`;
   return `<div class="streakrow">🔥 <b>${label}</b><span class="sep">·</span><span>${hint}</span></div>`;
 }
 
