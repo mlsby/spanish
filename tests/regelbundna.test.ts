@@ -109,6 +109,23 @@ describe("regelbundna verb", () => {
     expect(s.formFor(s.current!)!.person).not.toBe(forst.person);
   });
 
+  it("oregelbundna verb: högst en böjning per dag, de andra väntar", () => {
+    const store = makeStore();
+    const now = new Date();
+    for (const id of ["conocer|v#pres.1s", "conocer|v#pres.3s"]) {
+      const c = newCardRec(id, "es2sv", now);
+      c.fsrs.reps = 1; c.fsrs.stability = 3; c.fsrs.difficulty = 5; c.fsrs.state = 2;
+      c.fsrs.due = new Date(now.getTime() - 3600e3).toISOString();
+      store.data.cards[`${id}:es2sv`] = c;
+    }
+    expect(store.portionsPlan(now).rep).toHaveLength(1);
+    const s = new Session(store, store.startPortion(now));
+    const forsta = s.current!.wordId;
+    s.answer(s.formFor(s.current!)!.svPres); s.commit(now);
+    expect(store.portionsPlan(now).rep.some((c) => c.wordId.startsWith("conocer"))).toBe(false);
+    expect(forsta.startsWith("conocer|v#pres.")).toBe(true);
+  });
+
   it("'jag hade rätt' sparar synonymen på den frågade formen", () => {
     const store = makeStore();
     lasUpp(store);
