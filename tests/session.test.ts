@@ -44,18 +44,17 @@ describe("portionsmotorn: Öva bygger dagens portion", () => {
     expect(plan2.nyaOrd).toBe(3);
   });
 
-  it("ambitionsnivåerna styr portionens kort och dagsbudgeten", () => {
+  it("ambitionsnivåerna styr dagsbudgeten för nya ord", () => {
     const store = makeStore();
-    expect(store.nivaConf()).toEqual({ kort: 30, nya: 20 });
+    expect(store.nivaConf()).toEqual({ nya: 20 });
     store.setNiva("lugn");
-    expect(store.nivaConf()).toEqual({ kort: 20, nya: 15 });
+    expect(store.nivaConf()).toEqual({ nya: 15 });
     store.setNiva("ambitios");
-    expect(store.nivaConf()).toEqual({ kort: 40, nya: 25 });
+    expect(store.nivaConf()).toEqual({ nya: 25 });
   });
 
-  it("repskuld fyller portionen — nya ord väntar tills högen är nere", () => {
+  it("allt förfallet kommer med — nya ord introduceras först när det är klart", () => {
     const store = makeStore();
-    store.setNiva("lugn"); // 20 kort per portion
     const now = Date.now();
     for (let i = 0; i < 25; i++) {
       const c = newCardRec(`skuld${i}|n`, "es2sv", new Date());
@@ -65,10 +64,10 @@ describe("portionsmotorn: Öva bygger dagens portion", () => {
       store.data.cards[`skuld${i}|n:es2sv`] = c;
     }
     const plan = store.portionsPlan();
-    expect(plan.rep).toHaveLength(20);
-    expect(plan.nyaUnits).toHaveLength(0); // skuld kvar utanför portionen
-    expect(plan.forvag).toHaveLength(0);
-    expect(plan.totalKort).toBe(20);
+    expect(plan.rep).toHaveLength(25); // inget tak
+    const kort = store.startPortion();
+    expect(kort).toHaveLength(25);
+    expect(store.card("empezar|v", "es2sv")).toBeUndefined(); // inget nytt ovanpå skulden
   });
 
   it("ömtåliga kort går före: relativ försening slår rå väntetid", () => {
@@ -87,7 +86,7 @@ describe("portionsmotorn: Öva bygger dagens portion", () => {
     expect(plan.rep[0].wordId).toBe("farsk|n");
   });
 
-  it("utan skuld fylls portionen i förväg — närmast förfall först", () => {
+  it("inget i förväg: kort som inte förfaller idag kommer inte med", () => {
     const store = makeStore();
     const now = Date.now();
     const mk = (id: string, dueMs: number) => {
@@ -102,8 +101,7 @@ describe("portionsmotorn: Öva bygger dagens portion", () => {
     const plan = store.portionsPlan();
     expect(plan.rep.map((c) => c.wordId)).toEqual(["empezar|v"]);
     expect(plan.nyaUnits).toHaveLength(0); // alla ord har redan kort
-    expect(plan.forvag.map((c) => c.wordId)).toEqual(["feliz|adj", "ciudad|n"]);
-    expect(plan.repKort).toBe(3);
+    expect(plan.totalKort).toBe(1);
     expect(store.glosorKlara()).toBe(false); // empezar är förfallet
   });
 
@@ -226,12 +224,47 @@ describe("session: betygsmappning och tvåfelsregeln", () => {
     expect(s2.answer("glad").grade).toBe("good");
   });
 
-  it("fel svar återkommer i samma pass tills det sitter", () => {
-    const cards = ["empezar|v", "ciudad|n", "feliz|adj"].map((id) => newCardRec(id, "es2sv", new Date()));
+  it("rätt svar är klart för idag — kortet kommer inte tillbaka och förfaller tidigast i morgon", () => {
+    const now = new Date();
+    const cards = ["empezar|v", "ciudad|n"].map((id) => newCardRec(id, "es2sv", now));
     const s = new Session(store, cards);
-    s.answer("fel svar");
-    s.commit();
-    expect(s.queue.map((c) => c.wordId)).toContain("empezar|v");
+    s.answer("fel svar"); s.commit(now);          // empezar: fel, ett nytt försök
+    s.answer("stad"); s.commit(now);              // ciudad: rätt
+    expect(s.queue.map((c) => c.wordId)).toEqual(["empezar|v"]);
+    s.answer("börja"); s.commit(now);             // nytt försök: rätt
+    // kvar är bara dagens nya ord (feliz) — inget av de besvarade korten
+    expect(s.queue.every((c) => c.wordId === "feliz|adj")).toBe(true);
+    for (const id of ["empezar|v", "ciudad|n"]) {
+      const due = new Date(store.card(id, "es2sv")!.fsrs.due).getTime();
+      expect(due - now.getTime()).toBeGreaterThanOrEqual(86400e3 - 1000);
+    }
+  });
+
+  it("fel svar får ett enda nytt försök, ungefär tio kort senare", () => {
+    const now = new Date();
+    const ids = Array.from({ length: 15 }, (_, i) => `ord${i}|n`);
+    const cards = ids.map((id) => newCardRec(id, "es2sv", now));
+    store.words = [...WORDS, ...ids.map((id, i) => ({ id, rank: 10 + i, es: id.split("|")[0], pos: "n", sv: `sv${i}`, syn: [] }))];
+    store.byId = new Map(store.words.map((w) => [w.id, w]));
+    const s = new Session(store, cards);
+    s.answer("fel"); s.commit(now);
+    expect(s.queue.findIndex((c) => c.wordId === "ord0|n")).toBe(10);
+    while (s.current?.wordId !== "ord0|n") { s.answer(store.byId.get(s.current!.wordId)!.sv); s.commit(now); }
+    s.answer("fel igen"); s.commit(now);
+    expect(s.queue.some((c) => c.wordId === "ord0|n")).toBe(false);
+  });
+
+  it("när det förfallna är klart tar dagens nya ord vid i samma pass", () => {
+    const now = new Date();
+    const c = newCardRec("empezar|v", "es2sv", now);
+    c.fsrs.reps = 1; c.fsrs.stability = 3; c.fsrs.difficulty = 5; c.fsrs.state = 2;
+    c.fsrs.due = new Date(now.getTime() - 3600e3).toISOString();
+    store.data.cards["empezar|v:es2sv"] = c;
+    const s = new Session(store, store.startPortion(now));
+    expect(s.queue).toHaveLength(1);
+    s.answer("börja"); s.commit(now);
+    expect(s.finished).toBe(false);
+    expect(new Set(s.queue.map((k) => k.wordId))).toEqual(new Set(["ciudad|n", "feliz|adj"]));
   });
 });
 

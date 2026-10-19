@@ -8,21 +8,28 @@ import { dayKey, endOfToday } from "./time";
 /** Nästa enhet i introduktionskön: ett nytt ord eller en upplåst verbböjning. */
 export type IntroUnit = { kind: "word"; word: Word } | { kind: "form"; form: VerbForm };
 
-/** Ambitionsnivåerna: portionens kort per övning + dagsbudget nya ord (≈ ⅔ av korten). */
-export const NIVAER: Record<Niva, { kort: number; nya: number }> = {
-  lugn: { kort: 20, nya: 15 },
-  lagom: { kort: 30, nya: 20 },
-  ambitios: { kort: 40, nya: 25 },
+/** Ambitionsnivåerna: dagsbudget för nya ord. */
+export const NIVAER: Record<Niva, { nya: number }> = {
+  lugn: { nya: 15 },
+  lagom: { nya: 20 },
+  ambitios: { nya: 25 },
 };
 
-/** Dagens portion, uträknad men inte startad — hjälten visar den, Öva kör den. */
+/** Presensändelser (1s, 2s, 3s, 1p, 3p) för regelbundna verb. */
+const ANDELSER: Record<string, string[]> = {
+  ar: ["o", "as", "a", "amos", "an"],
+  er: ["o", "es", "e", "emos", "en"],
+  ir: ["o", "es", "e", "imos", "en"],
+};
+const PERSONER: VerbForm["person"][] = ["1s", "2s", "3s", "1p", "3p"];
+
+/** Dagens övning, uträknad men inte startad — hjälten visar den, Öva kör den. */
 export interface PortionsPlan {
   rep: CardRec[];        // förfallna repetitioner, mest kritiska först
   unseen: CardRec[];     // ärvda: introducerade men aldrig besvarade
-  nyaUnits: IntroUnit[]; // nya enheter som skulle introduceras
-  forvag: CardRec[];     // repetition i förväg — fyller när inget annat finns
+  nyaUnits: IntroUnit[]; // nya enheter inom dagsbudgeten — kommer när det förfallna är klart
   nyaOrd: number;        // deklarationens "nya ord" (ärvda + färska)
-  repKort: number;       // deklarationens "repetitioner" (due + i förväg)
+  repKort: number;       // deklarationens "repetitioner"
   totalKort: number;
 }
 
@@ -43,6 +50,23 @@ export class Store {
   /** exempelmeningar (Tatoeba): ord-/form-id → [spansk mening, ev. svensk översättning] */
   examples = new Map<string, string[]>();
   formsByParent = new Map<string, VerbForm[]>();
+  /**
+   * Regelbundna verb (presens): böjningen är en regel, inte ord att minnas. De
+   * har inga egna formkort — verbets kort frågar en slumpad person (se
+   * varianter). Gamla formkort för dem ligger kvar orörda men vilar.
+   */
+  regularVerbs = new Set<string>();
+  /** Regelbundna verbs alla fem presensformer (befintliga poster + genererade). */
+  varianterByParent = new Map<string, VerbForm[]>();
+  private kortFormsCache: { forms: VerbForm[]; size: number; out: VerbForm[] } | null = null;
+  /** Formerna som får egna kort: de oregelbundna verbens. */
+  get kortForms(): VerbForm[] {
+    const c = this.kortFormsCache;
+    if (c && c.forms === this.forms && c.size === this.regularVerbs.size) return c.out;
+    const out = this.forms.filter((f) => !this.regularVerbs.has(f.parent));
+    this.kortFormsCache = { forms: this.forms, size: this.regularVerbs.size, out };
+    return out;
+  }
   /** verb-id → alla presensformer (läsning: får förekomma i texter, blir aldrig kort) */
   lasFormer = new Map<string, string[]>();
   data: AppData = emptyData();
@@ -112,36 +136,40 @@ export class Store {
   private async loadForms(baseUrl: string): Promise<void> {
     const res = await fetch(`${baseUrl}data/verbforms.json`);
     if (!res.ok) return;
-    const json = await res.json();
-    this.forms = json.forms as VerbForm[];
+    this.setForms(await res.json());
+  }
+
+  /** Böjningsdatan (data/verbforms.json): formposterna, läslistan, regelbundna verb och extra facit. */
+  setForms(json: { forms: VerbForm[]; las?: Record<string, string[]> }): void {
+    this.forms = json.forms;
     this.formById = new Map(this.forms.map((f) => [f.id, f]));
     this.lasFormer = new Map(Object.entries((json.las ?? {}) as Record<string, string[]>));
     this.formsByParent = new Map();
-    const byEs = new Map<string, VerbForm[]>();
     for (const f of this.forms) {
       if (!this.formsByParent.has(f.parent)) this.formsByParent.set(f.parent, []);
       this.formsByParent.get(f.parent)!.push(f);
-      if (!byEs.has(f.es)) byEs.set(f.es, []);
-      byEs.get(f.es)!.push(f);
     }
+    const generated = this.klassaVerb();
+    for (const f of generated) this.formById.set(f.id, f);
+    const allForms = [...this.forms, ...generated];
     // extra godkända sv→es-svar:
     //  1. moderverbets alt-verb i samma person (elegir/escoger-paren)
     //  2. krockande sv-promptar ("jag går" → voy ELLER ando) — men bara när
     //     moderverbet saknar hint; med hint är prompten redan entydig
     const formsByParentEs = new Map<string, Map<string, string>>(); // verbets es → person → formens es
-    for (const f of this.forms) {
+    for (const f of allForms) {
       const parentEs = this.byId.get(f.parent)?.es;
       if (!parentEs) continue;
       if (!formsByParentEs.has(parentEs)) formsByParentEs.set(parentEs, new Map());
       formsByParentEs.get(parentEs)!.set(f.person, f.es);
     }
     const byPrompt = new Map<string, VerbForm[]>();
-    for (const f of this.forms) {
+    for (const f of allForms) {
       const key = `${PERSON_SV[f.person]} ${f.svPres}`;
       if (!byPrompt.has(key)) byPrompt.set(key, []);
       byPrompt.get(key)!.push(f);
     }
-    for (const f of this.forms) {
+    for (const f of allForms) {
       const acc = new Set<string>();
       const parent = this.byId.get(f.parent);
       for (const altEs of parent?.alt ?? []) {
@@ -155,6 +183,58 @@ export class Store {
       }
       if (acc.size) f.accept = [...acc];
     }
+  }
+
+  /**
+   * Regelbundet i presens = varje belagd form (läslistan + formposterna) är
+   * stam + regelbunden ändelse, och jag-formen finns belagd. Jag-formen avslöjar
+   * stamväxling, -zco, -go, -jo, -yo och accentflytt; saknas den räknas verbet
+   * som oregelbundet och behåller sina formkort. Ger de genererade formerna.
+   */
+  private klassaVerb(): VerbForm[] {
+    const belagt = new Map<string, Set<string>>();
+    for (const [vid, fs] of this.lasFormer) belagt.set(vid, new Set(fs));
+    for (const f of this.forms) {
+      if (!belagt.has(f.parent)) belagt.set(f.parent, new Set());
+      belagt.get(f.parent)!.add(f.es);
+    }
+    this.regularVerbs = new Set();
+    this.varianterByParent = new Map();
+    const generated: VerbForm[] = [];
+    for (const [vid, fs] of belagt) {
+      const inf = this.byId.get(vid)?.es ?? "";
+      const andelser = ANDELSER[inf.slice(-2)];
+      const poster = this.formsByParent.get(vid) ?? [];
+      if (!andelser || !poster.length) continue; // utan svensk presens går inget att fråga
+      const ratt = andelser.map((e) => inf.slice(0, -2) + e);
+      if (!fs.has(ratt[0]) || [...fs].some((x) => !ratt.includes(x))) continue;
+      this.regularVerbs.add(vid);
+      const svPres = poster[0].svPres;
+      this.varianterByParent.set(vid, PERSONER.map((person, i) => {
+        const finns = poster.find((p) => p.person === person);
+        if (finns) return finns;
+        const f: VerbForm = { id: `${vid}#pres.${person}`, parent: vid, es: ratt[i], person, svPres, r: 0, slot: 0 };
+        generated.push(f);
+        return f;
+      }));
+    }
+    return generated;
+  }
+
+  /** Vilande formkort: en böjning av ett regelbundet verb — kortet ligger kvar men övas inte. */
+  vilande(unitId: string): boolean {
+    const f = this.formById.get(unitId);
+    return !!f && this.regularVerbs.has(f.parent);
+  }
+
+  /**
+   * Böjningarna verbets kort kan fråga: regelbundet verb vars es→sv-kort klarats
+   * minst en gång (samma upplåsning som formkorten hade). Annars infinitiven.
+   */
+  varianter(verbId: string): VerbForm[] {
+    const v = this.varianterByParent.get(verbId);
+    const pc = this.card(verbId, "es2sv");
+    return v && pc && pc.fsrs.reps >= 1 && pc.fsrs.stability >= 1 ? v : [];
   }
 
   loadUserData(): void {
@@ -204,7 +284,7 @@ export class Store {
    * klassens ord (och böjningar av dem). Korten utanför rörs inte — de vilar.
    */
   iPasset(unitId: string): boolean {
-    if (this.avstadd(unitId)) return false;
+    if (this.avstadd(unitId) || this.vilande(unitId)) return false;
     if (!this.klassLage()) return true;
     return this.klassOrd.has(unitId) || this.klassOrd.has(this.formById.get(unitId)?.parent ?? "");
   }
@@ -275,12 +355,15 @@ export class Store {
     return [word.es, ...(word.alt ?? []), ...uw.syn];
   }
 
-  /** Facit för ett kort — hanterar både ord och böjningsformer. */
-  targetsFor(card: CardRec): string[] {
-    const form = this.formById.get(card.wordId);
+  /**
+   * Facit för ett kort — hanterar både ord och böjningsformer. `variant` är
+   * böjningen passet valt för ett regelbundet verbs kort.
+   */
+  targetsFor(card: CardRec, variant?: VerbForm): string[] {
+    const form = variant ?? this.formById.get(card.wordId);
     if (form) {
       // egna synonymer ("jag hade rätt") bor på FORMENS id — inte moderverbets
-      const uw = this.userWord(card.wordId);
+      const uw = this.userWord(form.id);
       // es→sv: alla pronomenvarianter är facit ("han är" OCH "hon är"), blotta verbet
       // också — och moderverbets glosor i böjd form ("jag passerar" för paso, vars
       // huvudglosa är "händer"): synonymer ska gälla även på formkorten
@@ -377,7 +460,7 @@ export class Store {
       const form = this.formById.get(c.wordId);
       if (form && dayKey(new Date(c.introducedAt)) === day) parentToday.add(form.parent);
     }
-    const formQueue = this.forms
+    const formQueue = this.kortForms
       .filter((f) => !this.card(f.id, "es2sv") && this.formUnlocked(f) &&
                      !parentToday.has(f.parent) && !this.avstadd(f.id))
       .sort((a, b) => a.slot - b.slot || a.r - b.r);
@@ -456,8 +539,8 @@ export class Store {
     return n;
   }
 
-  /** Nivåns portionsstorlek (kort) och dagsbudget (nya ord). */
-  nivaConf(): { kort: number; nya: number } {
+  /** Nivåns dagsbudget (nya ord). */
+  nivaConf(): { nya: number } {
     return NIVAER[this.data.settings.niva ?? "lagom"];
   }
 
@@ -477,60 +560,66 @@ export class Store {
    * Ändrar ingenting — `startPortion` gör själva introduktionen.
    */
   portionsPlan(now: Date = new Date()): PortionsPlan {
-    const N = this.nivaConf().kort;
     const cutoff = endOfToday(now).getTime();
     const alla = Object.values(this.data.cards).filter((c) => this.iPasset(c.wordId));
     const kritik = (c: CardRec) =>
       (now.getTime() - dueDate(c).getTime()) / Math.max(c.fsrs.stability, 0.1);
-    const dueRep = alla
+    const rep = alla
       .filter((c) => c.fsrs.reps > 0 && dueDate(c).getTime() <= cutoff)
       .sort((a, b) => kritik(b) - kritik(a));
-    const rep = dueRep.slice(0, N);
-    const skuldKvar = dueRep.length > N;
-
-    let plats = N - rep.length;
     const unseen = alla
       .filter((c) => c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff)
       .sort((a, b) =>
-        a.dir === b.dir ? (a.introducedAt < b.introducedAt ? -1 : 1) : a.dir === "es2sv" ? -1 : 1)
-      .slice(0, Math.max(0, plats));
-    plats -= unseen.length;
-
-    const nyaUnits = !skuldKvar && plats >= 2
-      ? this.nextIntroUnits(Math.min(Math.floor(plats / 2), this.budgetKvar(now)), now)
-      : [];
-    plats -= nyaUnits.length * 2;
-
-    const med = new Set([...rep, ...unseen].map((c) => cardKey(c.wordId, c.dir)));
-    const forvag = plats > 0 && !skuldKvar
-      ? alla
-          .filter((c) => c.fsrs.reps > 0 && !med.has(cardKey(c.wordId, c.dir)) &&
-                         dueDate(c).getTime() > cutoff)
-          .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime())
-          .slice(0, plats)
-      : [];
-
-    const nyaOrd = new Set(unseen.map((c) => c.wordId)).size + nyaUnits.length;
+        a.dir === b.dir ? (a.introducedAt < b.introducedAt ? -1 : 1) : a.dir === "es2sv" ? -1 : 1);
+    // en böjning per verb och dag (båda hållen): verbets övriga förfallna former
+    // väntar till kommande dagar i stället för att komma om och om igen i samma pass
+    const dagens = this.dagensForm(now);
+    const enPerVerb = (c: CardRec): boolean => {
+      const f = this.formById.get(c.wordId);
+      if (!f) return true;
+      const vald = dagens.get(f.parent);
+      if (vald && vald !== c.wordId) return false;
+      dagens.set(f.parent, c.wordId);
+      return true;
+    };
+    const repEn = rep.filter(enPerVerb);
+    const unseenEn = unseen.filter(enPerVerb);
+    const nyaUnits = this.nextIntroUnits(this.budgetKvar(now), now);
+    const nyaOrd = new Set(unseenEn.map((c) => c.wordId)).size + nyaUnits.length;
     return {
-      rep, unseen, nyaUnits, forvag, nyaOrd,
-      repKort: rep.length + forvag.length,
-      totalKort: rep.length + unseen.length + nyaUnits.length * 2 + forvag.length,
+      rep: repEn, unseen: unseenEn, nyaUnits, nyaOrd,
+      repKort: repEn.length,
+      totalKort: repEn.length + unseenEn.length + nyaUnits.length * 2,
     };
   }
 
-  /** Bygg portionen på riktigt: introducera planens nya enheter och ge hela kön. */
-  startPortion(now: Date = new Date()): CardRec[] {
-    const plan = this.portionsPlan(now);
-    const fresh = this.introduceUnits(plan.nyaUnits.length, now);
-    return [...plan.rep, ...plan.unseen, ...fresh, ...plan.forvag];
+  /** Verb → den böjning som redan övats idag (senaste repetitionen under dagens datum). */
+  private dagensForm(now: Date): Map<string, string> {
+    const idag = dayKey(now);
+    const out = new Map<string, string>();
+    for (const key in this.data.cards) {
+      const c = this.data.cards[key];
+      const f = this.formById.get(c.wordId);
+      if (f && c.fsrs.last_review && dayKey(new Date(c.fsrs.last_review)) === idag) out.set(f.parent, c.wordId);
+    }
+    return out;
   }
 
-  /** Dagens glosor klara? Inga förfallna kvar och nya-budgeten använd → läsövning förvald. */
+  /**
+   * Dagens kö: allt förfallet, mest kritiskt först, sedan ärvda nya. Nya ord ur
+   * kön introduceras först när inget förfallet är kvar — passet hämtar dem
+   * själv när kön tar slut (Session), så man aldrig lägger till ovanpå en skuld.
+   */
+  startPortion(now: Date = new Date()): CardRec[] {
+    const plan = this.portionsPlan(now);
+    if (plan.rep.length || plan.unseen.length) return [...plan.rep, ...plan.unseen];
+    return this.introduceUnits(plan.nyaUnits.length, now);
+  }
+
+  /** Dagens glosor klara? Inget kvar i dagens kö och nya-budgeten använd → läsövning förvald. */
   glosorKlara(now: Date = new Date()): boolean {
-    const cutoff = endOfToday(now).getTime();
-    const harDue = Object.values(this.data.cards)
-      .some((c) => dueDate(c).getTime() <= cutoff && this.iPasset(c.wordId));
-    return !harDue && (this.budgetKvar(now) === 0 || this.nextIntroUnits(1, now).length === 0);
+    const p = this.portionsPlan(now);
+    return p.rep.length === 0 && p.unseen.length === 0 && p.nyaUnits.length === 0;
   }
 
   /** Budgetåterbäring vid fast-track: en extra enhet, utanför övningsmålet. */
@@ -636,14 +725,15 @@ export class Store {
       else lar++;
     }
     // böjningsformerna är fullvärdiga poäng — samma nivåregler som orden
-    for (const f of this.forms) {
+    // regelbundna verbs böjningar är ingen egen enhet — verbet räknas en gång
+    for (const f of this.kortForms) {
       if (this.avstadd(f.id)) { avstadda++; continue; }
       const lvl = this.formLevel(f);
       if (lvl === "ny") ny++;
       else if (lvl === "kan") kan++;
       else lar++;
     }
-    const total = this.words.length + this.forms.length - avstadda;
+    const total = this.words.length + this.kortForms.length - avstadda;
     return {
       ny, lar, kan,
       score: kan + lar, // nivåresans poäng — orden man kan + orden på väg

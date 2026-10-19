@@ -10,7 +10,6 @@ import { Social } from "./lib/social";
 import { activityStats } from "./lib/streak";
 import { oppnaKonto, renderIdag, type CloudUi } from "./views/idag";
 import { PassView } from "./views/pass";
-import { LasView } from "./views/las";
 import { renderOrdlista } from "./views/ordlista";
 import { renderTopplista } from "./views/topplista";
 import { renderLyssna } from "./views/lyssna";
@@ -40,7 +39,7 @@ const TABS = [
   },
 ] as const;
 
-type TabId = (typeof TABS)[number]["id"] | "pass" | "las";
+type TabId = (typeof TABS)[number]["id"] | "pass";
 
 async function boot(): Promise<void> {
   initViewportFit();
@@ -106,7 +105,6 @@ async function boot(): Promise<void> {
   root.innerHTML = `
     <div class="screen" id="screen-idag"></div>
     <div class="screen" id="screen-pass" hidden></div>
-    <div class="screen" id="screen-las" hidden></div>
     <div class="screen" id="screen-ordlista" hidden></div>
     <div class="screen" id="screen-lyssna" hidden></div>
     <div class="screen" id="screen-topplista" hidden></div>
@@ -119,7 +117,6 @@ async function boot(): Promise<void> {
   const screens: Record<TabId, HTMLElement> = {
     idag: root.querySelector("#screen-idag")!,
     pass: root.querySelector("#screen-pass")!,
-    las: root.querySelector("#screen-las")!,
     ordlista: root.querySelector("#screen-ordlista")!,
     lyssna: root.querySelector("#screen-lyssna")!,
     topplista: root.querySelector("#screen-topplista")!,
@@ -129,7 +126,7 @@ async function boot(): Promise<void> {
 
   function showTab(id: TabId): void {
     currentTab = id;
-    root.classList.toggle("tab-pass", id === "pass" || id === "las");
+    root.classList.toggle("tab-pass", id === "pass");
     (Object.keys(screens) as TabId[]).forEach((k) => (screens[k].hidden = k !== id));
     tabButtons.forEach((b) => {
       const on = b.dataset.tab === id;
@@ -182,19 +179,6 @@ async function boot(): Promise<void> {
     showTab("pass");
   }
 
-  /** Läsförståelse — låses upp vid Turista, kräver inloggning (Edge Function). */
-  function startLas(): void {
-    if (!sync.session) {
-      showTab("idag");
-      flashKonto();
-      return;
-    }
-    if (sync.status === "syncing") return;
-    if (sync.status === "error") { flashKonto(); return; }
-    showTab("las");
-    void las.start();
-  }
-
   const social = new Social(sb, () => sync.session?.user.id ?? null);
 
   /** Ladda upp mina topplistesiffror (streak, dagar, resapoäng). */
@@ -217,10 +201,8 @@ async function boot(): Promise<void> {
   );
   pass.render();
 
-  const las = new LasView(screens.las, store, sb, () => { pushMyStats(); showTab("idag"); });
-
   function renderIdagTab(): void {
-    renderIdag(screens.idag, store, { startPass, startLas }, cloud);
+    renderIdag(screens.idag, store, { startPass }, cloud);
   }
 
   sync.onStatus = () => {

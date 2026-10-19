@@ -439,7 +439,7 @@ export class PassView {
     if (card.dir !== "es2sv") return "";
     const ex = this.store.exampleFor(card.wordId);
     if (!ex) return "";
-    const form = this.store.formFor(card);
+    const form = this.session?.formFor(card) ?? this.store.formFor(card);
     const w = this.session?.word(card);
     const ytor = [form?.es, w?.es].filter((s): s is string => !!s);
     return `<div class="extips" id="exTips" hidden>
@@ -524,7 +524,7 @@ export class PassView {
     if (this.state === "question") {
       const card = s.current!;
       const w = s.word(card);
-      const form = this.store.formFor(card);
+      const form = s.formFor(card);
       const prompt = form
         ? card.dir === "es2sv" ? form.es : `${PERSON_SV[form.person]} ${form.svPres}`
         : card.dir === "es2sv" ? (w.art ? `${w.art} ${w.es}` : w.es) : w.sv;

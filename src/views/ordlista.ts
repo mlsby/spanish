@@ -92,7 +92,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       <div class="searchrow">
         <label class="search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input id="searchInput" type="search" placeholder="Sök bland ${store.words.length + store.forms.length} ord …" aria-label="Sök ord">
+          <input id="searchInput" type="search" placeholder="Sök bland ${store.words.length + store.kortForms.length} ord …" aria-label="Sök ord">
         </label>
         <button type="button" class="icobtn" id="sortBtn" aria-label="Sortera">${IKON_SORT}</button>
         <button type="button" class="icobtn" id="filtBtn" aria-label="Filtrera">${IKON_FILTER}<span class="bdot" hidden></span></button>
@@ -122,8 +122,9 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
       if (q && !w.es.toLowerCase().includes(q) && !w.sv.toLowerCase().includes(q)) continue;
       out.push(store.wordStatus(w));
     }
-    // böjningarna som egna rader, insprängda på sin korpusplats (rank = slot)
-    for (const f of store.forms) {
+    // böjningarna som egna rader, insprängda på sin korpusplats (rank = slot) —
+    // bara de oregelbundna: regelbundna verbs böjningar övas på verbets eget kort
+    for (const f of store.kortForms) {
       const sw = formAsWord(f);
       if (q && !sw.es.toLowerCase().includes(q) && !sw.sv.toLowerCase().includes(q)) continue;
       out.push(store.wordStatus(sw));
@@ -146,6 +147,12 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
 
   /** Verbets böjningsformer med status-prick (grå = inte introducerad än). */
   function formsHtml(wordId: string): string {
+    const regel = store.varianterByParent.get(wordId);
+    if (regel) {
+      // regelbundet: formerna är en regel och övas på verbets kort — ingen egen status
+      const chips = regel.map((f) => `<span class="syn formchip">${esc(f.es)}</span>`).join("");
+      return `<div><div class="xl">Böjningar · presens · regelbundet</div><div class="syns">${chips}</div></div>`;
+    }
     const forms = store.formsByParent.get(wordId);
     if (!forms?.length) return "";
     const chips = [...forms].sort((a, b) => a.r - b.r).map((f) => {
@@ -335,7 +342,7 @@ export function renderOrdlista(el: HTMLElement, store: Store, social?: Social): 
     const klar = list.length <= shown;
     sentinel.hidden = klar;
     slutRad.hidden = !klar;
-    slutRad.textContent = list.length === store.words.length + store.forms.length
+    slutRad.textContent = list.length === store.words.length + store.kortForms.length
       ? `${list.length} ord` : `${list.length} ord matchar`;
     // väck observern så nästa sida laddas direkt om slutet redan syns
     io.unobserve(sentinel);

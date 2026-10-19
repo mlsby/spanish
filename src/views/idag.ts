@@ -1,4 +1,3 @@
-import { LAS_UNLOCK, lasNiva } from "../lib/lastext";
 import { loadPass } from "../lib/passpaus";
 import { dagarKvar, MIN_DAGAR, nyaIdag, prognosOrd, taktPerDag } from "../lib/prognos";
 import { resaFor, TITLAR } from "../lib/resa";
@@ -11,8 +10,6 @@ import type { Lage, Niva } from "../lib/types";
 
 export interface IdagCallbacks {
   startPass(): void;
-  /** läsförståelse — låses upp vid Turista (100 poäng) */
-  startLas(): void;
 }
 
 export interface CloudUi {
@@ -35,7 +32,6 @@ export function oppnaKonto(): void {
   settingsOpen = true;
 }
 let resaOpen = false; // nivåtrappan utfälld? (minns tills appen laddas om)
-let valdTyp: "glosor" | "las" | null = null; // typväljaren; null = följ förvalet
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -94,7 +90,7 @@ function resanPanelHtml(store: Store): string {
   const now = new Date();
   const r = resaFor(s.score);
   const takt = taktPerDag(Object.values(store.data.cards), now);
-  const prognos = takt ? prognosOrd(s.score, takt, now, store.words.length + store.forms.length) : null;
+  const prognos = takt ? prognosOrd(s.score, takt, now, store.words.length + store.kortForms.length) : null;
   const rp = prognos === null ? null : resaFor(prognos);
 
   // --- Nu: statrad, meter mot nästa tröskel, ev. trappan ---
@@ -246,11 +242,7 @@ function deklaration(plan: { repKort: number; nyaOrd: number }): string {
 }
 
 function heroHtml(store: Store, cloud: CloudUi): string {
-  const s = store.stats();
   const busy = cloud.status === "syncing";
-  // läsförståelsen låses upp vid Turista — kräver inloggning (texten genereras i molnet)
-  const lasUpplast = !!cloud.email && s.score >= LAS_UNLOCK;
-
   // pausad övning? den fortsätts alltid först — där man slutade
   const paused = loadPass();
   if (paused && cloud.email) {
@@ -272,28 +264,11 @@ function heroHtml(store: Store, cloud: CloudUi): string {
   }
 
   const plan = store.portionsPlan();
-  const typ: "glosor" | "las" = valdTyp ?? (lasUpplast && store.glosorKlara() ? "las" : "glosor");
-  const picker = lasUpplast
-    ? `<div class="picker" id="typVal">
-        <button type="button" data-typ="glosor" class="${typ === "glosor" ? "on" : ""}">Glosor</button>
-        <button type="button" data-typ="las" class="${typ === "las" ? "on" : ""}">Läsövning</button>
-      </div>` : "";
-
-  if (typ === "las") {
-    return `<div class="hero">
-      ${picker}
-      <div class="big">📖</div>
-      <p class="cap">en text på din nivå · <b>${lasNiva(s.score).anvand}</b> övningsord</p>
-      <button class="btn" id="lasBtn" ${busy ? "disabled" : ""}>${busy ? "Synkar …" : "Läs"}</button>
-    </div>`;
-  }
-
   const repPct = plan.totalKort > 0 ? (plan.repKort / plan.totalKort) * 100 : 0;
   const mix = plan.totalKort > 0
     ? `<div class="mix">${repPct > 0 ? `<i class="mrep" style="width:${repPct.toFixed(1)}%"></i>` : ""}${repPct < 100 ? `<i class="mny" style="width:${(100 - repPct).toFixed(1)}%"></i>` : ""}</div>`
     : "";
   return `<div class="hero">
-    ${picker}
     <div class="big">${plan.totalKort} <small>kort</small></div>
     <p class="cap">${deklaration(plan) || "inget att öva just nu"}</p>
     ${mix}
@@ -362,7 +337,7 @@ function settingsHtml(store: Store, cloud: CloudUi): string {
         <button type="button" data-niva="lagom" class="${niva === "lagom" ? "on" : ""}">Lagom</button>
         <button type="button" data-niva="ambitios" class="${niva === "ambitios" ? "on" : ""}">Ambitiös</button>
       </div>
-      <span class="finstilt">${conf.kort} kort per övning · upp till ${conf.nya} nya ord om dagen</span>
+      <span class="finstilt">Upp till ${conf.nya} nya ord om dagen</span>
     </div>
     ${lageHtml(store)}
     <div class="panel setting">
@@ -430,12 +405,6 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
     rerender();
   };
   el.querySelector<HTMLButtonElement>("#startBtn")?.addEventListener("click", () => cb.startPass());
-  el.querySelector<HTMLButtonElement>("#lasBtn")?.addEventListener("click", () => cb.startLas());
-  el.querySelectorAll<HTMLButtonElement>("#typVal [data-typ]").forEach((b) =>
-    b.addEventListener("click", () => {
-      valdTyp = b.dataset.typ as "glosor" | "las";
-      rerender();
-    }));
   el.querySelectorAll<HTMLButtonElement>("#lageVal [data-lage]").forEach((b) =>
     b.addEventListener("click", () => {
       store.setLage(b.dataset.lage as Lage);

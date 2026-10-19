@@ -4,8 +4,12 @@ import {
 } from "ts-fsrs";
 import type { CardRec, Dir, Grade, StoredFsrs } from "./types";
 
-/** FSRS med default-parametrar och retention-mål 0,90 enligt kravspec §4. */
-const scheduler = fsrs(generatorParameters({ request_retention: 0.9 }));
+/**
+ * FSRS med default-parametrar och retention-mål 0,90 enligt kravspec §4.
+ * Utan korttidssteg: varje intervall är minst en dag, så ett besvarat kort är
+ * klart för idag (spridda hämtningar över dagar slår upprepning inom ett pass).
+ */
+const scheduler = fsrs(generatorParameters({ request_retention: 0.9, enable_short_term: false }));
 
 // Anki-mature-konventionen: tredje lyckade repetitionen (~25 d stabilitet)
 // ska räcka — se docs/research-troskel.md

@@ -3,7 +3,7 @@ import { insertSpaced, spaceSiblings } from "./queue";
 import { applyReview, dueDate } from "./scheduler";
 import type { Store } from "./store";
 import { endOfToday } from "./time";
-import type { CardRec, Dir, Grade, Step, VerbForm, Word } from "./types";
+import { cardKey, type CardRec, type Dir, type Grade, type Step, type VerbForm, type Word } from "./types";
 
 export interface Pending {
   card: CardRec;
@@ -31,8 +31,11 @@ export interface SessionState {
   baseline: number;
 }
 
-/** Kort som fastnar i korttidsinlärning visas igen inom samma pass om nästa due är nära. */
-const RELEARN_WINDOW_MS = 15 * 60 * 1000;
+/**
+ * Ett kort besvaras en gång per dag. Fel svar får ett enda nytt försök, så här
+ * många kort senare (eller sist om kön är kortare) — sedan är kortet klart för idag.
+ */
+const RETRY_GAP = 10;
 /** Syskonuppskov: klaras första riktningen exakt väntar andra riktningen ~2 veckor. */
 const SIBLING_DEFER_MS = 14 * 24 * 3600 * 1000;
 /** Budgetåterbäringens tak: max 3× första övningens takt i introduktioner per dag. */
@@ -45,12 +48,47 @@ export class Session {
   pending: Pending | null = null;
   /** kort med due inom 7 dagar vid sessionsstart — för prognosraden */
   private dueSoonBaseline = 0;
+  /** kort som redan fått sitt enda nya försök efter fel svar */
+  private retried = new Set<string>();
+  /** böjningen som valts för ett regelbundet verbs kort — fast tills kortet besvarats */
+  private valdForm = new Map<string, VerbForm>();
+  /** senast frågade person per kort — nytt försök slår om till en annan */
+  private senastePerson = new Map<string, VerbForm["person"]>();
+  private rand: () => number;
 
-  constructor(private store: Store, cards: CardRec[], opts?: { dueSoonBaseline?: number }) {
+  constructor(
+    private store: Store, cards: CardRec[],
+    opts?: { dueSoonBaseline?: number; rand?: () => number },
+  ) {
     // syskonkort (samma ord/moderverb) hålls isär så facit aldrig står kvar på skärmen
     this.queue = spaceSiblings(cards);
     // baslinjen tas helst FÖRE introduktionen — annars räknas dagens nya inte in
     this.dueSoonBaseline = opts?.dueSoonBaseline ?? this.store.dueSoonCount();
+    this.rand = opts?.rand ?? Math.random;
+  }
+
+  /**
+   * Böjningen kortet frågar: formkortets egen, eller för ett regelbundet verb en
+   * slumpad person (vald en gång och fast tills kortet besvarats). Annars ingen.
+   */
+  formFor(card: CardRec): VerbForm | undefined {
+    const egen = this.store.formFor(card);
+    if (egen) return egen;
+    const key = cardKey(card.wordId, card.dir);
+    const vald = this.valdForm.get(key);
+    if (vald) return vald;
+    const forra = this.senastePerson.get(key);
+    // har passet redan frågat en böjning hålls det kvar vid nytt försök, även om
+    // felet sänkte verbets stabilitet under upplåsningen
+    const alla = forra
+      ? this.store.varianterByParent.get(card.wordId) ?? []
+      : this.store.varianter(card.wordId);
+    if (!alla.length) return undefined;
+    const val = alla.length > 1 ? alla.filter((f) => f.person !== forra) : alla;
+    const f = val[Math.floor(this.rand() * val.length) % val.length];
+    this.valdForm.set(key, f);
+    this.senastePerson.set(key, f.person);
+    return f;
   }
 
   /** Ögonblicksbild av passet — det som behövs för att fortsätta senare. */
@@ -103,11 +141,12 @@ export class Session {
     const card = this.current;
     if (!card) throw new Error("inget aktuellt kort");
     const word = this.word(card);
-    const targets = this.store.targetsFor(card);
+    const form = this.formFor(card);
+    const targets = this.store.targetsFor(card, form);
     const r: GradeResult = gradeAnswer(raw, targets, this.answerLang(card.dir));
     const firstExposure = card.fsrs.reps === 0;
     this.pending = {
-      card, word, form: this.store.formFor(card), raw: raw.trim(),
+      card, word, form, raw: raw.trim(),
       grade: r.grade, step: r.step, matched: r.matched,
       firstExposure,
       // förkunskaps-fast-track: helt rätt vid allra första mötet ⇒ Easy
@@ -123,9 +162,9 @@ export class Session {
     const p = this.pending;
     const lang = this.answerLang(p.card.dir);
     const norm = normalize(p.raw, lang);
-    // formkort: synonymen hör till just den formen (kortets id), inte moderverbet —
+    // böjning: synonymen hör till just den formen (formens id), inte moderverbet —
     // annars läses den aldrig vid nästa rättning
-    if (norm) this.store.addUserSyn(p.form ? p.card.wordId : p.word.id, norm);
+    if (norm) this.store.addUserSyn(p.form ? p.form.id : p.word.id, norm);
     this.pending = { ...p, grade: "hard", step: "override", forcedMnem: false };
     return this.pending;
   }
@@ -158,8 +197,9 @@ export class Session {
 
   /**
    * Bekräfta utfallet: FSRS uppdateras, reviewloggen skrivs, kortet lämnar kön.
-   * Fel svar läggs tillbaka längre fram i kön; korttidsinlärda kort återkommer i slutet.
-   * Fast-track (easy) utlöser syskonuppskov och budgetåterbäring.
+   * Rätt svar är klart för idag. Fel svar kommer tillbaka en gång, RETRY_GAP kort
+   * senare och (för regelbundna verb) i en annan person. Tar kön slut fylls den
+   * på med dagens nya ord. Fast-track (easy) utlöser syskonuppskov och budgetåterbäring.
    */
   commit(now: Date = new Date()): void {
     const p = this.pending;
@@ -182,16 +222,18 @@ export class Session {
     });
     this.queue.shift();
     this.done++;
-    const nextDue = dueDate(updated).getTime() - now.getTime();
-    if (p.grade === "again") {
-      insertSpaced(this.queue, updated, 3);
-    } else if (nextDue <= RELEARN_WINDOW_MS && this.queue.length > 0) {
-      this.queue.push(updated);
+    const key = cardKey(p.card.wordId, p.card.dir);
+    this.valdForm.delete(key);
+    if (p.grade === "again" && !this.retried.has(key)) {
+      this.retried.add(key);
+      insertSpaced(this.queue, updated, RETRY_GAP);
     }
     if (p.easy && p.firstExposure) {
       this.deferSibling(p.card, now);
       this.maybeRefund(p.card, now);
     }
+    // det förfallna är klart: dagens nya ord (och återbäringens extra) tar vid
+    if (this.queue.length === 0) this.queue = spaceSiblings(this.store.startPortion(now));
     this.store.save();
   }
 
