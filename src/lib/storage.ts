@@ -12,7 +12,7 @@ export interface StorageAdapter {
 export function emptyData(): AppData {
   return {
     version: 1,
-    settings: { niva: "lagom", newFirst: 10, newMore: 5, autoNext: true, autoMs: 3000 },
+    settings: { niva: "lagom", lage: "allt", newFirst: 10, newMore: 5, autoNext: true, autoMs: 3000 },
     userWords: {},
     cards: {},
     reviews: [],
@@ -27,6 +27,7 @@ function normSettings(s: Partial<Settings> & { newPerDay?: number } = {}): Setti
   return {
     // gamla sparfiler saknar fälten — defaulta i stället för att migrera
     niva: s.niva === "lugn" || s.niva === "ambitios" ? s.niva : "lagom",
+    lage: s.lage === "klass" ? "klass" : "allt",
     newFirst: s.newFirst ?? s.newPerDay ?? 10,
     newMore: s.newMore ?? 5,
     autoNext: s.autoNext ?? true,

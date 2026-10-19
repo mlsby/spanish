@@ -1,4 +1,4 @@
-import type { AppData, CardRec, Dir, DirtyKind, Level, Niva, ReviewRec, UserWord, VerbForm, Word } from "./types";
+import type { AppData, CardRec, Dir, DirtyKind, Lage, Level, Niva, ReviewRec, UserWord, VerbForm, Word } from "./types";
 import { cardKey, PERSON_SV, PERSON_SV_SVAR } from "./types";
 import { svBestamd, svBojda } from "./grading";
 import { dueDate, isKnown, KNOWN_STABILITY_DAYS, levelCardRec, newCardRec } from "./scheduler";
@@ -47,6 +47,9 @@ export class Store {
   lasFormer = new Map<string, string[]>();
   data: AppData = emptyData();
   attribution: string[] = [];
+  /** Kursens lektioner (data/klass.json): per enhet orden den introducerar, i lektionsordning. */
+  klassLektioner: { unidad: string; datum: string | null; ord: string[] }[] = [];
+  klassOrd = new Set<string>();
   /** Anropas när lokal data ändras — synken använder den för att veta vad som ska skickas upp. */
   onDirty?: (kind: DirtyKind, key?: string) => void;
 
@@ -70,6 +73,9 @@ export class Store {
     try {
       await this.loadForms(baseUrl);
     } catch { /* böjningsdata är valfri — appen funkar med bara orden */ }
+    try {
+      await this.loadKlass(baseUrl);
+    } catch { /* klasslistan är valfri — utan den finns bara läget "allt" */ }
     // exempelmeningarna laddas i bakgrunden — facit funkar utan dem tills de kommit
     void this.loadExamples(baseUrl).catch(() => { /* valfri data */ });
   }
@@ -91,6 +97,14 @@ export class Store {
       ?? this.examples.get(this.formById.get(wordId)?.parent ?? "");
     if (!e) return null;
     return { es: e[0], sv: e[1] || undefined, en: e[2] || undefined };
+  }
+
+  private async loadKlass(baseUrl: string): Promise<void> {
+    const res = await fetch(`${baseUrl}data/klass.json`);
+    if (!res.ok) return;
+    const json = await res.json();
+    this.klassLektioner = json.lektioner ?? [];
+    this.klassOrd = new Set(this.klassLektioner.flatMap((l) => l.ord.filter((id) => this.byId.has(id))));
   }
 
   private async loadForms(baseUrl: string): Promise<void> {
@@ -178,6 +192,21 @@ export class Store {
   }
 
   /** Övas inte: användaren har avstått enheten. Böjningar ärver moderverbets val. */
+  /** Klassläget är på (och klasslistan finns). */
+  klassLage(): boolean {
+    return this.data.settings.lage === "klass" && this.klassOrd.size > 0;
+  }
+
+  /**
+   * Hör enheten till dagens pass? Inte om den är avstådd, och i klassläget bara
+   * klassens ord (och böjningar av dem). Korten utanför rörs inte — de vilar.
+   */
+  iPasset(unitId: string): boolean {
+    if (this.avstadd(unitId)) return false;
+    if (!this.klassLage()) return true;
+    return this.klassOrd.has(unitId) || this.klassOrd.has(this.formById.get(unitId)?.parent ?? "");
+  }
+
   avstadd(unitId: string): boolean {
     if (this.userWord(unitId).skip) return true;
     const f = this.formById.get(unitId);
@@ -216,6 +245,11 @@ export class Store {
   /** Ambitionsnivån — lokal inställning precis som facittempot. */
   setNiva(n: Niva): void {
     this.data.settings.niva = n;
+    this.save();
+  }
+
+  setLage(l: Lage): void {
+    this.data.settings.lage = l;
     this.save();
   }
 
@@ -288,11 +322,11 @@ export class Store {
     this.dirty("card", cardKey(rec.wordId, rec.dir));
   }
 
-  /** Förfallna kort (due ≤ slutet av idag), äldst först. Avstådda ord räknas inte. */
+  /** Förfallna kort (due ≤ slutet av idag), äldst först. Bara kort i passet (se iPasset). */
   dueCards(now: Date = new Date()): CardRec[] {
     const cutoff = endOfToday(now).getTime();
     return Object.values(this.data.cards)
-      .filter((c) => dueDate(c).getTime() <= cutoff && !this.avstadd(c.wordId))
+      .filter((c) => dueDate(c).getTime() <= cutoff && this.iPasset(c.wordId))
       .sort((a, b) => dueDate(a).getTime() - dueDate(b).getTime());
   }
 
@@ -331,6 +365,8 @@ export class Store {
    */
   nextIntroUnits(count: number, now: Date = new Date()): IntroUnit[] {
     if (count <= 0) return [];
+    // klassläget tar inga nya ord ur kön: klassens ord kommer in när lektionen markeras gjord
+    if (this.klassLage()) return [];
     const day = dayKey(now);
     const parentToday = new Set<string>();
     for (const key in this.data.cards) {
@@ -401,7 +437,7 @@ export class Store {
     let n = 0;
     for (const key in this.data.cards) {
       const c = this.data.cards[key];
-      if (dueDate(c).getTime() <= cutoff && !this.avstadd(c.wordId)) n++;
+      if (dueDate(c).getTime() <= cutoff && this.iPasset(c.wordId)) n++;
     }
     return n;
   }
@@ -413,7 +449,7 @@ export class Store {
     for (const key in this.data.cards) {
       const c = this.data.cards[key];
       if (c.dir === "es2sv" && c.fsrs.reps === 0 && dueDate(c).getTime() <= cutoff &&
-          !this.avstadd(c.wordId)) n++;
+          this.iPasset(c.wordId)) n++;
     }
     return n;
   }
@@ -441,7 +477,7 @@ export class Store {
   portionsPlan(now: Date = new Date()): PortionsPlan {
     const N = this.nivaConf().kort;
     const cutoff = endOfToday(now).getTime();
-    const alla = Object.values(this.data.cards).filter((c) => !this.avstadd(c.wordId));
+    const alla = Object.values(this.data.cards).filter((c) => this.iPasset(c.wordId));
     const kritik = (c: CardRec) =>
       (now.getTime() - dueDate(c).getTime()) / Math.max(c.fsrs.stability, 0.1);
     const dueRep = alla
@@ -491,7 +527,7 @@ export class Store {
   glosorKlara(now: Date = new Date()): boolean {
     const cutoff = endOfToday(now).getTime();
     const harDue = Object.values(this.data.cards)
-      .some((c) => dueDate(c).getTime() <= cutoff && !this.avstadd(c.wordId));
+      .some((c) => dueDate(c).getTime() <= cutoff && this.iPasset(c.wordId));
     return !harDue && (this.budgetKvar(now) === 0 || this.nextIntroUnits(1, now).length === 0);
   }
 

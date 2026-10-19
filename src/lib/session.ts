@@ -73,7 +73,7 @@ export class Session {
     const cards: CardRec[] = [];
     for (const [wordId, dir] of state.queue) {
       const c = store.card(wordId, dir);
-      if (c && dueDate(c).getTime() <= cutoff && !store.avstadd(wordId)) cards.push(c);
+      if (c && dueDate(c).getTime() <= cutoff && store.iPasset(wordId)) cards.push(c);
     }
     const s = new Session(store, [], { dueSoonBaseline: state.baseline });
     s.queue = cards; // behåll passets ordning — den var redan syskonavståndad

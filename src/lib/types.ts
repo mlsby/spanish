@@ -86,6 +86,8 @@ export interface ReviewRec {
 
 /** Ambitionsnivån styr portionsstorlek och dagsbudget för nya ord. */
 export type Niva = "lugn" | "lagom" | "ambitios";
+/** Vilka ord passen tar: hela basen, eller bara kursens klassord (data/klass.json). */
+export type Lage = "allt" | "klass";
 
 export interface Settings {
   /** ambitionsnivå: portionens kort + nya ord per dag (lokal, synkas inte) */
@@ -94,6 +96,8 @@ export interface Settings {
   newFirst: number;
   /** pensionerad — nya ord per "Öva mer" i gamla modellen */
   newMore: number;
+  /** allt = hela basen; klass = bara klassens ord, inga nya ur frekvenskön (lokal, synkas inte) */
+  lage: Lage;
   /** facit vid rätt: gå vidare automatiskt? (lokal, synkas inte) */
   autoNext: boolean;
   /** hur länge facit visas vid rätt, ms (lokal, synkas inte) */

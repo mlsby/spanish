@@ -7,7 +7,7 @@ import { exportBlob, parseImport, LocalStorageAdapter } from "../lib/storage";
 import { activityStats } from "../lib/streak";
 import { addDays, dayKey, fmtDate, weekdayMon } from "../lib/time";
 import type { SyncStatus } from "../lib/sync";
-import type { Niva } from "../lib/types";
+import type { Lage, Niva } from "../lib/types";
 
 export interface IdagCallbacks {
   startPass(): void;
@@ -333,6 +333,24 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
     </div>`;
 }
 
+/** Vilka ord passen tar: hela basen eller bara klassens. Visas bara när klasslistan finns. */
+function lageHtml(store: Store): string {
+  if (store.klassOrd.size === 0) return "";
+  const lage = store.data.settings.lage ?? "allt";
+  const traffade = [...store.klassOrd].filter((id) => store.card(id, "es2sv")).length;
+  return `
+    <div class="panel setting" style="display:block">
+      <span class="t">Ord</span>
+      <div class="picker" id="lageVal" style="margin:10px 0 8px">
+        <button type="button" data-lage="allt" class="${lage === "allt" ? "on" : ""}">Alla ord</button>
+        <button type="button" data-lage="klass" class="${lage === "klass" ? "on" : ""}">Klassen</button>
+      </div>
+      <span class="finstilt">${lage === "klass"
+        ? `Bara ord från lektionerna · ${traffade} av ${store.klassOrd.size} träffade hittills`
+        : "Hela ordlistan, nya ord i frekvensordning"}</span>
+    </div>`;
+}
+
 function settingsHtml(store: Store, cloud: CloudUi): string {
   const niva = store.data.settings.niva ?? "lagom";
   const conf = NIVAER[niva];
@@ -346,6 +364,7 @@ function settingsHtml(store: Store, cloud: CloudUi): string {
       </div>
       <span class="finstilt">${conf.kort} kort per övning · upp till ${conf.nya} nya ord om dagen</span>
     </div>
+    ${lageHtml(store)}
     <div class="panel setting">
       <span class="t">Facit — gå vidare automatiskt</span>
       <button type="button" class="tagg${store.data.settings.autoNext ? " on" : ""}" id="autoNextTgl"
@@ -415,6 +434,11 @@ export function renderIdag(el: HTMLElement, store: Store, cb: IdagCallbacks, clo
   el.querySelectorAll<HTMLButtonElement>("#typVal [data-typ]").forEach((b) =>
     b.addEventListener("click", () => {
       valdTyp = b.dataset.typ as "glosor" | "las";
+      rerender();
+    }));
+  el.querySelectorAll<HTMLButtonElement>("#lageVal [data-lage]").forEach((b) =>
+    b.addEventListener("click", () => {
+      store.setLage(b.dataset.lage as Lage);
       rerender();
     }));
   el.querySelectorAll<HTMLButtonElement>("#nivaVal [data-niva]").forEach((b) =>
