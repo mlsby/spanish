@@ -48,7 +48,8 @@ export class Store {
   data: AppData = emptyData();
   attribution: string[] = [];
   /** Kursens lektioner (data/klass.json): per enhet orden den introducerar, i lektionsordning. */
-  klassLektioner: { unidad: string; datum: string | null; ord: string[] }[] = [];
+  klassLektioner: { unidad: string; datum: string | null; ord: string[]; klar?: boolean }[] = [];
+  /** Orden från lektioner markerade klara — det klassläget övar på. */
   klassOrd = new Set<string>();
   /** Anropas när lokal data ändras — synken använder den för att veta vad som ska skickas upp. */
   onDirty?: (kind: DirtyKind, key?: string) => void;
@@ -104,7 +105,8 @@ export class Store {
     if (!res.ok) return;
     const json = await res.json();
     this.klassLektioner = json.lektioner ?? [];
-    this.klassOrd = new Set(this.klassLektioner.flatMap((l) => l.ord.filter((id) => this.byId.has(id))));
+    this.klassOrd = new Set(this.klassLektioner.filter((l) => l.klar)
+      .flatMap((l) => l.ord.filter((id) => this.byId.has(id))));
   }
 
   private async loadForms(baseUrl: string): Promise<void> {

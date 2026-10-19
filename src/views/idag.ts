@@ -333,11 +333,11 @@ function dashboardHtml(store: Store, cloud: CloudUi): string {
     </div>`;
 }
 
-/** Vilka ord passen tar: hela basen eller bara klassens. Visas bara när klasslistan finns. */
+/** Vilka ord passen tar: hela basen eller bara klassens. Visas när minst en lektion är klar. */
 function lageHtml(store: Store): string {
   if (store.klassOrd.size === 0) return "";
   const lage = store.data.settings.lage ?? "allt";
-  const traffade = [...store.klassOrd].filter((id) => store.card(id, "es2sv")).length;
+  const senast = store.klassLektioner.filter((l) => l.klar).slice(-1)[0]?.unidad ?? "";
   return `
     <div class="panel setting" style="display:block">
       <span class="t">Ord</span>
@@ -346,7 +346,7 @@ function lageHtml(store: Store): string {
         <button type="button" data-lage="klass" class="${lage === "klass" ? "on" : ""}">Klassen</button>
       </div>
       <span class="finstilt">${lage === "klass"
-        ? `Bara ord från lektionerna · ${traffade} av ${store.klassOrd.size} träffade hittills`
+        ? `Bara ord från lektionerna t.o.m. ${senast} · ${store.klassOrd.size} ord`
         : "Hela ordlistan, nya ord i frekvensordning"}</span>
     </div>`;
 }
