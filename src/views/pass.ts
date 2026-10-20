@@ -3,6 +3,7 @@ import { clearPass, loadPass, savePass } from "../lib/passpaus";
 import { Session, type Pending, type SessionState } from "../lib/session";
 import { STREAK_MAL } from "../lib/streak";
 import { dayKey } from "../lib/time";
+import { setCompactHold } from "../lib/viewport";
 import type { Social, FriendRule } from "../lib/social";
 import type { Store } from "../lib/store";
 import type { CardRec } from "../lib/types";
@@ -72,7 +73,7 @@ export class PassView {
             <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
           </button>
         </form>
-        <p class="vetinte" id="vetInte" hidden>
+        <p class="vetinte" id="vetInte" style="visibility:hidden">
           <button type="button" data-act="giveup">vet inte</button>
         </p>
       </div>`;
@@ -97,15 +98,15 @@ export class PassView {
     vetInte.addEventListener("pointerdown", keepFocus);
     vetInte.querySelector("button")!.addEventListener("click", () => this.onAction("giveup"));
 
-    // håll in kortet = paus (baren fryser), släpp = fortsätt
+    // håll in kortet = paus (baren fryser), släpp = fortsätt. Ett tryck på kortet
+    // tar aldrig fokus från svarsraden — då fälls mobiltangentbordet inte ihop
     this.card.addEventListener("pointerdown", (e) => {
       const t = e.target as HTMLElement;
       if (t.closest("button")) { e.preventDefault(); return; }
       if (t.closest("textarea,input,a")) return;
-      if (AUTO_STATES.includes(this.state)) {
-        e.preventDefault(); // tangentbordet ska inte fällas ihop
-        this.holdPause(true);
-      }
+      if (this.state === "idle") return;
+      e.preventDefault();
+      if (AUTO_STATES.includes(this.state)) this.holdPause(true);
     });
     const release = () => this.holdPause(false);
     this.card.addEventListener("pointerup", release);
@@ -117,6 +118,11 @@ export class PassView {
     });
     this.card.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
+      // har tangentbordet ändå fällts ihop tar ett tryck på kortet tillbaka det
+      if (this.state !== "idle" && this.state !== "forced" && !target.closest("button,textarea,input,a")) {
+        const a = document.activeElement;
+        if (a !== this.input && !(a instanceof HTMLTextAreaElement)) this.input.focus({ preventScroll: true });
+      }
       const sno = target.closest<HTMLElement>("[data-snoidx]");
       if (sno) {
         const rule = this.friendRules[Number(sno.dataset.snoidx)];
@@ -610,11 +616,12 @@ export class PassView {
       }, TIPS_MS);
     }
     this.el.querySelector<HTMLButtonElement>("#passExit")!.hidden = !this.live;
-    this.el.querySelector<HTMLElement>("#vetInte")!.hidden = this.state !== "question";
-    // tvingad minnesregel: svarsraden är död vikt (fokus bor i textrutan) —
-    // göm den så kortet får plats med regelfältet när tangentbordet är uppe
-    this.form.hidden = this.state === "forced";
+    // "vet inte" och svarsraden döljs utan att lämna sin plats — kortet ska inte
+    // byta storlek mellan lägena (tvingad minnesregel: fokus bor i textrutan)
+    this.el.querySelector<HTMLElement>("#vetInte")!.style.visibility = this.state === "question" ? "" : "hidden";
+    this.form.style.visibility = this.state === "forced" ? "hidden" : "";
     document.getElementById("app")?.classList.toggle("pass-live", this.live);
+    setCompactHold(this.live);
     if (s && this.state !== "idle") {
       // inga kösiffror: hur mycket man gjort idag, stapeln fylls mot streakens 20 rätt
       const idag = dayKey();
