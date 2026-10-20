@@ -264,7 +264,14 @@ export class PassView {
       this.pendingSno = null;
       this.state = p.forcedMnem ? "forced" : "wrong";
       this.render();
-      if (this.state === "forced") void this.loadFriendRules(p.word.id);
+      // fokus läggs tillbaka i samma tryck — annars fäller iOS ihop tangentbordet:
+      // svarsraden vid fel svar, regelrutan när en minnesregel krävs
+      if (this.state === "forced") {
+        this.focusMnem();
+        void this.loadFriendRules(p.word.id);
+      } else {
+        this.input.focus({ preventScroll: true });
+      }
       return;
     }
     if (act === "claim") {
